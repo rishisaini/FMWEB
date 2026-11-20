@@ -1,0 +1,227 @@
+﻿@using AssetCare.Model.ViewModels
+@model ReactiveRCTIReportViewModel
+@{
+    Layout = null;
+    var displayAMUConfirmedDate = "";
+}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicon.ico">
+    <title>Print RCTI- NSW Department of Education School Infrastructure SINSW FMWeb Maintenance System</title>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,600,700,800,900&amp;display=swap" rel="stylesheet">
+    <!-- Bootstrap Core CSS -->
+    <link href="~/theme2/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">   
+      <link href="~/theme2/css/style.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="~/theme2/css/colors/blue.css" id="theme" rel="stylesheet">
+    <link href="~/theme2/css/custom.css" rel="stylesheet">
+    <link href="~/theme2/css/responsive.css" rel="stylesheet">
+    <link href="~/theme2/css/woms.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body class="fix-header fix-sidebar card-no-border" style="color:#4C4C4C; line-height: 1;">
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <div class="preloader" style="display: none;">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+        </svg>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <div id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper" style="min-height: 380px;">
+            <div class="container-fluid">
+                <div class="row" style="display: flex; justify-content: center;">
+                    <div class="col-md-12">
+                        <div class="card card-body printableArea" style="border: none !important; ">
+                            <div class="card-header"><h3 class="text-center" style="font-family: Roboto; margin-bottom:-4px; font-weight:900; color:#ffffff;">Recipient Created Tax Invoice</h3></div>
+
+                            <div class="container-fluid">
+                                <div class="col-md-12">
+                                    <div class="row" style="background-image: url(@Url.Content("~/theme2/assets/images/invoice-bg.png")); background-repeat: no-repeat; ">
+                                        <div class="col-8 float-left">
+                                            <img style="margin-top:10px; max-height:64px;" src="~/theme2/assets/images/image001.png">
+                                            <h4 class="mt-2" style="font-family: Roboto; font-weight:600;">Department of Education NSW</h4>
+                                            <p class="mt-2" style="font-size: 15px;">ABN : 40 300 173 822</p>
+                                            <p class="mt-5" style="font-size: 15px;"><b>Date :</b> @Model.AMUApprovedDate.ToString("dd-MM-yyyy")</p>
+                                        </div>
+                                        <div class="col-4 float-right">
+                                            <img style="margin-top:17px; max-height:34px;" src="~/theme2/assets/images/FMWeb2-transperant-Logo.png">
+                                            <h4 class="mt-2" style="font-family: Roboto; font-weight:700;  text-align: left;"> DoE Asset Maintenance</h4>
+                                            <h4 class="mt-2" style="font-family: Roboto; font-weight:700; text-align: left;"> <span class="mr-2">Region:</span>@Model.ContractNo </h4>
+                                            <h4 class="mt-2" style="font-family: Roboto; font-weight:700; text-align: left;"><span style="font-weight:800; margin-right: 4px;">Region ID:</span> @Model.Contract </h4>
+                                            <h4 class="mt-2" style="font-family: Roboto; font-weight:800;"><span style="font-weight:800; margin-right: 4px;">Progress Payment No: </span> <span style="font-weight:800; color:#002664;"> @Model.WorkOrderNo </span></h4>
+                                            <h4 style="font-family: Roboto; font-weight:800;"><span style="font-weight:800; margin-right: 4px; margin-left: 0px;  text-align: left;">Category: </span> <span style="font-weight:800; color:#002664;"> @Model.WorkCategory</span></h4>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-7 pull-left text-left mt-3">
+                                            <address>
+                                                <h4 style="font-family: Roboto; ">To,</h4>
+                                                <h4 style="font-family: Roboto; font-weight:700;">@Model.SubContractorName</h4>
+                                                <p style="line-height: 1.5; font-size: 14px;">
+                                                    @Model.SubContractorPostalAddress                                                    
+                                                </p>
+                                                <p class="mt-2" style="font-size: 15px;">ABN : @Model.ContractorABN</p>
+                                            </address>
+                                        </div>
+                                        <div class="col-5">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="row">
+
+                                        <div class="col-xl-12 col-lg-12 ">
+                                            <div class="card inner-border-1" style="border-radius:25px !important;">
+
+
+                                                <div class="card-base">
+
+                                                    <div class="table-responsive m-t-0">
+                                                        <table id="myTable" class="display table nowrap table-hover display table-bordered table-striped dataTable">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width:10%; padding-left:10px !important; color:#002664 !important; font-size: 14px;">ID</th>
+                                                                    <th style="width:18%; padding-left:10px !important; color:#002664 !important; font-size: 14px;">Description</th>
+                                                                    <th style="width:18%; padding-left:10px !important; color:#002664 !important; font-size: 14px;">Rate</th>
+                                                                    <th style="width:18%; padding-left:10px !important; color:#002664 !important; font-size: 14px;">Quantity</th>
+                                                                    <th style="width:18%; padding-left:10px !important; color:#002664 !important; font-size: 14px;">Cost Adj %</th>
+                                                                    <th style="width:18%; padding-left:10px !important; color:#002664 !important; font-size: 14px;">Amount</th>
+
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @{
+                                                                    List<ReactiveRCTILineItems> lineItems = (List<ReactiveRCTILineItems>)ViewData["LineItems"];
+                                                                    if (lineItems != null)
+                                                                    {                                                                    
+                                                                        foreach (var lineItem in lineItems)
+                                                                        {
+                                                                            <tr>
+                                                                                <td>@lineItem.ID</td>
+                                                                                <td style="padding-left:10px !important; height: 30px;">@lineItem.Description</td>
+                                                                                <td style="text-align:right; padding-right:100px">$ @lineItem.Rate.ToString("0.00") </td>
+                                                                                <td style="text-align:right; padding-right:100px">@lineItem.Quantity.ToString("0.00")</td>
+                                                                                <td style="text-align:right; padding-right:100px">@lineItem.CostAdjPercent.ToString("0.00")</td>
+                                                                                <td style="text-align:right; padding-right:100px">$ @lineItem.Amount.ToString("0.00")</td>
+
+                                                                            </tr>
+                                                                        }                                                              
+                                                                    }
+                                                                }
+                                                            </tbody>
+
+                                                        </table>
+
+                                                        <table class="display table nowrap table-hover display table-bordered table-striped dataTable">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="75%" colspan="3" style="padding-left:10px !important; color:#002664 !important; font-size: 14px;">Claimed Amount </th>
+                                                                    <th width="25%" style="padding-left:10px !important; color:#002664 !important; font-size: 14px;text-align:right; padding-right:100px">@Model.ClaimValue.ToString("C")</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th colspan="3" style="padding-left:10px !important; color:#002664 !important; font-size: 14px;">Claimed GST</th>
+                                                                    <th style="padding-left:10px !important; color:#002664 !important; font-size: 14px;text-align:right; padding-right:100px">@Model.ClaimGST.ToString("C")</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="75%" colspan="3" style="padding-left:10px !important; color:#002664 !important; font-size: 18px; background: #eaeaea !important;">Total Claimed</th>
+                                                                    <th width="25%" style="padding-left:10px !important; color:#002664 !important; font-size: 18px;  background: #eaeaea !important;text-align:right; padding-right:100px"><strong>@Model.ClaimValueGrandTotal.ToString("C")</strong></th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+
+                                                        <table class="display table nowrap table-hover display table-bordered table-striped dataTable">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="75%" colspan="3" style="padding-left:10px !important; color:#002664 !important; font-size: 14px;">Approved </th>
+                                                                    <th width="25%" style="padding-left:10px !important; color:#002664 !important; font-size: 14px;text-align:right; padding-right:100px">@Model.ApprovedValue.ToString("C")</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th colspan="3" style="padding-left:10px !important; color:#002664 !important; font-size: 14px;">Approved GST</th>
+                                                                    <th style="padding-left:10px !important; color:#002664 !important; font-size: 14px;text-align:right; padding-right:100px">@Model.ApprovedGST.ToString("C")</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th width="75%" colspan="3" style="padding-left:10px !important; color:#002664 !important; font-size: 18px; background: #eaeaea !important;">Total Approved</th>
+                                                                    <th width="25%" style="padding-left:10px !important; color:#002664 !important; font-size: 18px;  background: #eaeaea !important;text-align:right; padding-right:100px"><strong>@Model.ApprovedValueGrandTotal.ToString("C")</strong></th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <div class="clearfix"></div>
+                                        <div class="container-fluid mt-5 mb-5">
+                                            <div class="row">
+                                                <div class="col-md-7">
+                                                </div>
+                                                <div class="col-md-5">
+                                                    <h4 class="mt-2 mb-3" style="font-family: Roboto; font-weight:700; text-align: left;"> Approved By. </h4>
+                                                    @Model.SignedName
+                                                    <h4 class="mt-2 mb-5" style="font-family: Roboto; font-weight:700; text-align: left;">Asset Management Unit </h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p>Total GST shown on this Recipient Created Tax Invoice (RCTI) is payable by the supplier.</p>
+                                </div>
+
+                                <hr class="mt-5">
+                                <div class="text-right">
+                                    <button id="print" class="btn btn-outline-info" type="button" onclick="javascript:print()"> <span><i class="fa fa-print"></i> Print</span> </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Container fluid  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- End Page wrapper  -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Wrapper -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- All Jquery -->
+    <!-- ============================================================== -->
+</body>
+</html>

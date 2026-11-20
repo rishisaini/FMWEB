@@ -1,0 +1,676 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Helpers
+
+
+<input type="hidden" id="ExpectedVisitDateTime" />
+<div class="p-20">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mt-2">
+                <div class="col-xl-6 col-lg-6 mtm-10">
+                    <div class="card inner-border-1">
+                        <div class="card-base mbm-0 mtmx-0 white-bg">
+                            <div class="row" style="margin-top:0px;">
+                                <div class="col-md-6 mtp-12" style="margin-top:-4px;">
+                                    <label><strong>Local Contractor:</strong></label>
+                                    <label>@Model.DetailsTab.SubContractorName</label>
+                                </div>
+                                <div class="col-md-6 mtp-12">
+                                    <label><i class="fa fa-envelope fa-color"></i> <strong> Email: </strong></label> <label> <a href="#"><strong>@Model.DetailsTab.SubContractorEmail</strong></a> </label>
+                                </div>
+                            </div>
+
+                            <div class="row label-bdr-wo" style="margin-top:0px;">
+                                <div class="col-md-6 mtp-12">
+                                    <label><i class="fa fa-envelope fa-user"></i> <strong> Contact Person: </strong></label> <label>@Model.DetailsTab.SubContractorContactPersonName</label>
+                                </div>
+                                <div class="col-md-6 mtp-12">
+                                    <label><i class="fa fa-phone fa-color fa-color"></i> <strong> Mobile: </strong></label> <label> <a href="#"><strong>@Model.DetailsTab.SubContractorMobile</strong></a> </label>
+                                </div>
+                            </div>
+                            <div class="row label-bdr-wo" style="margin-top:0px;">
+                                <div class="col-md-6 mtp-12 ">
+                                    <label> <strong>Local Contractor Status: </strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                    <div class="form-group">
+                                        <span>
+                                            <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                @Html.RadioButtonFor(m => m.DetailsTab.SubContractorAccepted, "True", new RouteValueDictionary(new { @id = "subContrYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("detailSection", "SubContractorAccepted"), "disabled", "disabled"))
+                                                <label for="subContrYes" style="margin-right:10px; font-size:14px; font-weight: 500 !important;">Accepted</label>
+                                                @Html.RadioButtonFor(m => m.DetailsTab.SubContractorAccepted, "False", new RouteValueDictionary(new { @id = "subContrNo", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("detailSection", "SubContractorAccepted"), "disabled", "disabled"))
+                                                <label for="subContrNo" style="font-size:14px; font-weight: 500 !important;">Rejected</label>
+                                            </span>
+                                        </span>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-md-6 mtp-12">
+                                    <label> <strong> Expected Visit Date and Time: </strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                    <div class="input-group">
+
+                                        @Html.EditorFor(m => m.DetailsTab.ExpectedVisitDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+                                           @Value = ((Model.DetailsTab.ExpectedVisitDate.HasValue) ? Model.DetailsTab.ExpectedVisitDate.Value.ToString("dd/MM/yyyy") : ""),
+                                           @id = "ExpectedVisitDate",
+                                       }).AddIf(Model.DisableField("detailSection", "ExpectedVisitDate"), "disabled", "disabled")
+                                   })
+                                        @{
+                                            if (Model.DisableField("detailSection", "ExpectedVisitDate"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.ExpectedVisitDate)
+                                                @Html.HiddenFor(x => x.DetailsTab.ExpectedFirstVisitTime)
+
+                                            }
+                                            @Html.HiddenFor(m => m.DetailsTab.LoggedInUser)
+                                        }
+                                        <div class="input-group-append datepicker-control-sibling" style="height: 35px;">
+                                            <span class="input-group-text mr-2" id="basic-addon1">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+
+                                        <div class="sm-1">
+                                            <div class="row ml-2 date" data-target-input="nearest">
+                                                @{
+                                                    @Html.EditorFor(m => m.DetailsTab.ExpectedFirstVisitTime, new
+                                                    {
+                                                        htmlAttributes = new RouteValueDictionary(new
+                                                        {
+                                                            @placeholder = "HH:mm",
+                                                            @class = "form-control datetimepicker-input",
+                                                            @Value = ((Model.DetailsTab.ExpectedVisitDate.HasValue) ? (Model.DetailsTab.ExpectedFirstVisitTime.HasValue ? Model.DetailsTab.ExpectedFirstVisitTime.Value.ToString("HH:mm tt") : "") : ""),
+                                                            @id = "txtExpectedVisitTime",
+                                                            @style = "width:80px",
+                                                            @type = "text"
+                                                        }).AddIf(Model.DisableField("detailSection", "ExpectedFirstVisitTime"), "disabled", "disabled")
+                                                    })
+
+                                                    if (Model.DisableField("detailSection", "ExpectedFirstVisitTime"))
+                                                    {
+                                                        <button type="button" class="btn btn-info h-32" style="margin-left:5px" readonly><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;" readonly></i></button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-info h-32" id="btnSetCurrentExpectedVisitDate" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @{
+                                        if (!Model.DisableField("detailSection", "ExpectedVisitDate"))
+                                        {
+                                            @Html.ValidationMessageFor(x => x.DetailsTab.ExpectedVisitDate)
+                                        }
+                                    }
+
+                                    <br />
+                                    @{
+                                        if (!Model.DisableField("detailSection", "ExpectedFirstVisitTime"))
+                                        {
+                                            @Html.ValidationMessageFor(x => x.DetailsTab.ExpectedFirstVisitTime)
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 ">
+                    <div class="card inner-border-1">
+                        <div class="card-base mbm-0 mtmx-0 white-bg">
+                            <div class="row " style="margin-top:0px;">
+                                <div class="col-md-6 mtp-12">
+                                    <label><strong>First Visit Date</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.DetailsTab.FirstVisitDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+                                           @Value = ((Model.DetailsTab.FirstVisitDate.HasValue) ? Model.DetailsTab.FirstVisitDate.Value.ToString("dd/MM/yyyy") : ""),
+                                           @id = "FirstVisitDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("detailSection", "FirstVisitDate"), "disabled", "disabled")
+                                   })
+
+                                        @{
+                                            if (Model.DisableField("detailSection", "FirstVisitDate"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.FirstVisitDate)
+                                            }
+                                        }
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height:33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                    @Html.ValidationMessageFor(x => x.DetailsTab.FirstVisitDate)
+                                </div>
+                                <div class="col-md-6 ed-2">
+                                    <label><strong>Estimated Completion Date</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.DetailsTab.EstimatedCompletionDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+                                           @Value = ((Model.DetailsTab.EstimatedCompletionDate.HasValue) ? Model.DetailsTab.EstimatedCompletionDate.Value.ToString("dd/MM/yyyy") : ""),
+                                           @id = "EstimatedCompletionDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("detailSection", "EstimatedCompletionDate"), "disabled", "disabled")
+                                   })
+
+                                        @{
+                                            if (Model.DisableField("detailSection", "EstimatedCompletionDate"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.EstimatedCompletionDate)
+                                            }
+                                        }
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height: 33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                    @Html.ValidationMessageFor(x => x.DetailsTab.EstimatedCompletionDate)
+                                </div>
+
+
+                            </div>
+
+                            <div class="row" style="margin-top:0px;">
+                                <div class="col-md-6 ed-2 mt-3">
+                                    <label><strong>Date All Work Completed</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.DetailsTab.CompletedDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+                                           @Value = ((Model.DetailsTab.CompletedDate.HasValue) ? Model.DetailsTab.CompletedDate.Value.ToString("dd/MM/yyyy") : ""),
+                                           @id = "CompletedDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("detailSection", "CompletedDate"), "disabled", "disabled")
+                                   })
+
+                                        @{
+                                            if (Model.DisableField("detailSection", "CompletedDate"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.CompletedDate)
+                                            }
+                                        }
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height:33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                    @Html.ValidationMessageFor(x => x.DetailsTab.CompletedDate)
+                                </div>
+                                <div class="col-md-6 mtp-12 mt-3">
+                                    <label><strong>WO Status</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                    <div class="form-group" style="margin-top:-5px">
+                                        @Html.DropDownListFor(x => x.DetailsTab.ServiceReportStatusId,
+                                        new SelectList((List<SelectListItem>)ViewData["JobStatus"], "Value", "Text"), "---Select---",
+                                        new RouteValueDictionary(new { @class = "custom-select", @id = "ServiceReportStatusSelectList" }).AddIf(Model.DisableField("detailSection", "ServiceReportStatusId"), "disabled", "disabled"))
+                                        @Html.ValidationMessageFor(x => x.DetailsTab.ServiceReportStatusId)
+                                        @{
+                                            if (Model.DisableField("detailSection", "ServiceReportStatusId"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.ServiceReportStatusId)
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--- AssignTradie -->
+                <div class="row">
+                        <div class="col-12">
+                            <div class="card" style="border: 4px solid #d1def3;">
+                                <div class="row">
+                                    <div class="col-6 ml-5 mt-2">
+                                        <div class="form-horizontal form-group row">
+                                            <label class="text-left  mt-2 ml-0"><strong>Assign Trades Person: </strong> <span id="tradieRequiredStar" style="color:#d7153a; display:none;">*</span></label>
+                                            <div class="pl-0">
+                                                @Html.DropDownListFor(
+             x => x.DetailsTab.AssignedTradies,
+             Model.TradieSelectList.Select(x => new SelectListItem { Value = x.ID.ToString(), Text = x.FirstName + " " + x.LastName }), "-- Select Tradie --", new RouteValueDictionary(new
+        {
+        id = "tradieSelect",
+        @class = "form-control custom-select",
+        style = "min-width:240px",
+                 databackenddisabled = Model.DisableField("detailSection", "TradieSelectList")
+             }).AddIf(Model.DisableField("detailSection", "TradieSelectList"), "disabled", "disabled")
+         )
+
+                                            </div>
+                                            <span id="tradieValidationMessage" class="text-danger" style="display:none;"></span>
+                                            <label class="text-danger" id="tradieLockMessage"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row ml-1 mr-1">
+                                    <div class="col-xl-12 col-lg-12">
+                                        <div class="card " id="tradieDetailCard" style="display:none;">
+
+                                            <div class="card-header" style="height:44px; background: #e7f5f9;">
+                                                <span class="float-left mt-1 ml-1"><<label style="font-size:14px;  color:#002664;" id="TradieFullName" /></span>
+                                                <span class="float-left mt-1 ml-1"><label style="color:#1e88e5; font-weight: 700; " id="ID" /></span>
+                                                <span class="float-left mt-1 ml-1"><label style="color:#1e88e5; font-weight: 700; " id="UserCode" /></span>
+                                                <span class="float-left ml-1">
+                                                    <button type="button" class="btn btn-info btn-sm btn-rounded align-self-center" data-toggle="modal" data-target="#InfoModal39" style="vertical-align: middle; border: none; box-shadow: none;  padding-bottom: 2px; padding-top: 2px; font-weight: 600; background: #009efb; " id="btnAddTradie">
+                                                        <i class="fa fa-plus-circle" style="font-weight: 600;"></i> Add Tradie
+                                                    </button>
+                                                </span>
+                                                <span class="float-right align-self-center mtp-1200-5" style="margin-top: -8px;">
+                                                </span>
+                                            </div>
+                                            <div class="card-base white-bg m-3">
+
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="col-1 float-left pr-2"><img id="ProfileImage" src="" style="border-radius: 50%;object-fit: cover;" width="100" height="100" alt=""></div>
+                                                        <div class="col-lg-3 col-sm-12 float-left">
+                                                            <div class="form-group">
+                                                                <label class="mt-2"><i class="fa fa-envelope"></i> <strong> Email:</strong> <span id="Email"></span></label><br>
+                                                                <label class="mt-2"><i class="fa fa-phone"></i> <strong> Contact:</strong> <span id="Contact"></span></label><br>
+                                                                <label class="mt-2"><i class="fa fa-map"></i> <strong> State / Postcode: </strong><span id="StatePostCode"></span></label>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-3 col-sm-12 float-left ">
+                                                            <div class="form-group">
+                                                                <label class="mt-2"> <strong> Tradie Service Type:</strong> <span id="ServiceType"></span></label><br>
+                                                                <label class="mt-2"><strong> Local Contractor:</strong> <span id="localContractorName"></span></label><br>
+                                                                <label class="mt-2"><strong> Contractor Type: </strong><span id="localContractorType"></span> Type</label>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-3 col-sm-12 float-left ">
+                                                            <div class="form-group">
+                                                                <label class="mt-2"> <strong> Licence Number:</strong> <span id="LicenseNumber"></span></label><br>
+                                                                <label class="mt-2"><strong> Licence Issue:</strong> <span id="LicenceIssue"></span></label><br>
+                                                                <label class="mt-2"><strong> Licence Expiry: </strong><span id="LicenceExpiry"></span></label>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-2 col-sm-12 float-left">
+                                                            <div class="form-group">
+                                                                <label class="mt-2"> <strong>NTBEL Check:</strong></label> <span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4" id="NTBEL"><i class="fa fa-check-square"></i> Yes</span><br>
+                                                                <label class="mt-2"><strong>WWCC Check:</strong></label> <span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4" id="WWCC"><i class="fa fa-check-square"></i> Yes</span><br>
+                                                                <label class="mt-2"><strong>NCCHC:: </strong></label> <span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4" id="NPC"><i class="fa fa-check-square"></i> Yes</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mtm-10 ml-1 mr-1">
+                                    <div class="col-12">
+                                        <div class="card card-border">
+                                            <div class="card-header"><strong>Trades Person List</strong></div>
+                                            <div class="card-base">
+                                                <div class="table-responsive m-t-0" style="margin-top:-14px;">
+                                                    <table id="tradieGrid" class="display table nowrap table-hover display table-bordered table-striped dataTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">Actions</th>
+                                                                <th>User Name</th>
+                                                                <th>First Name</th>
+                                                                <th>Last Name</th>
+                                                                <th>Mobile</th>
+                                                                <th>Licence No.</th>
+                                                                <th>Licence Expiry</th>
+                                                                <th>Assigned Date</th>
+                                                                <th>NTBEL</th>
+                                                                <th>WWCC</th>
+                                                                <th>NCCHC</th>
+
+                                                                <th>Check In Time</th>
+                                                                <th>Check Out Time</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var a in Model.DetailsTab.AssignedTradies)
+                                                            {
+                                                                <tr data-id="@a.ID">
+                                                                    <td class="text-center">
+                                                                        @if (!Model.DisableField("detailSection", "TradieSelectList"))
+                                                                        {
+                                                                            <button type="button" class="btn  btn-sm remove-tradie" style="color: #e8984b; font-size: 14px; padding: 2px;"><i class="fa fa-trash"></i></button>
+                                                                        }
+                                                                    </td>
+                                                                    <td>@a.UserCode</td>
+                                                                    <td>@a.FirstName </td>
+                                                                    <td>@a.LastName</td>
+                                                                    <td>@a.Mobile</td>
+                                                                    <td>@a.LicenseNumber</td>
+                                                                    <td>@(a.LicenseExpiryDate?.ToString("dd-MM-yyyy"))</td>
+                                                                    <td> @(a.CreatedDate?.ToString("dd-MM-yyyy")) </td>
+                                                                    <td>
+                                                                        @if (a.NTBELCheck == true)
+                                                                        {<span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4"><i class="fa fa-check-square"></i><span>Yes</span></span> }
+                                                                        else
+                                                                        {<span class="badge badge - pill " style="background - color: #ffffe0; color: orangered; border: 1px dotted orangered"><i class="fa fa-window-close"></i> No</span>}
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (a.WWCCCheck == true)
+                                                                        {<span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4"><i class="fa fa-check-square"></i><span>Yes</span></span> }
+                                                                        else
+                                                                        {<span class="badge badge - pill " style="background - color: #ffffe0; color: orangered; border: 1px dotted orangered"><i class="fa fa-window-close"></i> No</span>}
+                                                                    </td>
+                                                                    <td>
+                                                                        @if (a.PoliceCheck == true)
+                                                                        {<span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4"><i class="fa fa-check-square"></i><span>Yes</span></span> }
+                                                                        else
+                                                                        {<span class="badge badge - pill " style="background - color: #ffffe0; color: orangered; border: 1px dotted orangered"><i class="fa fa-window-close"></i> No</span>}
+                                                                    </td>
+
+                                                                    <td>@(a.CheckIn?.ToString("dd-MM-yyyy hh:mm tt"))  </td>
+                                                                    <td>@(a.CheckOut?.ToString("dd-MM-yyyy hh:mm tt"))  </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <input type="hidden" name="DetailsTab.OriginalAssignedTradieIds" id="OriginalAssignedTradieIds" value="@Model.DetailsTab.OriginalAssignedTradieIds" />
+                <input type="hidden" name="DetailsTab.AssignedTradieIds" id="DetailsTab_AssignedTradieIds" value="@Model.DetailsTab.AssignedTradieIds" />
+            <!--end AssignTradie -->
+            <div class="row mt-2">
+                <div class="col-xl-12 col-lg-12">
+                    <div class="card inner-border-1">
+                        <div class="card-base mtmx-0 white-bg" style="margin-left:-7px; ">
+                            <div class="row" style="margin-top:0px;">
+                                <div class="col-md-12 mtp-12" style="margin-top:-4px;">
+                                    <label><strong>Local Contractor Comments ( 1000 Characters)</strong></label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(x => x.DetailsTab.SubContractorComments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", style = "height: 98px !important;", maxlength = 1000 }).AddIf(Model.DisableField("detailSection", "SubContractorComments"), "disabled", "disabled"))
+                                        @{
+                                            if (Model.DisableField("detailSection", "SubContractorComments"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.SubContractorComments)
+                                            }
+                                        }
+                                        @Html.ValidationMessageFor(x => x.DetailsTab.SubContractorComments)
+                                    </div>
+
+                                </div>
+                            </div>
+                            @if (!Model.IsAMURegion)
+                            {
+                                <div class="row" style="margin-top:0px;">
+                                    <div class="col-md-12 mtp-12" style="margin-top:-4px;">
+                                        <label><strong>FMC Comments/Scope ( 1000 Characters)</strong></label>
+                                        <div class="form-group">
+                                            @Html.TextAreaFor(x => x.DetailsTab.Comments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", style = "height: 98px !important;", maxlength = 1000 }).AddIf(Model.DisableField("detailSection", "Comments"), "disabled", "disabled"))
+                                            @{
+                                                if (Model.DisableField("detailSection", "Comments"))
+                                                {
+                                                    @Html.HiddenFor(x => x.DetailsTab.Comments)
+                                                }
+                                            }
+                                            @Html.ValidationMessageFor(x => x.DetailsTab.Comments)
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div class="row" style="margin-top:0px;">
+                                <div class="col-md-12 mtp-12" style="margin-top:-4px;">
+                                    <label><strong>ASO Comments ( 1000 Characters)</strong></label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(x => x.DetailsTab.AMUComments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", style = "height: 98px !important;", maxlength = 997 }).AddIf(Model.DisableField("detailSection", "AMUComments"), "disabled", "disabled"))
+                                        @{
+                                            if (Model.DisableField("detailSection", "AMUComments"))
+                                            {
+                                                @Html.HiddenFor(x => x.DetailsTab.AMUComments)
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" id="confirm" role="dialog" aria->
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #002664;">
+                <h4 class="modal-title" style=" color:white !important;" id="bs-example-modal-lg">Local Contractor Agreement</h4>
+                <button type="button" style="color:white;" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card" style="border:none;">
+                            <div class="card-base" style="padding:15px;">
+                                <div class="col-12">
+                                    <input type="checkbox" id="chkCondition1" class="custom-control-input">
+                                    <label style="font-size:16px; margin-top:2px; margin-left:8px; margin-bottom: 0px !important; line-height: 1.2;" for="chkCondition1">By ticking this you acknowledge receipt of site-specific asbestos register.</label>
+
+                                </div>
+                                <div class="col-12" style="margin-top:18px;">
+                                    <input type="checkbox" id="chkCondition2" class="custom-control-input">
+                                    <label style="font-size:16px; margin-top:2px; margin-left:8px; margin-bottom: 0px !important; line-height: 1.2;" for="chkCondition2">By ticking this you are confirming that it has been read and understood by all staff members working on this order.</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top:-24px;">
+                <button class="btn btn-info waves-effect waves-light" type="button" id="btnconfirm" disabled><span class="btn-label"><i class="fa fa-paper-plane"></i></span>Submit </button>
+                <button type="button" id="popupCancel" class="btn btn-default waves-effect waves-light"><span class="btn-label"><i class="fa fa-eraser"></i></span>Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Start AssignTradie
+   
+    $(document).ready(function () {
+        var tradieList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.TradieSelectList));
+        let selectedTradieslist = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.DetailsTab.AssignedTradies));
+        let selectedTradie = null;
+
+        function updateSelectedList() {
+            let ids = [];
+            $("#tradieGrid tbody tr").each(function () {
+                ids.push($(this).data("id"));
+            });
+            $("#DetailsTab_AssignedTradieIds").val(ids.join(","));
+        }
+
+        function updateExpectedVisitDateTime() {
+            var date = $("#ExpectedVisitDate").val();
+            var time = $("#txtExpectedVisitTime").val();
+
+            if (!date || !time) {
+                $("#ExpectedVisitDateTime").val("");
+                return;
+            }
+
+            var parts = date.split("/");
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10) - 1;
+            var year = parseInt(parts[2], 10);
+
+            var t = time.split(":");
+            var hour = parseInt(t[0], 10);
+            var minute = parseInt(t[1], 10);
+
+            var visitTime = new Date(year, month, day, hour, minute, 0);
+            $("#ExpectedVisitDateTime").val(visitTime.toISOString());
+            if ($('#subContrYes').is(':checked')) {
+                checkIfTradieRemovable(visitTime);
+            }
+        }
+
+        // Show tradie detail card
+    $("#tradieSelect").change(function () {
+        let id = $(this).val();
+        if (!id) {
+            $("#tradieDetailCard").hide();
+            selectedTradie = null;
+            return;
+        }
+        selectedTradie = tradieList.find(x => x.ID == id);
+
+        var urlRoot = "@Url.Content("~")";
+        $("#TradieFullName").text(selectedTradie.FirstName + " " + selectedTradie.LastName);
+        $("#ID").text("(ID: " + selectedTradie.ID + ")");
+        $("#UserCode").text("(User Name: " + selectedTradie.UserCode + ")");
+         //  $("#Active").html(selectedTradie.Active ? '<i class="fa fa-color fa-check-circle mr-1"></i>Active' : '<i class="fa fa-color fa-window-close mr-1"></i>Inactive');
+       // $("#Compliant").html(selectedTradie.Compliant ? '<i class="fa fa-color fa-check-circle mr-1"></i>Compliant' : '<i class="fa fa-color fa-window-close mr-1"></i>Not Compliant');
+        $("#ProfileImage").attr('src', ((urlRoot != "/") ? urlRoot : "") +  (selectedTradie.PictureUrl != null ? selectedTradie.PictureUrl : "/theme2/assets/images/213.png")) ;
+
+            $("#Email").text(selectedTradie.Email);
+            $("#Contact").text(selectedTradie.Mobile);
+            $("#StatePostCode").text(selectedTradie.State != null ? selectedTradie.State : "" + " " + selectedTradie.PostCode != null ? selectedTradie.PostCode : "" );
+            $("#ServiceType").text(selectedTradie.ServiceType);
+            $("#LicenseNumber").text(selectedTradie.LicenseNumber!= null ? selectedTradie.LicenseNumber: "");
+            $("#LicenceIssue").text(selectedTradie.LicenseStartDate != null ? moment(selectedTradie.LicenseStartDate).format('DD-MM-YYYY') : "");
+            $("#ContractorType").text(selectedTradie.ContractorType);
+            $("#LicenceExpiry").text(selectedTradie.LicenseExpiryDate != null ? moment(selectedTradie.LicenseExpiryDate).format('DD-MM-YYYY') : "");
+        $("#NTBEL").html(selectedTradie.NTBELCheck ? '<i class="fa fa-check-square"></i> Yes' : '<i class="fa fa-window-close"></i> No');
+        $("#WWCC").html(selectedTradie.WWCCCheck ? '<i class="fa fa-check-square"></i> Yes' : '<i class="fa fa-window-close"></i> No');
+        $("#NPC").html(selectedTradie.PoliceCheck ? '<i class="fa fa-check-square"></i> Yes' : '<i class="fa fa-window-close"></i> No');
+            $("#ServiceType").text(selectedTradie.TradieServiceTypeOptionNames);
+
+
+            $("#localContractorName").text(selectedTradie.LocalContractorName != null ? selectedTradie.LocalContractorName : "");
+            $("#localContractorType").text(selectedTradie.LocalContractorTypeName != null ? selectedTradie.LocalContractorTypeName : "");
+
+            $("#tradieDetailCard").show();
+        });
+
+        // Add tradie to the grid
+     $("#btnAddTradie").click(function (event) {
+            event.preventDefault();
+
+            if (!selectedTradie) return;
+
+        $("#tradieGrid tbody").append(`<tr data-id="${selectedTradie.ID}">
+        <td class="text-center"><button type="button" class="btn  btn-sm remove-tradie" style="color: #e8984b; font-size: 14px; padding: 2px;"><i class="fa fa-trash"></i></button></td>
+        <td>${selectedTradie.UserCode} </td>
+        <td>${selectedTradie.FirstName} </td>
+        <td> ${selectedTradie.LastName}</td>
+        <td>${selectedTradie.Mobile}</td>
+        <td>${selectedTradie.LicenseNumber}</td>
+         <td>${selectedTradie.LicenseExpiryDate != null ? moment(selectedTradie.LicenseExpiryDate).format('DD-MM-YYYY') : ""}</td>
+         <td>${selectedTradie.CreatedDate != null ? moment(selectedTradie.CreatedDate).format('DD-MM-YYYY') : ""}</td>
+        <td>${selectedTradie.NTBELCheck ? '<span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4"><i class="fa fa-check-square"></i><span> Yes</span></span>' : '<span class="badge badge - pill " style="background - color: #ffffe0; color: orangered; border: 1px dotted orangered"><i class="fa fa-window-close"></i> No</span>'}</td>
+        <td>${selectedTradie.WWCCCheck? '<span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4"><i class="fa fa-check-square"></i><span> Yes</span></span>': '<span class="badge badge - pill " style="background - color: #ffffe0; color: orangered; border: 1px dotted orangered"><i class="fa fa-window-close"></i> No</span>'}</td>
+        <td>${selectedTradie.PoliceCheck? '<span class="badge badge-pill " style="background-color: #e0ffff; color: darkblue; border:1px dotted #667EB4"><i class="fa fa-check-square"></i><span> Yes</span></span>': '<span class="badge badge - pill " style="background - color: #ffffe0; color: orangered; border: 1px dotted orangered"><i class="fa fa-window-close"></i> No</span>'}</td>
+        <td>${selectedTradie.CheckIn != null ? moment(selectedTradie.CheckIn).format('DD-MM-YYYY') : ""}</td>
+        <td>${selectedTradie.CheckOut != null ? moment(selectedTradie.CheckOut).format('DD-MM-YYYY') : ""}</td>
+    </tr>`);
+
+            $("#tradieSelect option[value='" + selectedTradie.ID + "']").remove();
+
+            $("#tradieDetailCard").hide();
+            $("#tradieSelect").val("");
+            selectedTradieslist.push(selectedTradie);
+            updateSelectedList();
+            updateExpectedVisitDateTime();
+
+            var hasTradies = $("#tradieGrid tbody tr").length > 0;
+            if (hasTradies) {
+                $("#tradieValidationMessage").hide().text("");
+            }
+
+        });
+
+     // Remove from grid and restore dropdown
+        $("#tradieGrid").on("click", ".remove-tradie", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            let row = $(this).closest("tr");
+            let id = row.data("id");
+            let tradie = selectedTradieslist.find(x => x.ID == id);
+
+            $("#tradieSelect").append(`<option value="${tradie.ID}">${tradie.FirstName} ${tradie.LastName}</option>`);
+            selectedTradieslist = selectedTradieslist.filter(x => x.ID != id);
+            tradieList.push(tradie);
+            row.remove();
+
+            updateSelectedList();
+        });
+
+        $('#ExpectedVisitDate').change(function () {
+            updateExpectedVisitDateTime();
+        });
+
+        $('#txtExpectedVisitTime').change(function () {
+            updateExpectedVisitDateTime();
+        });
+
+    function checkIfTradieRemovable(visitTimeFromInput){
+        var tradieSelect = $("#tradieSelect");
+        var tradieListLockBeforeHours = parseInt(@ViewData["tradieListLockBeforeHours"], 10) ;
+
+            var visitTime;
+            if (visitTimeFromInput instanceof Date) {
+                visitTime = visitTimeFromInput;
+            } else {
+                var saved = $("#ExpectedVisitDateTime").val();
+                if (!saved) return;
+                visitTime = new Date(saved);
+            }
+
+            var now = new Date();
+            var diffMs = visitTime - now;
+        var diffHours = diffMs / (1000 * 60 * 60);
+        if (diffHours <= tradieListLockBeforeHours && $("#OriginalAssignedTradieIds").val() !== '') {
+                $("#tradieGrid .remove-tradie").prop("disabled", true).css("opacity", "0.4").css("cursor", "not-allowed");              $("#tradieSelect").prop("disabled", true);
+            $("#tradieLockMessage").html("Tradie list is locked before " + tradieListLockBeforeHours +"hrs of expected visit date and time.")
+            } else {
+                if (tradieSelect.attr("databackenddisabled") === "False") {
+                    $("#tradieGrid .remove-tradie").prop("disabled", false).css("opacity", "1").css("cursor", "pointer");
+                    $("#tradieSelect").prop("disabled", false);
+                }
+                $("#tradieLockMessage").html("")
+            }
+        }
+    updateExpectedVisitDateTime();
+
+    });
+   // End AssignTradie
+</script>
+

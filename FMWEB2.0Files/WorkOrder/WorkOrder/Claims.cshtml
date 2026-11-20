@@ -1,0 +1,368 @@
+﻿@using AssetCare.Model.ViewModels
+@using AssetCare.Model.Models
+@using AssetCare.Common
+@using AssetCare.Helpers
+@model WorkOrderCertifyViewModel
+
+<div class="container-fluid">
+    <!-- quick tip start div -->
+    <div class="row tips">
+        <div class="col-12">
+            <div class="card" style="background-color: #009efb;">
+                <div class="col-12">
+
+                    <div style="background: white; padding:8px; border-radius:20px;">
+                        <span style="background-color:#002664; border-radius:18px; margin-left:-6px; padding:2px; color: white !important;"><i class="fa fa-lightbulb"></i><strong> Search Tips: </strong></span>
+                        &nbsp; <span style="color: #007bff; line-height: 20px;">
+                            Search column, except columns with * requires a minimum of 3 characters in the search field.
+                        </span>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- quick tip end div -->
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    @using (Html.BeginForm("Claims", "WorkOrder", FormMethod.Post, new { id = "frmClaims" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row" style="margin-top:-8px;">
+            <div class="col-12">
+                <div class="card white-bg">
+
+                    <div class="row">
+                        <div class="col-12 float-right">
+                            <div class="col-lg-6 col-sm-12 float-left">
+
+                                <h4><strong>Reactive Payment Claims</strong></h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item float-left"><a href="@Url.Action("Index", "Home" , new { Area="" })">Home</a></li>
+                                    <li class="breadcrumb-item float-left"><a href="#">Work Order</a></li>
+                                    <li class="breadcrumb-item float-left"><a href="#">Payment Claims</a></li>
+                                    <li href="#" class="breadcrumb-item active">Reactive Payment Claims</li>
+                                </ol>
+                            </div>
+                            <div class="col-lg-6 col-sm-12 float-right" style="text-align:right;">
+                                @{
+                                    var cancelUrl = "/";
+                                    if (string.IsNullOrEmpty(Model.CallbackUrl))
+                                    {
+                                        cancelUrl = Url.Action("Index", "Home", new { area = "" });
+                                    }
+                                    else
+                                    {
+                                        cancelUrl = Model.CallbackUrl;
+                                    }
+                                }
+
+                                @{
+                                    if (!Model.DisableField("mainSection", "SubContractorId"))
+                                    {
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" id="btnSearch" type="button"><span class="top-btn-label"><i class="fa fa-eye"></i></span>Review Items</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="button" disabled><span class="top-btn-label"><i class="fa fa-eye"></i></span>Review Items</button>
+                                    }
+                                }
+
+                                <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="button" onclick="cancelButtonClicked(event,'@cancelUrl')"><span class="top-btn-label"><i class="fa fa-eraser"></i></span>Cancel</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-bottom:15px!important">
+            <div class="col-lg-6">
+                @Html.Partial("_QuickHelp", Model)
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:-8px;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Select options</strong>
+                    </div>
+                    <div class="card-base" style="margin-bottom:-5px; margin-left:-7px;">
+                        <div class="row" style="margin-left:-5px;">
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Local Contractor</strong></label>
+                                    @Html.DropDownListFor(x => x.SubContractorId, (IEnumerable<SelectListItem>
+                                        )ViewData["SubContractors"], "Select Local Contractor",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "SubContractorId"), "disabled", "disabled"))
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>School</strong></label>
+                                    @Html.DropDownListFor(x => x.PropertyId, (IEnumerable<SelectListItem>
+                                        )ViewData["SchoolsList"], "Select School",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "PropertyId"), "disabled", "disabled"))
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Approval Status</strong></label>
+                                    @Html.DropDownListFor(x => x.ApprovalStatus, (IEnumerable<SelectListItem>
+                                        )ViewData["ClaimApprovalStatus"], "Select Status",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "ApprovalStatus"), "disabled", "disabled"))
+
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Claimed Amount</strong></label>
+                                    @Html.DropDownListFor(x => x.ClaimedAmountFlag, (IEnumerable<SelectListItem>
+                                        )ViewData["ClaimeAmount"], "Select Claimed Amount",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "ClaimedAmountFlag"), "disabled", "disabled"))
+
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Approved From</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.ApprovalFromDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+
+                                           @id = "ApprovalFromDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("mainSection", "ApprovalFromDate"), "disabled", "disabled")
+                                   })
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height:33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span id="errFromDate" style="color:red; display:block"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Approved To</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.ApprovalToDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+
+                                           @id = "ApprovalToDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("mainSection", "ApprovalToDate"), "disabled", "disabled")
+                                   })
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height:33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+
+    <div class="row" style="margin-top:-8px;">
+        <div class="col-12">
+            <div class="card white-bg">
+                <div class="row">
+                    <div class="col-12 float-right mm-15">
+                        <div class="col-lg-6 col-sm-12 float-left"></div>
+                        <div class="col-lg-6 col-sm-12 float-right" style="margin-top:35px; text-align:right;">
+                            @{
+                                if (!Model.DisableField("mainSection", "btnSave"))
+                                {
+                                    <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="button" id="btnSave"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save</button>
+
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-down">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Review Items List</strong>
+                </div>
+                <div class="card-base">
+                    <div class="table-responsive m-t-0" style="margin-top:-30px;">
+                        <div id="myTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                            <table id="tblWorkOrderClaimList" class="display table table-hover display table-bordered table-striped dataTable no-footer w-100" role="grid">
+                                <thead>
+                                    <tr role="row">
+                                         <th class="sorting_asc" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="WO ID*" style="min-width:4em; vertical-align:middle;">View WO</th>
+                                        <th class="sorting_asc" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="WO ID*" style="min-width:4em; vertical-align:middle;">WO ID*</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Category" style="min-width:4em; vertical-align:middle;">Category</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="LRLV" style="min-width:4em; vertical-align:middle;">LRLV</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Local Contractor" style="min-width:8em; vertical-align:middle;">Local Contractor</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="School Name" style="min-width:8em; vertical-align:middle;">School Name</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Description" style="min-width:8em; vertical-align:middle;">Description</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Claim Date" style="min-width:5em; vertical-align:middle;">Claim Date</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Claimed Amt" style="min-width: 7em; text-align: center !important">Claimed Amt</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Approved Amt" style="min-width: 7em; text-align: center">Approved Amt</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="FMC Comment" style="@(Model.IsAMURegion ? "display:none":"") min-width: 5em; vertical-align: middle;">FMC Comment</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" style="@(Model.IsAMURegion ? "display:none;max-width:100px;text-align:center" : "max-width:100px;text-align:center")" aria-label="Review?">Endorse?</th>
+
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ASO Comment" style="min-width:5em; vertical-align:middle;">ASO Comment</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Approve?" style="min-width:5em; vertical-align:middle;">Approve?</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Approve?" style="min-width:7em; vertical-align:middle;">Approved Date</th>
+                                        <th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="RCTI">RCTI</th>
+                                    </tr>
+                                    <tr style="border: none;">
+                                       
+                                        <td>  </td>
+                                        <td><input type="search" id="searchJobId" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchCategory" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchLRLV" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchContractor" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchSchoolName" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchDesc" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchClaimDate" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td><input type="search" id="searchClaimedAmount" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+
+                                        <td><input type="search" id="searchApprovedAmount" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+
+                                        <td style="@(Model.IsAMURegion ? "vertical-align: middle; border: none; padding-top: 13px;display:none": "vertical-align: middle; border: none; padding-top: 13px")" rowspan="1" colspan="1"><input type="search" id="searchFMCComment" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+
+                                        <td style="@(Model.IsAMURegion ? "vertical-align: middle; border: none; padding-top: 13px;display:none": "vertical-align: middle; border: none; padding-top: 13px;")" rowspan="1" colspan="1" class=" column_search"> </td>
+
+                                        <td><input type="search" id="searchASOComment" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td> </td>
+                                        <td><input type="search" id="searchApproveDate" class="form-control form-control-sm  column_search" placeholder="Search"> </td>
+                                        <td> </td>
+                                    </tr>
+                                </thead>
+                                <tbody> </tbody>
+                            </table>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Unsaved Changes detected</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>There are un-saved changes. Click "Close" to stay on the same page or click "Save Changes" to Save.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveFromModal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.24/features/conditionalPaging/dataTables.conditionalPaging.js"></script>
+    @Scripts.Render("~/bundles/claims")
+<script>
+    var dataLink = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "WorkOrder" })';
+    var opType = '@Model.ApprovalType';
+    var agencyId = '@Model.AgencyId';
+    var detailUrl = "@Url.Action("Detail", "WorkOrder", new { Area = "FMWorks" })";
+    var lrlvUrl = "@Url.Action("Detail", "Proposals", new { Area = "FMWorks" })";
+    var claimUrl = "@Url.Action("Claims", "WorkOrder", new { Area = "FMWorks" })";
+    var claimWODetailUrl = "@Url.Action("ClaimWODetails", "WorkOrder", new { Area = "FMWorks" })";
+    var baseUrl = "@Url.Content("~")";
+    var approveAmount = '@(!Model.DisableField("mainSection", "approveAmount"))';
+    var fmcComment = '@(!Model.DisableField("mainSection", "fmcComment"))';
+    var fmcApprove = '@(!Model.DisableField("mainSection", "fmcApprove"))';
+    var asoComment = '@(!Model.DisableField("mainSection", "asoComment"))';
+    var asoApprove = '@(!Model.DisableField("mainSection", "asoApprove"))';
+    var popupLink = '@Url.Action("ClaimRCTI", "WorkOrder")';
+    var IsAMURegion = '@Model.IsAMURegion';
+    var CurrentUserRole = '@Model.CurrentRoleID';
+    var helpUrl = '@Url.Action("QuickHelp", "WorkOrder")';
+</script>
+
+}
+
+<style type="text/css">
+
+    .custom-control-label::before {
+        background-color: #75a8fe !important;
+    }
+
+    .input-validation-error {
+        border-color: red !important;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+
+    .btn-outline-info.disabled, .btn-outline-info:disabled {
+        background-color: #5a7ca4;
+    }
+
+    #btnSearchIcon {
+        margin-right: 7px;
+        color: #2196f3;
+    }
+
+    #tblWorkOrderClaimList_filter {
+        height: 32px;
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input {
+        border: 1px solid white !important;
+    }
+
+    .search-btn {
+        width: auto;
+        float: right;
+        margin-top: 10px;
+    }
+</style>

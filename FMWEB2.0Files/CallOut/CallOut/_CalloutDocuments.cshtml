@@ -1,0 +1,116 @@
+﻿@model AssetCare.Model.ViewModels.CallOutAddEditViewModel
+@using AssetCare.Helpers
+
+<div class="row">
+    <div class="col-xl-12 col-lg-12">
+        <div class="card">
+            <div class="card-header"><strong>Documents</strong></div>
+            <div class="card-base">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-12">
+                            <div class="card inner-border-1 white-bg">
+                                <div class="card-base" style="margin-bottom:-18px; margin-left:-9px;">
+                                    <div class="row" style="margin-left:-5px;">
+                                        <div class="col-xl-12 col-lg-12 col-md-12">
+                                            <label><strong>Document Type</strong></label>
+                                            @Html.DropDownListFor(x => x.SelectedDocumentTypeId, (IEnumerable<SelectListItem>)ViewData["SupportDocumentType"], "---Select---", new RouteValueDictionary(new { @class = "custom-select", @id = "documentTypeSelectList" }).AddIf(Model.DisableField("documentSection", "btnUpload"), "disabled", "disabled"))
+                                            <span class="field-validation-error float-left" id="documentTypeErr"></span>
+                                        </div>
+                                        <div class="col-xl-12 col-lg-12 col-md-12 mtp-12" style="margin-top:14px;">
+                                            <label>Browse File</label>
+                                            <div class="form-group">
+                                                @{
+                                                    if (Model.DisableField("documentSection", "btnUpload"))
+                                                    {
+                                                        <input id="fileSelectedBtn" disabled type="file" class="form-control" name="fileSelectedBtn">
+                                                    }
+                                                    else
+                                                    {
+                                                        <input id="fileSelectedBtn" type="file" class="form-control" name="fileSelectedBtn" accept="@Model.AcceptedFileTypes">
+                                                    }
+                                                }
+
+                                                <span class="field-validation-error float-left" id="fileErr"></span>
+                                            </div>
+
+                                            @{
+                                                if (Model.DisableField("documentSection", "btnUpload"))
+                                                {
+                                                    <button id="btnUpload" disabled type="button" class="btn btn-sm btn-outline-info waves-effect waves-light float-right" style="margin-top:-3px; margin-bottom:12px;" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-upload"></i></span>Upload</button>
+                                                }
+                                                else
+                                                {
+                                                    <button id="btnUpload" type="button" class="btn btn-sm btn-outline-info waves-effect waves-light float-right" style="margin-top:-3px; margin-bottom:12px;" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-upload"></i></span>Upload</button>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-6 col-lg-12">
+                            <div class="card white-bg">
+                                <div class="card-base">
+                                    <div class="table-responsive m-t-0">
+                                        <table id="callOutDocumentList" class="table display table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Actions</th>
+                                                    <th>Document Type</th>
+                                                    <th>Download</th>
+                                                    <th>Uploaded On</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var supportDocument in Model.SupportDocuments)
+                                                {
+                                                    <tr>
+                                                        <td style="float:left">
+                                                            @{
+                                                                if (!Model.DisableField("documentSection", "btnUpload"))
+                                                                {
+                                                                    if (Model.CurrentRoleID != "A" || Model.CurrentRoleID != "AG" || Model.CurrentRoleID != "D" || Model.CurrentRoleID != "GL" ||
+                                                                        Model.CurrentRoleID != "SL" || Model.CurrentRoleID != "AM" || Model.CurrentRoleID != "EM" || Model.CurrentRoleID != "AO" || Model.CurrentRoleID != "P")
+                                                                    {
+                                                                        if (Model.CurrentRoleID == "C" && (@supportDocument.RoleID == "F" || @supportDocument.RoleID == "SM"))
+                                                                        {
+                                                                        }
+                                                                        else if (@supportDocument.RoleID == "C" && (Model.CurrentRoleID == "F" || Model.CurrentRoleID == "SM"))
+                                                                        {
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a href="javascript:;" onclick="javascript:return remove(this, '@supportDocument.SupportDocumentIDEnc')"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete the callout" style="font-size: 21px; margin-top: -3px; margin-left: 16px;"></i></a>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+
+                                                                        <a href="javascript:;" onclick="javascript:return remove(this, '@supportDocument.SupportDocumentIDEnc')"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete the callout" style="font-size: 21px; margin-top: -3px; margin-left: 16px;">DEL</i></a>
+                                                                    }
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td>@supportDocument.SupportDocumentTypeDesc</td>
+                                                        <td>
+                                                            <a href="javascript:;" onclick="return assetCare.downloadAttachment('@supportDocument.RawAttachmentLink')">
+                                                                @supportDocument.ClientDocumentName
+                                                            </a>
+                                                        </td>
+                                                        <td>@supportDocument.RecordedDate.Value.ToString("dd/MM/yyyy HH:mm:ss tt")</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

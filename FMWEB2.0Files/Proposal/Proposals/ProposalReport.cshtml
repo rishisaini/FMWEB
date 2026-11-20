@@ -1,0 +1,539 @@
+﻿@model AssetCare.Model.ViewModels.ProposalAddEditViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutPopup.cshtml";
+}
+<div class="container-fluid">
+    <div class="row" style="display: flex; justify-content: center;">
+
+        <div class="col-md-12">
+
+            <div class="card card-body printableArea" style="background-image: url(assets/images/report-bg.png); background-repeat: no-repeat; ">
+                <div><h2 class="text-center mb-3" style="font-family: Roboto; margin-bottom:-4px; font-weight:700; color:#002664;">Project Proposal Advice Form</h2></div>
+
+
+                <div class="container-fluid">
+                    <div class="col-md-12 mt-1">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1 mt-4">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Proposal Details</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+
+                                                <tbody style="font-size: 14px;">
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Principal Name</span></td>
+                                                        <td width="25%">@Model.PrincipalName</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">School Email</span></td>
+                                                        <td width="25%">@Model.PrincipalEmail</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Date Submitted</span></td>
+                                                        <td width="25%">@Model.PRSubmittedDate</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Date and Time Reported (24-hr Format HH:MM)</span></td>
+                                                        <td width="25%">@Model.ProposalDate</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Proposal Status</span></td>
+                                                        <td width="25%">@Model.ProposalStatusText</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Asset Management PM</span></td>
+                                                        <td width="25%">@Model.ASOText</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">School Fund Code</span></td>
+                                                        <td width="25%">@Model.ProposalSFCText</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Funds Availability</span></td>
+                                                        <td width="25%">@Model.FundsAvailability</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Work Description</span></td>
+                                                        <td width="25%" colspan="3">@Model.WorkDescription</td>
+
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">School Name</span></td>
+                                                        <td width="25%">@Model.SchoolNameFull</td>
+                                                    </tr>
+                                                    @*<tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+            <td width="25%"><span style="font-weight:700; color:#002664;">Project ID</span></td>
+            <td width="25%">12345</td>
+            <td width="25%"><span style="font-weight:700; color:#002664;">Project Date</span></td>
+            <td width="25%">23/05/2023</td>
+        </tr>*@
+
+                                                </tbody>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Details - AM Use Only</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+
+                                                <tbody style="font-size: 14px;">
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Buildings Affected</span></td>
+                                                        <td width="25%">@Model.BuildingList</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Work Nominated By</span></td>
+                                                        <td width="25%">@Model.WorkNominatedByText</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Room No(s)</span></td>
+                                                        <td width="25%">@Model.Rooms</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Room Location</span></td>
+                                                        <td width="25%">@Model.RoomLocation</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Program</span></td>
+                                                        <td width="25%">@Model.ProposalProgramText</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Sub Program </span></td>
+                                                        <td width="25%">@Model.ProposalSubProgramText</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Project Type</span></td>
+                                                        <td width="25%">@Model.ProposalSubProgramText</td>
+
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Project Description</span></td>
+                                                        <td width="25%" colspan="3">@Model.ProjectDescription</td>
+
+                                                    </tr>
+
+
+                                                </tbody>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Assessment</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                <th colspan="4">Estimates</th>
+                                                <tbody style="font-size: 14px;">
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Concept Estimate</span></td>
+                                                        <td width="25%">@Model.ConceptEstimate</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Concept Estimate Inc. GST</span></td>
+                                                        <td width="25%">@Model.ConceptEstimateGST</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%" colspan="2"><span style="font-weight:700; color:#002664;">Joint funding % is only inserted if the proposal is for annual program consideration</span></td>
+                                                        <td width="25%">@Model.JointFunding</td>
+
+                                                    </tr>
+
+
+                                                </tbody>
+
+
+                                                </thead>
+
+                                                <thead>
+                                                <th colspan="4">Entitlements</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%" colspan="1"><span style="font-weight:700; color:#002664;">Check PMM accommodation and enrolment profiles</span></td>
+                                                        <td width="25%" colspan="1">@Model.PMMText</td>
+
+                                                    </tr>
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Planning requirements</span></td>
+                                                        <td width="25%">@Model.PlanningRequirementText</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Environmental planning</span></td>
+                                                        <td width="25%">@Model.EnvironmentPlanningText</td>
+                                                    </tr>
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Stakeholders to be consulted</span></td>
+                                                        <td width="25%">@Model.StakeholderText</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Operational constraints</span></td>
+                                                        <td width="25%">@Model.OperationalText</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Tech services</span></td>
+                                                        <td width="25%">@Model.TechServicesText</td>
+                                                    </tr>
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Hazardous materials</span></td>
+                                                        <td width="25%">@Model.HazardousText</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Services</span></td>
+                                                        <td width="25%">@Model.ServicesText</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Asset Management PM Reviewed</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+
+                                                <tbody style="font-size: 14px;">
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Reviewed By</span></td>
+                                                        <td width="25%">@Model.ReviewedBy</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Date Reviewed</span></td>
+                                                        <td width="25%">@Model.ReviewDate</td>
+                                                    </tr>
+
+
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Assessor Submission</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+
+                                                <tbody style="font-size: 14px;">
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Submitted By</span></td>
+                                                        <td width="25%">@Model.SubmittedBy</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Date Submitted</span></td>
+                                                        <td width="25%">@Model.PRSubmittedDate</td>
+                                                    </tr>
+
+
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Assessment Approval</p>
+                                        <div class="table-responsive">
+                                            <table class="table ">
+
+
+                                                <thead>
+                                                <th colspan="4"> School Principal Approval (Up to $150,000 incl. GST)</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.SPApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.SPApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.SPPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.SPApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+
+                                                <thead>
+                                                <th colspan="4">  Director, Educational Leadership Endorsement (Up to $500,000 incl. GST)</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.SDApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.SDApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.SDPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.SDApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+
+                                                <thead>
+                                                <th colspan="4">   Executive Director, School Performance Endorsement (Above $500,000 incl. GST)</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.EDApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.EDApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.EDPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.EDApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <p style="font-size:14px; font-weight: 700; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">Proposal Approval (Approval of the proposal does not mean that this is an active project. Status of the proposal will change to Project Delivery once full funding is available.) </p>
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <thead>
+                                                <th colspan="4"> Asset Service Officer</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.ASOApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.ASOApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.ASOPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.ASOApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+
+                                                <thead>
+                                                <th colspan="4">   Group Leader</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.GLApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.GLApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.GLPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.GLApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+
+                                                <thead>
+                                                <th colspan="4">   Snr Group Leader (Up to $75,000 incl. GST)</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.SGLApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.SGLApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.SGLPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.SGLApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+                                                <thead>
+                                                <th colspan="4">   Director, Asset Management (Up to $500,000 incl. GST)</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.DAMApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.DAMApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.DAMPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.DAMApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+                                                <thead>
+                                                <th colspan="4">  Executive Director, Asset Management (Up to $2M incl. GST)</th>
+                                                <tbody style="font-size: 14px;">
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Status</span></td>
+                                                        <td width="25%">@Model.EDAMApprovalStatus</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approver</span></td>
+                                                        <td width="25%">@Model.EDAMApprovedBy</td>
+                                                    </tr>
+
+
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                        <td width="25%">@Model.EDAMPosition</td>
+                                                        <td width="25%"><span style="font-weight:700; color:#002664;">Approval Date</span></td>
+                                                        <td width="25%">@Model.EDAMApprovalDate</td>
+                                                    </tr>
+                                                </tbody>
+
+
+                                                </thead>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr class="mt-5">
+                        <div class="text-right">
+                            <button id="print"  onclick="print()" class="btn btn-default btn-outline" type="button"> <span><i class="fa fa-print"></i> Print</span> </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Container fluid  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- End Page wrapper  -->
+        <!-- ============================================================== -->
+    </div>
+</div>
+<style type="text/css">
+    .btn-outline-info.focus,
+    .btn-outline-info:focus,
+    .btn-outline-info:hover {
+    background: #1e88e5;
+    }
+    .breadcrumb-item a {
+    color: #002664 !important;
+    }
+    .table td a {
+    color: #002664 !important;
+    }
+    @*@media screen and (max-width: 768px) {
+    .mt-down {
+    margin-top:-8px !important;
+    }
+    }*@
+    .table th, .table thead th {
+    padding: 9px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #565656 !important;
+		background: #eeeeee;
+
+    }
+		 p
+		{
+			background-color: #002664!important;
+			padding: 8px;
+			color: white !important;
+			text-decoration: none !important;
+		}
+    .table td {
+    padding: 9px;
+    border-left: 1px solid #FFFFFF !important;
+    .nohover > tbody > tr { cursor:default !important; }
+    .nohover > tbody > tr:hover { background:inherit !important; }
+    thead tr th:first-child,
+    tbody tr td:first-child {
+    width: 4em;
+    }
+    tbody tr th:nth-child(3),
+    tbody tr td:nth-child(3) {
+    width: 4em;
+    }
+    .row-eq-height {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    }
+    @*@media (min-width: 767px) and (max-width: 1194px) {
+    .push { padding-top: 40px; }
+    .d-ec3-none {display: none !important;}
+    }*@
+</style>

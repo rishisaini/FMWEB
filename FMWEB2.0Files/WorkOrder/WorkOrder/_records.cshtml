@@ -1,0 +1,191 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Helpers
+
+
+<div class="p-20">
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card ">
+                <div class="card-header"><strong>Documents/ Attachments</strong></div>
+                <div class="card-base">
+
+                    <div class="col-lg-12">
+                        <div class="row">
+
+                            <div class="col-xl-12 col-lg-12">
+                                <div class="card inner-border-1 white-bg">
+
+                                    <div class="card-base" style="margin-bottom:-18px; margin-left:-9px;">
+                                        <div class="row" style="margin-left:-5px;">
+
+                                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label><strong>Document Issue Date</strong> </label>
+                                                    <div class="input-group">
+                                                        @Html.EditorFor(m => m.SupportDocument.IssueDate, new
+                                                   {
+                                                       htmlAttributes = new RouteValueDictionary(new
+                                                       {
+                                                           @placeholder = "dd/mm/yyyy",
+                                                           @class = "form-control form-control-sm datepicker-control",
+                                                           @Value = ((Model.SupportDocument.IssueDate.HasValue) ? Model.SupportDocument.IssueDate.Value.ToString("dd/MM/yyyy") : ""),
+                                                           id = "txtIssueDate"
+                                                       }).AddIf(Model.DisableField("recordSection", "IssueDate"), "disabled", "disabled")
+                                                   })
+                                                        <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                            <span class="input-group-text mr-2" id="basic-addon2">
+                                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <span class="field-validation-error float-left" id="issueDateErr"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-6 col-md-6">
+                                                <label><strong>Document Type</strong></label>
+                                                @Html.DropDownListFor(x => x.SelectedDocumentTypeId, (IEnumerable<SelectListItem>)ViewData["SupportDocumentType"], "---Select---", new RouteValueDictionary(new { @class = "custom-select", @id = "documentTypeSelectList" }).AddIf(Model.DisableField("recordSection", "IssueDate"), "disabled", "disabled"))
+                                                <span class="field-validation-error float-left" id="documentTypeErr"></span>
+                                            </div>
+                                            <div class="col-xl-12 col-lg-12 col-md-12 mtp-12" style="margin-top:14px;">
+
+                                                <div class="form-group">
+                                                    @{
+                                                        if (!Model.DisableField("recordSection", "selectFile"))
+                                                        {
+                                                            <input id="fileSelectedBtn" type="file" class="form-control" name="fileSelectedBtn" accept="@Model.AcceptedFileTypes">
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <input id="fileSelectedBtn" disabled type="file" class="form-control" name="fileSelectedBtn" accept="@Model.AcceptedFileTypes">
+
+                                                        }
+                                                    }
+                                                    <span class="field-validation-error float-left" id="fileErr"></span>
+                                                </div>
+
+                                                @{
+                                                    if (!Model.DisableField("recordSection", "btnUpload"))
+                                                    {
+                                                        <button type="button" id="btnUpload" class="btn btn-outline-info waves-effect waves-light float-left" style="margin-top: -3px; margin-bottom: 12px; margin-right: -7px;" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-upload"></i></span>Upload</button>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" disabled id="btnUpload" class="btn btn-outline-info waves-effect waves-light float-left" style="margin-top:-3px; margin-bottom:12px;" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-upload"></i></span>Upload</button>
+
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="card white-bg">
+                                    <div class="card-base">
+                                        <label><strong>Document/Attachments List</strong></label>
+                                        <div class="table-responsive m-t-0">
+                                            <table id="callOutDocumentList" class="table display table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Actions</th>
+                                                        <th>Document ID</th>
+                                                        <th>School</th>
+                                                        <th>Document Type</th>
+                                                        <th>Download</th>
+                                                        <th>Uploaded On</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var document in Model.SupportDocuments)
+                                                    {
+                                                        <tr>
+                                                            <td style="float:left">
+                                                                @{
+                                                                    if (!Model.DisableField("recordSection", "deleteDocument"))
+                                                                    {
+                                                                        <a href="#" onclick="return remove(this, @document.SupportDocumentID)"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete the callout" style="font-size: 21px; margin-top: -3px; margin-left: 16px;"></i></a>
+
+                                                                    }
+                                                                }
+                                                            </td>
+                                                            <td><span class="seqHandle">@document.DocumentSequenceID</span> </td>
+                                                            <td>@document.PropertyName</td>
+                                                            <td>@document.SupportDocumentTypeDesc</td>
+                                                            <td><a href="@document.AttachmentLink" target="_blank">@document.ClientDocumentName</a></td>
+                                                            <td>@document.RecordedDate.Value.ToString("dd/MM/yyyy HH:mm:ss tt")</td>
+                                                        </tr>
+                                                    }
+
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="p-20">
+    <div class="row">
+        <div class="col-xl-12 col-lg-12">
+            <div class="card ">
+                <div class="card-header"><strong>Callout Documents</strong></div>
+                <div class="card-base" >
+
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-12 col-sm-12">
+                                <div class="card white-bg">
+                                    <div class="card-base" style="background:#eff6ff; border-radius:15px">                                        
+                                        <div class="table-responsive m-t-0">
+                                            <table id="callOutDocuments" class="table display table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="background: #8cbde9 !important; color: white !important;">Document ID</th>
+                                                        <th  style="background: #8cbde9 !important; color: white !important;">School</th>
+                                                        <th  style="background: #8cbde9 !important; color: white !important;">Document Type</th>
+                                                        <th  style="background: #8cbde9 !important; color: white !important;">Download</th>
+                                                        <th  style="background: #8cbde9 !important; color: white !important;">Uploaded On</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var document in Model.SupportDocumentsCallout)
+                                                    {
+                                                        <tr>
+                                                            <td><span class="seqHandle">@document.DocumentSequenceID</span> </td>
+                                                            <td>@document.PropertyName</td>
+                                                            <td>@document.SupportDocumentTypeDesc</td>
+                                                            <td><a href="@document.AttachmentLink" target="_blank">@document.ClientDocumentName</a></td>
+                                                            <td>@document.RecordedDate.Value.ToString("dd/MM/yyyy HH:mm:ss tt")</td>
+                                                        </tr>
+                                                    }
+
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,444 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Common
+@using AssetCare.Model.Models
+@using AssetCare.Model.ViewModels
+@using AssetCare.Helpers
+@using Newtonsoft.Json
+@using System.Configuration;
+@using AssetCare.Service
+@{
+    string Google_apiKey = ConfigurationManager.AppSettings["Google_apiKey"];
+    string InvalidFilenameCharacters = ConfigurationManager.AppSettings["InvalidFilenameCharacters"];
+    ViewBag.Title = "Details";
+}
+
+<div class="container-fluid">
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    @using (Html.BeginForm("Detail", "WorkOrder", FormMethod.Post, new { id = "frmJobDetails" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row" @*style="margin-top:-8px;"*@>
+            <div class="col-12">
+                <div class="card white-bg">
+
+                    <div class="row">
+                        <div class="col-12 float-right mm-15">
+                            <div class="col-xl-6 col-lg-12 col-sm-12 float-left">
+                                <h4><strong>Reactive Work Order Details</strong></h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item float-left"><a href="@Url.Action("Index", "Home", new { Area = "" })?id=@Model.AgencyId">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="#">Work Orders</a></li>
+                                    <li class="breadcrumb-item float-left"><a href="@Url.Action("Index", "WorkOrder", new { Area = "FMWorks" })">Reactive Work Orders</a></li>
+                                    <li href="#" class="breadcrumb-item active">Reactive Work Order Details</li>
+                                </ol>
+                            </div>
+                            <div class="col-lg-6 col-sm-12 float-right" style="text-align:right;">
+                                @{
+                                    string errorMsg = "";
+                                    var cancelUrl = "/";
+                                    if (string.IsNullOrEmpty(Model.CallbackUrl))
+                                    {
+                                        cancelUrl = Url.Action("Index", "WorkOrder");
+                                    }
+                                    else
+                                    {
+                                        cancelUrl = Model.CallbackUrl;
+                                    }
+                                }
+
+                                @{
+                                    <button class="top-btn btn-outline-info waves-effect waves-light tm-20 float-right" type="button" id="btnCancel" onclick="cancelButtonClicked(event,'@cancelUrl')"><span class="top-btn-label"><i class="fa fa-eraser"></i></span>Cancel</button>
+                                    if (Model.UserCannotPerformAnyAction())
+                                    {
+
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20  mr-2" disabled type="button"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save</button>
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" disabled type="button"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save and Exit</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="top-btn btn-outline-info waves-effect waves-light  tm-20  mr-2" type="submit" id="btnSave"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save</button>
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="submit" id="btnSubmit"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save and Exit</button>
+                                    }
+                                    <span style="color:red; display:block" id="errMsg">@errorMsg</span>
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-bottom:15px!important">
+            <div class="col-lg-6">
+                @Html.Partial("_QuickHelp", Model)
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:-12px;">
+
+            <div class="col-12">
+                <div class=" blue-header">
+                    <div class="card-base">
+                        <div class="row">
+                            <label for="minimal-radio-3" style="margin-right:10px; font-size:14px; font-weight: 500 !important;">WO ID @Model.AgencySequenceId</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        @Html.Partial("_detailHeader", Model)
+
+
+        <div class="row" style="margin-top:12px;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-base p-b-0">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs customtab2" role="tablist" style="background:#f2f2f2; border-radius:12px; padding:8px;">
+                            <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#detail" role="tab"><span class="hidden-sm-up">Details</span> <span class="hidden-xs-down"><strong>Details</strong></span></a> </li>
+                            <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#estimate" role="tab"><span class="hidden-sm-up">Estimate</span> <span class="hidden-xs-down"><strong>Estimate</strong></span></a> </li>
+                            @if (!User.IsInRoles("DOEUSER, SINSW"))
+                            {
+                                <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#document" role="tab"><span class="hidden-sm-up">Documents</span> <span class="hidden-xs-down"><strong>Documents</strong></span></a> </li>
+                                <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#claim" role="tab"><span class="hidden-sm-up">Claims</span> <span class="hidden-xs-down"> <strong>Claims</strong></span></a> </li>
+                            }
+                            @*@if (User.IsInRoles("ADMIN,LOCALCONTRACTOR,APISTANDARD,APIPRIEMIUM"))
+                                {
+                                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#visitorQRCode" role="tab"><span class="hidden-sm-up">Visitor QRCode</span> <span class="hidden-xs-down"><strong>Visitor QRCode</strong></span></a> </li>
+                                }*@
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="detail" role="tabpanel">
+                                @Html.Partial("_details", Model)
+                            </div>
+                            <div class="tab-pane" id="estimate" role="tabpanel">
+                                @Html.Partial("_estimate", Model)
+                            </div>
+
+
+                            @if (!User.IsInRoles("DOEUSER, SINSW"))
+                            {
+                                <div class="tab-pane " id="document" role="tabpanel">
+                                    @Html.Partial("_records", Model)
+
+                                </div>
+                                <div class="tab-pane " id="claim" role="tabpanel">
+                                    @Html.Partial("_costing", Model)
+                                </div>
+                            }
+                            @*@if (User.IsInRoles("ADMIN,LOCALCONTRACTOR,APISTANDARD,APIPRIEMIUM"))
+                                {
+                                    <div class="tab-pane" id="visitorQRCode" role="tabpanel">
+                                        @Html.Partial("_visitorQRCode", Model)
+                                    </div>
+                                }*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    }
+
+    @{
+        if (!Model.DisableField("detailSection", "raiseVariation"))
+        {
+            <div class="modal fade bs-variation-modal" id="raiseVariationModal" tabindex="-1" role="dialog" aria-labelledby="adminModalLabel" aria-hidden="true" style="display: none;">
+                <div class="modal-dialog modal-lg modal-rv" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header card-header" style="background-color:rgba(0,0,0,.03)">
+                            <h4 class="modal-title" id="bs-variation-modal">Raise a variation</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+
+                                @using (Html.BeginForm("CreateWorkOrder", "WorkOrder", FormMethod.Post, new { id = "frmCreateWorkOrder", style = "display:contents" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <div class="col-xl-5 col-lg-12">
+                                        <div class="card inner-border-1 white-bg">
+
+                                            <div class="card-base" style="margin-left:-9px;padding:0px">
+                                                <div class="row" style="margin-left:-5px;">
+
+                                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                                        <label><strong>Service Type</strong></label>
+                                                        @Html.DropDownListFor(x => x.SubContractorBusinessTypeId, (IEnumerable<SelectListItem>)ViewData["SubContractorBusinessType"], "---Select---",
+                                                new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("detailSection", "SubContractorBusinessTypeId"), "disabled", "disabled"))
+                                                    </div>
+                                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                                        <label><strong>Local Contractor</strong></label>
+                                                        @Html.DropDownListFor(x => x.WOSubContractorId, (IEnumerable<SelectListItem>)ViewData["SubContractors"], "---Select---",
+                                            new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("detailSection", "WOSubContractorId"), "disabled", "disabled"))
+                                                        @Html.ValidationMessageFor(x => x.WOSubContractorId)
+                                                        @{
+                                                            if (Model.DisableField("detailSection", "WOSubContractorId"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.WOSubContractorId)
+                                                            }
+                                                        }
+                                                    </div>
+                                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                                        <div class="form-group m-t-10" style="">
+                                                            <label><span style="margin-right:5px;"><strong>Comments<span style="vertical-align: super; color:#d7153a;">*</span> </strong></span><span class="ml-1 label-desc"> (Maximum 1000 Characters) </span></label>
+                                                            @Html.TextAreaFor(m => m.WOComments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", rows = "5", style = "height:75px", @maxLength = 1000 }).AddIf(Model.DisableField("detailSection", "WOComments"), "disabled", "disabled"))
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                                        @{
+                                                            if (Model.DisableField("detailSection", "WOSubContractorId"))
+                                                            {
+                                                                <button type="button" disabled class="btn btn-sm btn-outline-info waves-effect waves-light float-right" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-case-sensitive-alt"></i></span>Create a Work Order</button>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <button type="submit" id="btnAddLocalContractor" class="btn btn-sm btn-outline-info waves-effect waves-light float-right"><span class="btn-label"><i class="mdi mdi-case-sensitive-alt"></i></span>Create a Work Order</button>
+
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="WOServiceReportId" name="WOServiceReportId" value="@Model.ServiceReportId" />
+                                    <input type="hidden" id="WOAgencyId" name="WOAgencyId" value="@Model.AgencyId" />
+                                    <input type="hidden" id="WOCalloutId" name="WOCalloutId" value="@Model.CallLogFITSId" />
+
+                                    <div class="col-lg-7 col-sm-12">
+                                        <div class="card white-bg">
+                                            <div class="card-base" style="padding: 0px">
+                                                <div class="col-12" style="margin: 0px; padding:0px;">
+                                                    <div class="col-8 ml-0 float-left" style="margin: 0px; padding:0px;">
+                                                        <div class="col-12" style="margin-left:8px; margin-right:8px;">
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>ABN</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="subABN"></label>
+
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Licence Number</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="subLicense"></label>
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Licence Expiry</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="subLicenseExpiry"></label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-8 col-lg-8 float-left">
+                                                                    <label><strong>Email</strong></label><br>
+                                                                    <label style="color:cornflowerblue" id="subEmail"><i class="fa fa-envelope fa-color"></i> <strong> &nbsp;</strong></label>
+
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Mobile</strong></label><br>
+                                                                    <label style="color:cornflowerblue"><i class="fa fa-mobile-alt fa-color"></i> <strong> <a id="subMobile" href="tel:"></a> </strong></label>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-8 col-lg-8 float-left">
+                                                                    <label><strong>Distance</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="distanceKm"></label>
+                                                                    <label style="color:#5f5f5f; padding-left:12px;" id="distanceDrive"></label>
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Aboriginal and Torres Strait Islander Verified</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="atsiVerified"></label>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+
+                                                    <div class="col-lg-4 col-sm-12 float-right mt-3">
+                                                        <label><strong>Address</strong></label><br>
+                                                        <label style="color:cornflowerblue" id="subAddress"><i class="fa fa-map-marker fa-color"></i> <strong> Address goes here</strong></label>
+
+                                                        <iframe id="addressMap" width="200" height="160" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"> </iframe>
+                                                    </div>
+
+
+
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                        <div class="modal-footer card-header" style="margin-top:-24px;background-color:rgba(0,0,0,.03)">
+                            <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal"><span class="btn-label"><i class="fa fa-eraser"></i></span>Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+
+
+
+    <!-- ============================================================== -->
+    <!-- End Container fluid  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- footer -->
+    <!-- ============================================================== -->
+    <footer class="footer"> © 2023 NSW Department of Education School Infrastructure FMWeb 2.0 - Work Order Management System </footer>
+    <!-- ============================================================== -->
+    <!-- End footer -->
+    <!-- ============================================================== -->
+</div>
+
+
+@section Scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=@Google_apiKey&libraries=places&v=weekly" defer></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script>
+        var workCategoryId = "@Model.WorkCategoryId";
+         var googleApikey = '@Google_apiKey';
+
+        var dataLink = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "WorkOrder" })';
+        var callOutDataLink = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })';
+        var uploadLink = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })' + "/upload";
+        var delUrl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })' + "/delete?supportDocumentID=" ;
+        var jobId = "@Model.ServiceReportId";
+
+        var workTypesList = @Html.Raw(JsonConvert.SerializeObject(ViewData["WorkTypeList"]));
+        var supportDocuments = @Html.Raw(JsonConvert.SerializeObject(Model.SupportDocuments.ToList()));
+
+        var supportQuoteDocuments = @Html.Raw(JsonConvert.SerializeObject(Model.SupportQuoteDocuments));
+
+
+        var assignedTradiesList = @Html.Raw(JsonConvert.SerializeObject(Model.DetailsTab.AssignedTradieIds));
+
+        var assemblyUrl = '@Url.RouteUrl("DefaultApi", new {httproute = "", controller = "Assembly"})?elementId=';
+        var subAssemblyUrl = '@Url.RouteUrl("DefaultApi", new {httproute = "", controller = "SubAssembly"})?assemblyId=';
+        var dfltTab = '@Model.defaultTab';
+        var subContractorAcceptanceDisabled = "@Model.DisableField("detailSection", "SubContractorAccepted")";
+        var claimStatus = '@Model.Claim.ClaimFinalized' && @Model.WorkItems.Sum(item=>item.Amount)>0;
+        var invalidFilenameCharacters = '@InvalidFilenameCharacters';
+        var schoolId = @Model.SchoolId;
+
+        var root = '@Url.Content("~")';
+        var getSitePlanUrl = '@Url.Content("~/")api/GetSitePlan?token=@AesIdProtector.Encrypt(Model.SchoolId > 0 ? Model.SchoolId.ToString() : "0")';
+        //var getAsbestosRegisterUrl = '@Url.Content("~/")api/GetAsbestosRegister?schoolId=@Model.SchoolId';
+        var getAsbestosRegisterUrl = '@Url.Content("~/")api/GetAsbestosRegister?token=@AesIdProtector.Encrypt(Model.SchoolId > 0 ? Model.SchoolId.ToString() : "0")';
+        //var getAsbestosManagementPlanUrl = '@Url.Content("~/")api/GetAsbestosManagementPlan?schoolId=@Model.SchoolId';
+        var getSitePlanFromFMWebAPIUrl = '@Url.Content("~/")api/GetSitePlanFromFMWebAPI?schoolId=@Model.SchoolId';
+        var getAsbestosRegisterFromFMWebAPIUrl = '@Url.Content("~/")api/GetAsbestosRegisterFromFMWebAPI?schoolId=@Model.SchoolId';
+        var fileNotFoundErrorUrl = '@Url.Action("FileNotFoundError", "WorkOrder")';
+        var helpUrl = '@Url.Action("QuickHelpIndex", "WorkOrder")';
+          var isLC = @User.IsInRoles("LOCALCONTRACTOR").ToString().ToLower();
+        var isC = @User.IsInRoles("CONTRACTOR").ToString().ToLower();
+
+        var ServiceReportStatusId = @Model.DetailsTab.ServiceReportStatusId;
+
+        $(".agencySelector").on("click", function (e) {
+            // stop anchor firing
+            e.preventDefault();
+            // set variables for inside the ajax post
+            var aid = $(this).data("id");
+            var an = $(this).data("name");
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SetAgency", "Home", new { area = "" })",
+                data: { agencyId: aid, agencyName: an },
+                success: function () {
+                    window.location.href = (aid == 7061009) ? '@Url.Action("Index", "Home", new {area = ""})' : "@Url.Action("Index", "WorkOrder", new { area = "FMWorks" })";
+                }
+            });
+        });
+
+        //function initMap() {
+        //    const map = new google.maps.Map(document.getElementById("map"), {
+        //        center: { lat: -33.7654770207353, lng: 151.24953134149638 },
+        //        zoom: 15,
+        //    });
+
+        //    geocoder = new google.maps.Geocoder();
+        //    codeAddress(geocoder, map);
+        //}
+        //function codeAddress(geocoder, map) {
+        //    geocoder.geocode({ 'address': $('#SchoolAddress').val() }, function (results, status) {
+        //        if (status === 'OK') {
+        //            map.setCenter(results[0].geometry.location);
+        //            var marker = new google.maps.Marker({
+        //                map: map,
+        //                position: results[0].geometry.location
+        //            });
+        //        } else {
+        //            alert('Geocode was not successful for the following reason: ' + status);
+        //        }
+        //    });
+        //}
+          $('#mapPreviewButton').click(function (e) {
+            var iframeSrc = $("#mapFrame").attr("src");
+
+            if (typeof iframeSrc === "undefined") {
+                var googleMapsUrl = "https://www.google.com/maps/embed/v1/place?key=@Google_apiKey&q=@Model.SchoolAddress";
+                $("#mapFrame").attr("src", googleMapsUrl);
+            }
+          });
+
+        $('[data-toggle="popover"]').popover({
+            placement: 'right',
+            trigger: 'focus'
+        });
+    </script>
+
+    <style>
+        [type=radio]:disabled:not(:checked) + label:before {
+            border-color: #bdbdbd;
+        }
+
+        [type=radio]:disabled + label {
+            color: #bdbdbd;
+        }
+
+        [type=radio]:disabled:checked + label:after {
+            background-color: #bdbdbd;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(130deg) brightness(95%) contrast(80%);
+        }
+
+        .btn-outline-info.disabled, .btn-outline-info:disabled {
+            background-color: #5a7ca4;
+        }
+
+        @@media (min-width: 992px) {
+            .modal-rv {
+                max-width: 1140px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+    @Scripts.Render("~/bundles/fmjobs")
+}
+
+

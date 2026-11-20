@@ -1,0 +1,571 @@
+﻿@using MvcSiteMapProvider.Web.Html
+@using AssetCare.Model.Models
+@using Newtonsoft.Json
+@model AssetCare.Model.ViewModels.ProposalViewModel
+
+<div class="container-fluid">
+
+    <!-- quick tip start div -->
+    <div class="row tips">
+        <div class="col-12">
+            <div class="card " style="background-color: #009efb;">
+                <div class="col-12">
+
+                    <div style="background: white; padding:8px; border-radius:20px;">
+                        <span style="background-color:#002664; border-radius:18px; margin-left:-6px; padding:2px; color: white !important;"><i class="fa fa-lightbulb"></i><strong> Search Tips: </strong></span>
+                        &nbsp; <span style="color:#007bff; line-height:20px;">
+                            Search column, except columns with * requires a minimum of 3 characters in the search field.
+                        </span>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- quick tip end div -->
+    <!-- Bread crumb -->
+
+    <div class="row" style="margin-top:-8px;">
+        <div class="col-12">
+            <div class="card white-bg">
+                <div class="row">
+                    <div class="col-12 float-right">
+                        <div class="col-xl-3 col-lg-12 col-sm-12 float-left">
+
+                            <h4><strong>Project Proposal List</strong></h4>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { Area = "" })?id=@Model.AgencyId">Home</a></li>
+                                <li class="breadcrumb-item"><a href="#">Callouts</a></li>
+                                <li href="#" class="breadcrumb-item active">Project Proposal List</li>
+                            </ol>
+                        </div>
+                        @using (Html.BeginForm("Detail", "Proposals", FormMethod.Get))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="col-lg-4 col-sm-12 tm-20 float-left">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(x => x.PropertyId, (IEnumerable<SelectListItem>)ViewData["SchoolsList"], "Select School", new { @class = "custom-select", @id = "schoolSelectList" })
+                                    @Html.ValidationMessageFor(x => x.PropertyId, null, new { @class = "text-danger", style = "float:left !important; margin-bottom:5px" })
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-lg-6 col-sm-12 float-right" style="text-align:right;">
+                                <button class="top-btn btn-outline-info waves-effect waves-light  tm-20" style="margin-right:14px;" type="button" id="btnProposalReport"><span class="btn-label"><i class="fas fa-print"></i></span>Proposal Report</button>
+                                <button id="btnViewList" class="top-btn btn-outline-info waves-effect waves-light  tm-20" style="margin-right:14px;" type="button">
+                                    <span class="top-btn-label"><i class="fa fa-eye"></i></span>View List
+                                </button>
+                                @if (Model.CanCreateCalout)
+                                {
+                                    <button class="top-btn btn-outline-info waves-effect waves-light  tm-20" type="submit" id="btnAddNewCallout"><span class="top-btn-label"><i class="mdi mdi-playlist-plus"></i></span>Add New</button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 float-right mm-15">
+                        <div class="col-lg-3 col-sm-12 float-left">
+
+                        </div>
+
+                        <div class="col-lg-4 col-sm-12 tm-20 float-left">
+
+                        </div>
+                        <div class="col-lg-5 col-sm-12 float-right" style="text-align:right;margin-top:5px;margin-right:25px;">
+                            <span class="field-validation-error text-danger" id="spnCallRptErr">Please select a proposal from the table</span>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom:15px!important">
+        <div class="col-lg-6">
+            @Html.Partial("_QuickHelp", Model)
+        </div>
+    </div>
+
+    @Html.Partial("_HelpDynamic")
+
+    <div class="row mtm-10">
+        <div class="col-12">
+            <div class="card-header" style="height: 48px;">
+                <strong>View Proposals</strong>
+            </div>
+            <div class="card" style="margin-top:-10px;">
+                <div class="card-base">
+                    <div class="table-responsive m-t-0" style="margin-top:-14px;">
+                        <table id="fmProposalDataTable" class="display nowrap table table-hover display table-bordered table-striped dataTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 44.5px;">Actions</th>
+                                    <th style="width: 130.5px;">Proposal ID*</th>
+                                    <th style="width: 130.5px;">Proposal Date</th>
+                                    <th style="width: 136px;">School Name</th>
+                                    <th style="width: 129.5px;">Requested By</th>
+                                    <th style="width: 217px;">Description</th>
+                                    <th style="width: 154.5px;">Work Nominated By</th>
+                                    <th style="width: 107px;">Proposal Status</th>
+                                    <th style="width: 107px;">Approval Status</th>
+                                    <th style="width: 107px;">Approved By</th>
+                                    <th style="width: 107px;">Approval Date</th>
+                                    <th style="width: 107px;">Awaiting Approval</th>
+                                    <th style="width: 107px;">Last Approved</th>
+                                    <th style="width: 107px;">Days Logged*</th>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"></td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchProposalId" class="form-control form-control-sm" placeholder="Search" style="msc"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchProposalDate" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchSchName" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchReqBy" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchDesc" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchWokNomBy" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchProposalStatus" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchStatus" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchAppBy" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchAppDate" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchAwaitingApp" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchLastApp" class="form-control form-control-sm" placeholder="Search"> </td>
+                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchDaysSinceLogged" class="form-control form-control-sm" placeholder="Search"> </td>
+                                </tr>
+
+                            </thead>
+                            <tbody></tbody>
+                            @*<tfoot>
+
+                                </tfoot>*@
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="InfoModal2" tabindex="-1" role="dialog" aria-labelledby="InfoModal2Label2" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content info-content" style="border-radius:0px;">
+                <div class="modal-header card-header" style="max-height: 53px;">
+                    <h4 class="modal-title info-title"><i class="fa fa-flag mr-2"></i>Information</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body" style="margin-top:0px;">
+                    <div class="vtabs">
+                        <ul class="nav nav-tabs tabs-vertical" role="tablist">
+                            <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#sorting1" role="tab">Sorting</a></li>
+                            <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#records1" role="tab">Records</a> </li>
+                            <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#icons1" role="tab">Icons</a> </li>
+                            <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#buttons1" role="tab">Buttons</a> </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="sorting1" role="tabpanel">
+                                <div class="p-20" style="margin-top:-24px;">
+                                    <h4>Click on any header or sorting arrow in the list to sort.</h4>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="records1" role="tabpanel">
+                                <div class="p-20" style="margin-top:-24px;">
+                                    <h4>Select a row from the list provided to check for records. Icons appearing under "Actions" column, to the left of the records, perform varying functions. Click the icons to perform the following functions. </h4>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="icons1" role="tabpanel">
+                                <div class="p-20" style="margin-top:-24px;">
+                                    <h4>Click <span class="ml-1 mr-1"><i class="fa fa-pencil-square" style="font-size:21px; color: #002664;"></i></span> icon on the left for editing the selected record.</h4>
+                                    <div class="mt-1 mb-2" style="border: 1px dashed #4C4C4C;"></div>
+                                    <h4>Create a project (if applicable). Click <span class="ml-1 mr-1"><img src="@Url.Content("~/theme2/assets/images/188.png")" style="height:15px; width: auto; margin-top:-2px;"></span> icon on the left to create a proposal.</h4>
+                                    <div class="mt-1 mb-2" style="border: 1px dashed #4C4C4C;"></div>
+                                    <h4>Select <span class="ml-1 mr-1"><i class="fa fa-trash" style="font-size: 21px; color: #002664;"></i></span> to delete the record selected.</h4>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="buttons1" role="tabpanel" disabled>
+                                <div class="p-20" style="margin-top:-24px;" id="divAddNew" disabled>
+                                    <h4>Click <span class="ml-1 mr-1"><button class="btn btn-xs btn-outline-info waves-effect waves-light" disabled type="button"><span class="btn-label"><i class="mdi mdi-playlist-plus"></i></span>Add New</button></span> button to add proposal. You MUST select a school and work category from the lists provided prior to adding a new proposal.</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style type="text/css">
+        @@media (max-width: 767px) {
+            #fmCallOutDataTable_paginate_select_pager_label {
+                display: block !important;
+                margin-top: 20px;
+                margin-left: 0px;
+                text-align: left;
+            }
+        }
+
+        input[type=search]::-ms-clear {
+            display: none;
+        }
+
+        .info-title {
+            color: #002664;
+            font-weight: 700;
+        }
+
+        .info-content {
+            border-radius: 0rem;
+            border: 1px solid #002664 !important;
+            outline: 0;
+        }
+
+        .btn-outline-info.focus,
+        .btn-outline-info:focus,
+        .btn-outline-info:hover {
+            background: #1e88e5;
+        }
+
+        .breadcrumb-item a {
+            color: #002664 !important;
+        }
+
+
+
+        @@media screen and (max-width: 768px) {
+            .mt-down {
+                margin-top: -8px !important;
+            }
+        }
+
+        .table-hover tbody tr:hover td {
+            background: #ccd3e0;
+        }
+
+        .page-link {
+            position: relative;
+            display: block;
+            padding: .5rem .75rem;
+            margin-left: -1px;
+            line-height: 1;
+            color: #007bff;
+            background-color: #fff;
+            border: 0px solid #dee2e6;
+        }
+
+        .page-item:last-child .page-link {
+            border-top-right-radius: 0rem !important;
+            border-bottom-right-radius: 0rem !important;
+        }
+
+        .page-item:first-child .page-link {
+            border-top-right-radius: 0rem !important;
+            border-bottom-right-radius: 0rem !important;
+        }
+
+        @@media (max-width: 991px) {
+            .sbmb {
+                margin-bottom: -13px !important;
+            }
+        }
+
+        @@media (min-width: 991px) and (max-width: 1120px) {
+            .cbmb {
+                margin-bottom: -61px !important;
+            }
+        }
+
+        @@media (min-width: 767px) and (max-width: 1194px) {
+            .push {
+                padding-top: 40px;
+            }
+
+            .mb-40 {
+                margin-bottom: 40px;
+            }
+
+            .mt-20 {
+                margin-top: 20px;
+            }
+
+            .d-ec3-none {
+                display: none !important;
+            }
+        }
+
+        @@media (min-width: 767px) and (max-width: 1180px) {
+            .d-ec2-block {
+                display: block !important;
+            }
+
+            .d-ec2-none {
+                display: none !important;
+            }
+        }
+
+        @@media (max-width: 568px) {
+            .fmcr-btn {
+                margin-top: 12px;
+                float: left !important;
+            }
+
+            .dataTables_filter {
+                float: left;
+                margin-top: 0px;
+            }
+        }
+
+        @@media (max-width: 767px) {
+            .d-ec-block {
+                display: block !important;
+            }
+
+            .xsmb {
+                margin-bottom: 18px !important;
+            }
+
+            .mtm-10 {
+                margin-top: -10px;
+            }
+
+            .push-back {
+                margin-top: -46px;
+            }
+
+            .help-mtb {
+                margin-top: -38px !important;
+            }
+        }
+
+        .ribbon {
+            padding: 0 12px;
+        }
+
+        .ribbon-bookmark:before {
+            border: 15px solid #1E88E5;
+            border-right: 10px solid transparent;
+        }
+
+        .shorten-x {
+            width: 100%;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+        }
+
+        table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting,
+        table.dataTable thead > tr > td.sorting_asc,
+        table.dataTable thead > tr > td.sorting_desc,
+        table.dataTable thead > tr > td.sorting {
+            padding-right: 20px;
+        }
+
+        @@media (min-width: 767px) and (max-width: 1194px) {
+            .push {
+                padding-top: 40px;
+            }
+
+            .d-ec3-none {
+                display: none !important;
+            }
+        }
+
+        .btn-waratah-red {
+            color: #ffffff;
+            background-color: #d7153a;
+            border-color: #d7153a;
+        }
+
+        .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+            color: #fbf5ee !important;
+            background-color: #d7153a;
+            border-bottom: none !important;
+            border-radius: 0px !important;
+            margin-top: -3px;
+            margin-bottom: -3px;
+        }
+
+        .list-group-item {
+            border: none !important;
+            background-color: transparent !important;
+            color: #fbf5ee;
+            border-radius: 0px !important;
+        }
+
+            .list-group-item:hover {
+                background-color: #d7153a !important;
+                color: #FFFFFF;
+            }
+
+        @@media (min-width: 767px) and (max-width: 1194px) {
+            .push {
+                padding-top: 40px;
+            }
+
+            .d-ec3-none {
+                display: none !important;
+            }
+        }
+
+        .customtab li a.nav-link {
+            color: #fbf5ee;
+        }
+
+        .nav-tabs {
+            border-bottom: none !important;
+        }
+
+        .help-module-card {
+            border: none !important;
+        }
+
+        .customtab li a.nav-link:hover, .profile-tab li a.nav-link:hover {
+            color: #FFFFFF !important;
+        }
+
+        @@media (min-width: 1600px) {
+            .d-xlarge-block {
+                display: block !important;
+            }
+
+            .xl-center {
+                display: flex !important;
+                justify-content: center !important;
+            }
+        }
+
+        @@media (max-width: 1600px) {
+            .header-sm-1 {
+                background-position: 44px 0px !important;
+                height: 128px !important;
+            }
+        }
+
+        .modal-dialog {
+            overflow-y: initial !important;
+        }
+
+        .modal-body {
+            max-height: calc(100vh - 210px);
+        }
+
+        .modal-body-x {
+            max-height: calc(100vh - 376px);
+            overflow-y: auto;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .help-p {
+            line-height: 1.4;
+            font-size: 14px;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        .help-sect-title {
+            font-size: 20px;
+            color: #000000;
+            font-weight: 900;
+            font-family: 'Roboto';
+        }
+
+        .help-title {
+            color: #000000;
+            font-weight: 900;
+            font-size: 16px;
+            font-family: 'Roboto';
+        }
+
+        .help-subtitle {
+            color: #1e88e5 !important;
+            font-weight: 900;
+            font-size: 15px;
+        }
+
+        .breadcrumb-item a {
+            color: white !important;
+        }
+
+        .icon {
+            position: relative;
+            top: 3px;
+            left: 0px;
+        }
+
+        .title-x {
+            font-family: 'Roboto', serif;
+            line-height: 1;
+            color: white;
+            text-shadow: 0 0 10px #000000;
+        }
+
+        @@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
+            .cbmb {
+                margin-bottom: -61px !important;
+            }
+        }
+
+        #btnSearchIcon {
+            margin-right: 7px;
+            color: #2196f3;
+        }
+
+        #fmProposalDataTable_filter {
+            height: 32px;
+        }
+
+        div.dataTables_wrapper div.dataTables_filter input {
+            border: 1px solid white !important;
+        }
+
+        .search-btn {
+            width: auto;
+            float: right;
+            margin-top: 10px;
+        }
+    </style>
+}
+
+@section Scripts
+{
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.21/pagination/select.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.21/pagination/extjs.js"></script>
+    @* <script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>*@
+   @* <script type="text/javascript" src="path/to/jquery.ba-throttle-debounce.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+
+
+    @Scripts.Render("~/bundles/jqueryval")
+    @{
+        var sessionAgencyId = Session["AgencyDetails"] != null ? ((KeyValuePair<int, string>
+    )Session["AgencyDetails"]).Key.ToString() : "0";
+
+    }
+
+    <script>
+
+        var agencyId = '@Model.AgencyId';
+        var propertyId = '@Model.PropertyId';
+        var grantApplication = '@Model.GrantApplication';
+        var workCategoryId = '@Model.WorkCategoryId';
+
+        var srvMode = '@Model.CanDelete';
+        var srvCanDelete = '@Model.CanCreateJob';
+
+        var srvApiUrl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "Proposal" })';
+        var callOutHomeUrl = '@Url.Action("Detail", "Proposals")';
+        var jobHomeUrl = '@Url.Action("Detail", "Project")';
+        var calloutListUrl = '@Url.Action("Index", "Proposals")';
+        var baseUrl = "@Url.Content("~")";
+        var rptUrl = '@Url.Action("ProposalReport", "Proposals", new { Area = "FMWorks" })';
+        var readOnlySchoolList = @Html.Raw(JsonConvert.SerializeObject(ViewData["ReadonlySchools"]));
+        var helpUrl = '@Url.Action("QuickHelp", "Proposals")';
+    </script>
+    @Scripts.Render("~/bundles/fmproposallist")
+}

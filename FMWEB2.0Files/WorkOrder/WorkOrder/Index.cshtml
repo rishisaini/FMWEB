@@ -1,0 +1,285 @@
+﻿@using AssetCare.Common
+@using Newtonsoft.Json
+
+@model AssetCare.Model.ViewModels.JobListViewModel
+
+
+<div class="container-fluid">
+    <!-- quick tip start div -->
+    <div class="row tips">
+        <div class="col-12">
+            <div class="card" style="background-color: #009efb;">
+                <div class="col-12">
+
+                    <div style="background: white; padding:8px; border-radius:20px;">
+                        <span style="background-color:#002664; border-radius:18px; margin-left:-6px; padding:2px; color: white !important;"><i class="fa fa-lightbulb"></i><strong> Search Tips: </strong></span>
+                        &nbsp;<span style="color:#007bff; line-height:20px !important;">
+                            Search column, except columns with * requires a minimum of 3 characters in the search field.
+                        </span>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- quick tip end div -->
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row" style="margin-top:-8px;">
+        <div class="col-12">
+            <div class="card white-bg">
+                @using (Html.BeginForm("Detail", "WorkOrder", FormMethod.Post))
+                {
+                    @Html.HiddenFor(x => x.CurrentRoleID)
+                    @Html.HiddenFor(x => x.ShowWOPaidOnly)
+                    <div class="row">
+                        <div class="col-12 float-right">
+                            <div class="col-lg-4 col-sm-12 float-left">
+                                <h4><strong>Reactive Work Orders</strong></h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home" ,new { Area="" })?id=@Model.AgencyId">Home</a></li>
+                                    <li class="breadcrumb-item"><a href="#">Work Orders</a></li>
+                                    <li href="#" class="breadcrumb-item active">Reactive</li>
+                                </ol>
+                            </div>
+
+                            <div class="col-lg-3 col-sm-12 tm-20 float-left ">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(x => x.SchoolId, (IEnumerable<SelectListItem>)ViewData["SchoolsList"], "Select School", new { @class = "custom-select", @id = "schoolSelectList" })
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-sm-12 tm-20 float-left ">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(x => x.SchoolId, (IEnumerable<SelectListItem>)ViewData["JobStatus"], "Select Status", new { @class = "custom-select", @id = "schoolSelectStatus" })
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-sm-12  float-right sch-drp-ma" style="text-align:right;">
+                                <button class="top-btn btn-outline-info waves-effect waves-light  tm-20  mr-2" type="button" id="btnViewList"><span class="top-btn-label"><i class="fa fa-eye"></i></span>View List</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @{
+        if (User.IsInRoles("LOCALCONTRACTOR,CONTRACTOR,APIStandard,APIPriemium,DETAMU,AMUOFFICER,DETAMCU,AMCUOFFICE,ADMIN,GROUPLEADER,SRGRPLEADER,DIRAM,EDAM,SUPPORT"))
+        {
+            <div class="row" style="margin-bottom:15px!important;">
+                <div class="col-lg-6">
+                    @Html.Partial("_QuickHelp", Model)
+                </div>
+            </div>
+        }
+    }
+
+    <div class="row" style="margin-top:-12px;">
+
+        <div class="col-12">
+            <div class=" blue-header">
+                <div class="card-base">
+                    <div class="row">
+                        <strong>View Work Orders</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:-12px;">
+        <div class="col-xl-12">
+            <div class="card ">
+                <div class="card-body collapse show">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12">
+                            <div class="card inner-border-1 white-bg">
+                                <div class="card-base">
+                                    <div class="table-responsive m-t-0" style="margin-top:-14px;">
+                                        <div id="myTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                                            <table id="fmJobsList" class="display nowrap table table-hover display table-bordered table-striped dataTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Actions</th>
+                                                        <th>WO ID*</th>
+                                                        <th>WO Date</th>
+                                                        <th>Local Contractor</th>
+                                                        <th>School Name</th>
+                                                        <th>Buildings</th>
+                                                        <th>Include betterment?</th>
+                                                        <th>Reimbursement Complete?</th>
+                                                        <th>Requested By</th>
+                                                        <th>Description</th>
+                                                        <th>Subcategory</th>
+                                                        <th>Status</th>
+                                                        <th>Callout ID*</th>
+                                                    </tr>
+                                                    <tr class="search-row">
+                                                        <td></td>
+                                                        <td><input type="search" id="searchJobId" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchWODate" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchContractor" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchSchoolName" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchBuildings" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchIsIncludeBetterment" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchIsReimbursementComplete" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchRequestedBy" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchDescription" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchCategory" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchStatus" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                        <td><input type="search" id="searchCallOutId" class="form-control form-control-sm column_search" placeholder="Search"></td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="InfoModal3" tabindex="-1" role="dialog" aria-labelledby="InfoModal3Label3" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content info-content" style="border-radius:0px;">
+            <div class="modal-header card-header" style="max-height: 53px;">
+                <h4 class="modal-title info-title"><i class="fa fa-flag mr-2"></i>Information</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body" style="margin-top:0px;">
+                <div class="vtabs">
+                    <ul class="nav nav-tabs tabs-vertical" role="tablist">
+                        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#sorting1" role="tab">Sorting</a></li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#records1" role="tab">Records</a> </li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#icons1" role="tab">Icons</a> </li>
+                        <li class="nav-item"> <a class="nav-link" data-toggle="tab" href="#buttons1" role="tab">Buttons</a> </li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="sorting1" role="tabpanel">
+                            <div class="p-20" style="margin-top:-24px;">
+                                <h4>Click on any header or sorting arrow in the list to sort.</h4>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="records1" role="tabpanel">
+                            <div class="p-20" style="margin-top:-24px;">
+                                <h4>Icons appearing under "Actions" column, to the left of the records, perform varying functions. Click the icons to perform the following functions. </h4>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="icons1" role="tabpanel">
+                            <div class="p-20" style="margin-top:-24px;">
+                                <h4>Click <span class="ml-1 mr-1"><i class="fa fa-pencil-square" style="font-size:21px; color: #002664;"></i></span> icon on the left for editing the selected record.</h4>
+                                <div class="mt-1 mb-2" style="border: 1px dashed #4C4C4C;"></div>
+                                <h4>Select <span class="ml-1 mr-1"><i class="fa fa-copy fa-2x" style="font-size:16px; color: #002664;"></i></span> icon to add a new job based on the record selected (as a template).</h4>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="buttons1" role="tabpanel">
+                            <div class="p-20" style="margin-top:-24px;">
+                                <h4>Click <span class="ml-1 mr-1"><button class="btn btn-xs btn-outline-info waves-effect waves-light" type="button"><span class="btn-label"><i class="mdi mdi-playlist-plus"></i></span>Add New</button></span> button to add a new call. You MUST select a school and work category from the lists provided prior to adding a new call.</h4>
+                                <div class="mt-3 mb-3" style="border: 1px dashed #4C4C4C;"></div>
+                                <h4>Click <span class="ml-1 mr-1"><button class="btn btn-xs btn-outline-info waves-effect waves-light" type="button"><span class="btn-label"><i class="fas fa-certificate"></i></span>Stat Dec</button></span> button to create a pop-up window to print a statutory declaration.</h4>
+                                <div class="mt-3 mb-3" style="border: 1px dashed #4C4C4C;"></div>
+                                <h4>Click <span class="ml-1 mr-1"><button class="btn btn-xs btn-outline-info waves-effect waves-light" type="button"><span class="btn-label"><i class="fas fa-print"></i></span>Service Report</button></span> button to create a service report.</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script>
+        var workCategoryId = "@Model.WorkCategoryId";
+        var propertyId = "@Model.SchoolId";
+        var woStatusId = 0;
+
+        var agencyId = "@Model.AgencyId";
+        var detailUrl = "@Url.Action("Detail", "WorkOrder", new { Area = "FMWorks" })";
+        var calloutUrl = "@Url.Action("Detail", "CallOut", new { Area = "FMWorks" })";
+        var listUrl =  "@Url.Action("Index", "WorkOrder", new { Area = "FMWorks" })";;
+        var baseUrl = "@Url.Content("~")";
+        var url = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "WorkOrder" })';
+        var canViewCallout = '@Model.CanViewCallOut';
+
+        const helpUrl = '@Url.Action("QuickHelpIndex", "WorkOrder")';
+
+        $('#getHelp').click(function (e) {
+            $.ajax({
+            url: helpUrl,
+                method: "POST",
+                success: function (quickHelp) {
+                    $('#HelpModalBody').empty();
+                    $('#HelpModalBody').append(quickHelp);
+                    $('#HelpModal').modal('show');
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    @*<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />*@
+    @Scripts.Render("~/bundles/fmjoblist")
+
+    <style>
+
+        .shorten-x {
+            width: 100%;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+        }
+
+        .shorten-xx {
+            width: 50%;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+        }
+
+        .whitespace {
+            white-space: normal;
+        }
+
+        #btnSearchIcon {
+            margin-right: 7px;
+            color: #2196f3;
+        }
+
+        #fmJobsList_filter {
+            height: 32px;
+        }
+
+        div.dataTables_wrapper div.dataTables_filter input {
+            border: 1px solid white !important;
+        }
+
+        .search-btn {
+            width: auto;
+            float: right;
+            margin-top: 10px;
+        }
+    </style>
+}

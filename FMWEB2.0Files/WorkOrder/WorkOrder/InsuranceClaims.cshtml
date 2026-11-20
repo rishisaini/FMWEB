@@ -1,0 +1,361 @@
+﻿@using AssetCare.Model.ViewModels
+@using AssetCare.Model.Models
+@using AssetCare.Common
+@using AssetCare.Helpers
+@model WorkOrderCertifyViewModel
+@{
+    var visibiltyOfGenerateReimbursementItemsButtonText = System.Configuration.ConfigurationManager.AppSettings["AssetCareSettings:VisibiltyOfGenerateReimbursementItemsButton"];
+    var visibiltyOfGenerateReimbursementItemsButton = bool.Parse(string.IsNullOrEmpty(visibiltyOfGenerateReimbursementItemsButtonText)?"false" : visibiltyOfGenerateReimbursementItemsButtonText);
+}
+
+<div class="container-fluid">
+    <!-- quick tip start div -->
+    <div class="row tips">
+        <div class="col-12">
+            <div class="card" style="background-color: #009efb;">
+                <div class="col-12">
+
+                    <div style="background: white; padding:8px; border-radius:20px;">
+                        <span style="background-color:#002664; border-radius:18px; margin-left:-6px; padding:2px; color: white !important;"><i class="fa fa-lightbulb"></i><strong> Search Tips: </strong></span>
+                        &nbsp; <span style="color: #007bff; line-height: 20px;">
+                            Search column, except columns with * requires a minimum of 3 characters in the search field.
+                        </span>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- quick tip end div -->
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    @using (Html.BeginForm("Claims", "WorkOrder", FormMethod.Post, new { id = "frmClaims" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row" style="margin-top:-8px;">
+            <div class="col-12">
+                <div class="card white-bg">
+
+                    <div class="row">
+                        <div class="col-12 float-right ">
+                            <div class="col-lg-6 col-sm-12 float-left">
+
+                                <h4><strong>Insurance Claims Reimbursement</strong></h4>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item float-left"><a href="@Url.Action("Index", "Home", new { Area = "" })">Home</a></li>
+                                    <li class="breadcrumb-item float-left"><a href="#">Work Order</a></li>
+                                    <li class="breadcrumb-item float-left"><a href="#">Payment Claims</a></li>
+                                    <li href="#" class="breadcrumb-item active">Insurance Claims Reimbursement</li>
+                                </ol>
+                            </div>
+                            <div class="col-lg-6 col-sm-12 float-right" style="text-align:right;">
+                                @{
+                                    var cancelUrl = "/";
+                                    if (string.IsNullOrEmpty(Model.CallbackUrl))
+                                    {
+                                        cancelUrl = Url.Action("Index", "Home", new { area = "" });
+                                    }
+                                    else
+                                    {
+                                        cancelUrl = Model.CallbackUrl;
+                                    }
+                                }
+                                <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" id="btnSearch" type="button"><span class="top-btn-label"><i class="fa fa-eye"></i></span>Review Items</button>
+                                <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="button" onclick="cancelButtonClicked(event,'@cancelUrl')"><span class="top-btn-label"><i class="fa fa-eraser"></i></span>Cancel</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:-8px;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Select options</strong>
+                    </div>
+                    <div class="card-base" style="margin-bottom:-5px; margin-left:-7px;">
+                        <div class="row" style="margin-left:-5px;">
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Callout Reimbursement Status</strong></label>
+                                    @Html.DropDownListFor(x => x.IRCMClaimStatusID, (IEnumerable<SelectListItem>
+                                        )ViewData["IRCMClaimStatuses"], "Select Callout Status",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "IRCMClaimStatusID"), "disabled", "disabled"))
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>School</strong></label>
+                                    @Html.DropDownListFor(x => x.PropertyId, (IEnumerable<SelectListItem>
+                                        )ViewData["SchoolsList"], "Select School",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "PropertyId"), "disabled", "disabled"))
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>WO Reimbursement Status</strong></label>
+                                    @Html.DropDownListFor(x => x.ReimbursementStatusID, (IEnumerable<SelectListItem>
+                                        )ViewData["ReimbursementStatuses"], "Select Reimbursement Status",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "ReimbursementStatusID"), "disabled", "disabled"))
+
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Assessor Appointed</strong></label>
+                                    @Html.DropDownListFor(x => x.AssessorStatusID, (IEnumerable<SelectListItem>
+                                        )ViewData["AssessorStatuses"], "Select Assessor Status",
+                                        new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "AssessorStatusID"), "disabled", "disabled"))
+
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Approval From Date</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.ApprovalFromDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+
+                                           @id = "ApprovalFromDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("mainSection", "ApprovalFromDate"), "disabled", "disabled")
+                                   })
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height:33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span id="errFromDate" style="color:red; display:block"></span>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+                                <div class="form-group">
+                                    <label><strong>Approval To Date</strong></label>
+                                    <div class="input-group">
+                                        @Html.EditorFor(m => m.ApprovalToDate, new
+                                   {
+                                       htmlAttributes = new RouteValueDictionary(new
+                                       {
+                                           @placeholder = "dd/mm/yyyy",
+                                           @class = "form-control form-control-sm datepicker-control",
+
+                                           @id = "ApprovalToDate",
+                                           style = "margin-bottom:3px"
+                                       }).AddIf(Model.DisableField("mainSection", "ApprovalToDate"), "disabled", "disabled")
+                                   })
+
+                                        <div class="input-group-append datepicker-control-sibling" style="height:33px;margin-bottom:3px">
+                                            <span class="input-group-text mr-2" id="basic-addon6">
+                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+
+
+    <div class="row" style="margin-top:-8px;">
+        <div class="col-12">
+            <div class="card white-bg">
+                <div class="row">
+                    <div class="col-12 float-right mm-15">
+                        <div class="col-lg-6 col-sm-12 float-left"></div>
+                        <div class="col-lg-6 col-sm-12 float-right" style="margin-top:35px; text-align:right;">
+                            <button type="button" class="btn-sm btn-rounded mr-2 mt-3 " data-toggle="popover" data-html="true"
+                                    data-content="Tick the ‘Auto Certify’ checkbox to select all claim line items with default ‘Reimbursement Status’ to ‘Full’ and ‘Reimbursement $’ value same as ‘Amount $’.<br/>Click on ‘Save’ button to submit the changes made after 'Auto Certify' selection or untick ‘Auto Certify’ to discard the changes and current selection.<br/>The 'Auto Certify' tick is enabled only for the Callouts with 'Reimbursement Ready' status. "
+                                    style="vertical-align: middle; border: none; box-shadow: none; margin-left:5px; padding: 1px 8px 1px 8px; background: #002664; " data-original-title="" title="">
+                                <i class="fa fa-info" style=" color: white; font-size: 11px !important;"></i>
+                            </button>
+                            @*<button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" id="btnAutoCertify" type="button"><span class="top-btn-label"><i class="fa fa-eye"></i></span>Auto certify</button>*@
+                            <span class="top-btn waves-effect waves-light tm-20 mr-2">
+                                <br />
+                                @Html.CheckBoxFor(p => p.AutoCertified, new { @class = "filled-in chk-col-light-blue" })
+                                @Html.LabelFor(model => model.AutoCertified, new { @style = "font-size:14px;color:#002664;font-weight:700" })
+                            </span>
+
+                            @{
+                                if (!Model.DisableField("mainSection", "btnSave") &&
+                                    @Model.ApprovalType == "mfu" || User.IsInRoles("ADMIN"))
+                                {
+                                    <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="button" id="btnSave"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save</button>
+
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-down">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Review Items List</strong>
+                </div>
+                <div class="card-base">
+                    <div class="table-responsive m-t-0" style="margin-top:-30px;">
+                        <div id="myTable_wrapper" class="display nowrap table table-hover display table-bordered table-striped dataTable no-footer">
+                            <table id="tblClaimsReimbursementList" class="display table table-hover display table-bordered table-striped dataTable no-footer" role="grid">
+                                <thead>
+                                    <tr role="row">
+                                        <th class="sorting_asc" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="CalloutID" style="min-width:5em; vertical-align:middle;">Callout*</th>
+                                        <th class="sorting" tabindex="1" aria-controls="myTable" rowspan="1" colspan="1" aria-label="WOID" style="min-width:5em; vertical-align:middle;">WO*</th>
+                                        <th class="sorting" tabindex="2" aria-controls="myTable" rowspan="1" colspan="1" aria-label="WISEQ#" style="min-width:5em; vertical-align:middle;">WI SEQ*</th>
+                                        <th class="sorting" tabindex="3" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ItemNo" style="min-width:5em; vertical-align:middle;">Item</th>
+                                        <th class="sorting" tabindex="6" aria-controls="myTable" rowspan="1" colspan="1" aria-label="SchoolName" style="min-width:10em; vertical-align:middle;">School</th>
+                                        <th class="sorting" tabindex="9" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ClaimNo" style="min-width:10em; vertical-align:middle;">CN</th>
+                                        <th class="sorting" tabindex="9" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ApprovedAmt" style="min-width:10em; vertical-align:middle;">Approved $</th>
+                                        <th class="sorting" tabindex="11" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ApproveDate" style="min-width:10em; vertical-align:middle;">Approved Date</th>
+                                        <th class="sorting" tabindex="12" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ReimbursementStatus" style="min-width:16em; vertical-align:middle;">Reimbursement Status</th>
+                                        <th class="sorting" tabindex="13" aria-controls="myTable" rowspan="1" colspan="1" aria-label="ReimbursementAmt" style="min-width:10em; vertical-align:middle;">Reimbursement $</th>
+                                        <th class="sorting" tabindex="14" aria-controls="myTable" rowspan="1" colspan="1" aria-label="IRCMComment" style="min-width:16em; vertical-align:middle;">IRCM Comment</th>
+                                    </tr>
+                                    <tr style="border: none;">
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchCalloutId" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchJobId" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchWorkItemSeq" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchItemNo" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchSchoolName" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchClaimNo" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchApprovedAmt" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"><input type="search" id="searchApproveDate" class="form-control form-control-sm column_search" placeholder="Search"> </td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"></td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"></td>
+                                        <td style="vertical-align: middle; border: none; padding-top: 13px;" rowspan="1" colspan="1"></td>
+                                    </tr>
+                                </thead>
+                                <tbody> </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Unsaved Changes detected</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>There are un-saved changes. Click "Close" to stay on the same page or click "Save Changes" to Save.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveFromModal">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModalCenter2" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle2" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle2"><strong>Confirm Unsaved Changes!</strong></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>You have unsaved changes on this page, click 'Ok' to discard these changes or 'Cancel' to keep them.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnSaveFromModal2">OK</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.24/features/conditionalPaging/dataTables.conditionalPaging.js"></script>"
+    @Scripts.Render("~/bundles/claimsReimbursement")
+<script>
+        var dataLink = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "WorkOrder" })';
+        var opType = '@Model.ApprovalType';
+        var agencyId = '@Model.AgencyId';
+        var calloutDetailUrl = "@Url.Action("Detail", "Callout", new { Area = "FMWorks" })";
+        var detailUrl = "@Url.Action("Detail", "WorkOrder", new { Area = "FMWorks" })";
+        var claimUrl = "@Url.Action("InsuranceClaims", "WorkOrder", new { Area = "FMWorks" })";
+        var baseUrl = "@Url.Content("~")";
+        var approveAmount = '@(!Model.DisableField("mainSection", "approveAmount"))';
+        var fmcComment = '@(!Model.DisableField("mainSection", "fmcComment"))';
+        var fmcApprove = '@(!Model.DisableField("mainSection", "fmcApprove"))';
+        var asoComment = '@(!Model.DisableField("mainSection", "asoComment"))';
+        var asoApprove = '@(!Model.DisableField("mainSection", "asoApprove"))';
+        @*var popupLink = '@Url.Action("InsuranceClaimRCTI", "WorkOrder")'*@
+</script>
+
+}
+
+<style type="text/css">
+
+    .custom-control-label::before {
+        background-color: #75a8fe !important;
+    }
+
+    .input-validation-error {
+        border-color: red !important;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+    .btn-outline-info.disabled, .btn-outline-info:disabled {
+        background-color: #5a7ca4;
+    }
+    .text-centre {
+        text-align :center;
+    }
+    #btnSearchIcon {
+        margin-right: 7px;
+        color: #2196f3;
+    }
+
+    #tblClaimsReimbursementList_filter {
+        height: 32px;
+    }
+
+    div.dataTables_wrapper div.dataTables_filter input {
+        border: 1px solid white !important;
+    }
+
+    .search-btn {
+        width: auto;
+        float: right;
+        margin-top: 10px;
+    }
+</style>

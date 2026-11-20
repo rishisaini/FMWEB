@@ -1,0 +1,363 @@
+﻿@using AssetCare.Model.ViewModels
+@using AssetCare.Model.Models
+@using AssetCare.Common
+@model JobDetails
+<style type="text/css">
+
+    .customtab2 li a.nav-link.active {
+        background: #e8f1ff !important;
+        text-transform: capitalized !important;
+        border-top-left-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        color: #002664 !important;
+        border: 1px solid #51a4ff;
+        border-bottom: 1px solid #51a4ff !important;
+        height: 27px;
+        font-size: 12px;
+        font-weight: 100;
+    }
+    .customtab2 li a.nav-link {
+        background: #f0f0f0 !important;
+        text-transform: capitalized !important;
+        color: #4d4d4d !important;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        height: 27px;
+        font-size: 12px;
+        font-weight: 100;
+    }
+    .card-header-3 {
+        background: #f1f1f1;
+        border-bottom: 1px dotted #F2A9AB !important;
+        padding: 6px 4px 0px 4px;
+        padding-left: 15px;
+        font-weight: 400;
+        color: #525354;
+        height: 25px;
+    }
+    .sorting_1
+    {
+        text-align: center !important;
+
+    }
+    .table-hover tbody tr:hover td {
+        background: #ffffff !important;
+    }
+</style>
+<div id="myDIV" style="margin-top:2px;" class="">
+    <div class="col-11">
+        <span style="float:left; margin-right: 10px;"><img src="~/theme2/assets/images/arrow2.png" alt=""></span>
+        <div class="card" style="border-radius:0px !important;">
+            <div class="card-header-3">  <strong> WO Description:</strong> @Model.ServiceReportDesc</div>
+            <div class="card-base p-b-0" style="margin-bottom:-37px;">
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs  customtab2" role="tablist" style="background:#f2f2f2; height:38px; border-radius:12px; padding:8px;">
+                    <li class="nav-item"> <a class="nav-link active show" data-toggle="tab" href=@("#detail" + Model.ServiceReportId) role="tab" aria-selected="true"><span class="hidden-sm-up">Details</span> <span class="hidden-xs-down"><strong>Details</strong></span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href=@("#estimate"+ Model.ServiceReportId) role="tab" aria-selected="false"><span class="hidden-sm-up">Estimate</span> <span class="hidden-xs-down"><strong>Estimate</strong></span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href=@("#document"+ Model.ServiceReportId) role="tab" aria-selected="false"><span class="hidden-sm-up">Documents</span> <span class="hidden-xs-down"><strong>Documents</strong></span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" href=@("#claim"+ Model.ServiceReportId) role="tab" aria-selected="false"><span class="hidden-sm-up"> Claims</span> <span class="hidden-xs-down"> <strong>Claims</strong></span></a> </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+
+                    <div class="tab-pane active show" id=@("detail" + Model.ServiceReportId) role="tabpanel">
+                        <div class="p-20">
+                            <div class="row ">
+                                <div class="col-xl-12 col-lg-12 mtm-10">
+                                    <div class="card inner-border-1">
+                                        <div class="card-base mbm-0 mtmx-0 white-bg" style=" border-bottom-left-radius: 0px !important; color:#525354; font-weight: 100;">
+
+                                            <div class="row" style="margin-top:0px;">
+                                                <div class="col-md-3 mtp-12" style="margin-top:-4px;">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>Callout ID:</strong></label>
+                                                    <label>@Model.CallOutId </label>
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong> Callout Date: </strong></label> <label> @Model.CallLogDate.ToString("dd/MM/yyyy") </label>
+
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong> Work Order  Date: </strong></label><label>
+    @if (Model.RecordedDate != null)    {        <text> @Model.RecordedDate.Value.ToString("dd/MM/yyyy") </text> }</label>
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>Expected Visit Date/Time: </strong></label> <label> @Model.DetailsTab.ExpectedVisitDate</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row label-bdr-wo" style="margin-top:0px;">
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong> First Visit Date: </strong></label><label> @if (Model.DetailsTab.FirstVisitDate.HasValue)
+                                                        {@Model.DetailsTab.FirstVisitDate.Value.ToString("dd/MM/yyyy")} </label>
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>Date All Work Completed: </strong></label> <label> @Model.DetailsTab.CompletedDate.Value.ToString("dd/MM/yyyy") </label>
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>School Contribution:  </strong></label> <label> @Model.IsSchoolContribution </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row label-bdr-wo" style="margin-top:0px;">
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>Incident Type:  </strong> </label> <label> @Model.SchoolIncidentCauseDesc </label>
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong> Is total estimated cost over $18K ?: </strong></label>  @if (Model.IsTotalEstimationOverLimit == true) { <label> Yes  </label>} else {<label> No  </label> } 
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>Incident Date/Time: </strong></label> <label> @Model.InsuranceIncidentDateTime </label>
+                                                </div>
+                                                <div class="col-md-3 mtp-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>  Does this workorder include betterment? : </strong></label> <label>  @Model.IsIncludeBetterment </label>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row label-bdr-wo" style="margin-top:0px;">
+
+
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>LC Comments:  </strong></label><br>
+                                                    <textarea style="width:100% !important; border:1px solid #E3E3E3; height: 80px; color: #9d9d9d; padding:4px; line-height: 16px;">@Model.DetailsTab.SubContractorComments
+</textarea>
+                                                </div>
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>FMC Comments:  </strong></label><br>
+                                                    <textarea style="width:100% !important; border:1px solid #E3E3E3; height: 80px; color: #9d9d9d; padding:4px; line-height: 16px;">@Model.DetailsTab.Comments
+</textarea>
+                                                </div>
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>ASO Comments:  </strong></label><br>
+                                                    <textarea style="width:100% !important; border:1px solid #E3E3E3; height: 80px; color: #9d9d9d; padding:4px; line-height: 16px;">@Model.DetailsTab.AMUComments
+</textarea>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id=@("estimate"+ Model.ServiceReportId) role="tabpanel">
+                        <div class="p-20 pb-5">
+
+
+                            <div class="card-base  white-bg" style="border:1px solid #CCCCCC !important; border-bottom-left-radius: 0px !important; color:#525354; font-weight: 100">
+
+                                <div class="row" style="margin-top:0px;">
+                                    <div class="col-md-3 mtp-12" style="margin-top:-4px;">
+                                        <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>Estimated Amount:</strong></label>
+                                        <label>$@Model.Estimate.EstimatedAmount</label>
+                                    </div>
+                                    <div class="col-md-3 mtp-12">
+                                        <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">   <strong>Recommended Date: </strong></label> 
+                                        @if (Model.Estimate.FMCApprovedDate.HasValue)
+                                        {
+                                          <label>
+                                              @Model.Estimate.FMCApprovedDate.Value.ToString("dd/MM/yyyy")
+                                          </label>
+                                              }
+                                         
+                                    </div>
+                                    <div class="col-md-3 mtp-12">
+                                        <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">   <strong>AMU Approval:</strong> </label> @if(Model.Estimate.AMUApproved == true){
+                                           <label>Approved</label>
+                                        }
+                                    
+                                    </div>
+                                    <div class="col-md-3 mtp-12">
+                                        <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt="">  <strong>Approval Date: </strong> </label> 
+                                            @if (Model.Estimate.AMUApprovedDate.HasValue)
+                                            {<label>    @Model.Estimate.AMUApprovedDate.Value.ToString("dd/MM/yyyy")</label>}
+                                    </div>
+                                </div>
+                                <div class="col-6 table-responsive mt-2 label-bdr-wo">
+                                    <table id="" class="table display table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Download</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Uploaded On</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var document in Model.SupportQuoteDocuments)
+                                            {
+                                                <tr>
+                                                    <td><a href="@document.AttachmentLink" target="_blank">@document.ClientDocumentName</a></td>
+                                                    <td>@document.RecordedDate</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id=@("document"+ Model.ServiceReportId) role="tabpanel">
+                        <div class="p-20 pb-5">
+
+                            <div class="card-base  white-bg" style="border:1px solid #CCCCCC !important; border-bottom-left-radius: 0px !important; color:#525354; font-weight: 100">
+
+                                <div class="table-responsive m-t-0">
+                                    <table id="" class="table display table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Document Type</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Download</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Uploaded On</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var document in Model.SupportDocuments)
+                                            {
+                                                <tr>
+                                                    <td>@document.SupportDocumentTypeDesc</td>
+                                                    <td><a href="@document.AttachmentLink" target="_blank">@document.ClientDocumentName</a></td>
+                                                    <td>@document.RecordedDate.Value.ToString("dd/MM/yyyy HH:mm:ss tt")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id=@("claim"+ Model.ServiceReportId) role="tabpanel">
+                        <div class="p-20 pb-5">
+                            <div class="row" style="margin-top:0px; color:#525354; font-weight: 100">
+                                <div class="col-md-3 mtp-12" style="margin-top:-4px;">
+                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>Total Costing:</strong></label>
+                                    <label>@Model.Claim.TotalAmount.ToString("c")</label>
+                                </div><div class="col-md-3 mtp-12" style="margin-top:-4px;">
+                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>Payment Approved:</strong></label>
+                                    <label>@Model.Claim.TotalApprovedAmount.ToString("c")</label>
+                                </div>
+                                <div class="col-md-3 mtp-12">
+                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong> Claim Date: </strong></label> 
+                                    @if (Model.Claim.ClaimFinalizedDate.HasValue)
+                                    {
+                                       <label>
+                                           @Model.Claim.ClaimFinalizedDate.Value.ToString("dd/MM/yyyy")
+                                       </label>
+                                           }
+                                      
+                                </div>
+                            </div>
+                            <div class="card-base  white-bg" style="border:1px solid #CCCCCC !important; border-bottom-left-radius: 0px !important; color:#525354; font-weight: 100">
+
+                                <div class="table-responsive m-t-0" style="margin-top:-14px;">
+                                    <table id="myTable" class="display table nowrap table-hover display table-bordered table-striped dataTable">
+                                        <thead>
+                                            <tr>
+
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Item No.</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Description</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Unit</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Rate</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Quantity</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Amount</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Work Date</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Reimbursement Status</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Reimbursement Amount</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">IRCM Comments</th>
+                                                <th style="color:#525354 !important; font-weight: 100; background-color: #e9e9e9 !important;">Reimbursement Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                int count = 0;
+                                                foreach (var workItem in Model.WorkItems)
+                                                {
+                                                    <tr>
+                                                        <td>@workItem.ScheduleItemNo</td>
+                                                        <td>@workItem.SRLIDescription</td>
+                                                        <td class="text-right">@workItem.Unit</td>
+                                                        <td class="text-right">
+                                                            @{
+                                                                if (@workItem.Rate.HasValue)
+                                                                {
+                                                                    @Math.Round(workItem.Rate.Value, 2)
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td class="text-right">@workItem.Quantity</td>
+                                                        <td class="text-right">
+                                                            @{
+                                                                if (@workItem.Amount.HasValue)
+                                                                {
+                                                                    @Math.Round(workItem.Amount.Value, 2)
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td class="text-right">
+                                                            @{
+                                                                if (@workItem.WorkDate.HasValue)
+                                                                {
+                                                                    <text>@workItem.WorkDate.Value.ToString("dd/MM/yyyy")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                if (@workItem.ReimbursementStatusID.HasValue)
+                                                                {
+                                                                    <text>@workItem.ReimbursementStatusID.Value</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                if (@workItem.IRCMReimbursementAmount.HasValue)
+                                                                {
+                                                                    <text>@Math.Round(workItem.IRCMReimbursementAmount.Value, 2)</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td>@workItem.IRCMComments</td>
+                                                        <td>
+                                                            @{
+                                                                if (@workItem.IRCMReimbursementDate.HasValue)
+                                                                {
+                                                                    <text>@workItem.IRCMReimbursementDate.Value.ToString("dd/MM/yyyy")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    count++;
+
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            @*<div class="row mt-4 label-bdr-wo" style=" color:#525354; font-weight: 100">
+
+                                <div class="col-md-3 mtp-12" style="margin-top:-4px;">
+                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>Total Reimbursement Amount:</strong></label>
+                                    <label>$4500</label>
+                                </div><div class="col-md-3 mtp-12" style="margin-top:-4px;">
+                                    <label><img src="@Url.Content("~/theme2/assets/images/bullet.jpg")" width="20" height="20" alt=""> <strong>WO Reimbursement Status:</strong></label>
+                                    <label>Fully Reimbursed</label>
+                                </div>
+
+                            </div>*@
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>

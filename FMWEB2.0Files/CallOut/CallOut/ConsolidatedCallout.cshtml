@@ -1,0 +1,1320 @@
+﻿@model AssetCare.Model.ViewModels.CallOutInsAddModel
+@using AssetCare.Model.ViewModels
+@using Newtonsoft.Json
+@using AssetCare.Helpers
+<div class="container-fluid" style="max-width: 1450px;">
+    @using (Html.BeginForm("ConsolidatedCallout", "CallOut", FormMethod.Post, new { @id = "frmConsolidated" }))
+    {
+        @Html.AntiForgeryToken()
+        <!-- ============================================================== -->
+        <!-- Bread crumb and right sidebar toggle -->
+        <!-- ============================================================== -->
+        <div class="col-xl-12">
+            <div class="row mt-2 mb-2">
+                <button type="button" class="btn btn-info btn-sm btn-rounded align-self-center d-none d-lg-block ml-1 ml-auto" data-toggle="modal" data-target="#HelpModal1" style="vertical-align: middle; border: none; box-shadow: none; margin-top:-20px; margin-right:30px; font-weight: 600; padding-bottom: 2px; padding-top: 2px; ">
+                    <i class="fa fa-question-circle" style="font-weight: 600;"></i>
+                    Help
+                </button>
+            </div>
+        </div>
+        <div class="row page-titles push ptop push-back" style="margin-left:20px; margin-right:20px;">
+            <div class="col-xl-7 col-lg-7 col-md-7 align-self-center" style="vertical-align: middle;">
+                <h3 class="text-themecolor">Reactive / Insurance Callout</h3>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { Area = "" })">Home</a></li>
+                    <li href="#" class="breadcrumb-item ">Callout Details</li>
+                </ol>
+            </div>
+            <div class="col-xl-5 col-lg-5 col-md-5 align-self-center mtp-8" style="vertical-align: middle;">
+                <button id="btnCancel" class="btn btn-outline-info waves-effect waves-light float-right" type="button"><span class="btn-label"><i class="fa fa-eraser"></i></span>Cancel</button>
+                <button class="btn btn-outline-info waves-effect waves-light float-right" type="submit" id="btnSubmit" style="margin-right:16px;"><span class="btn-label"><i class="fa fa-check"></i></span>Save and Exit</button>
+            </div>
+
+        </div>
+        <div class="container-fluid mtaut1 push2" style="height: 100%; max-width: 1450px; overflow: hidden;">
+            <div class="col-xl-12">
+                <div class="card" style="background-color:#306baf; border: 1px solid #FFFFFF; border-top-left-radius: 20px; border-top-right-radius: 20px; height: 73px; padding-left:15px; padding-right:15px; ">
+                    <div class="card-base" style="margin-top:-12px; ">
+                        <div class="row">
+                            <div class="col-xl-12 col-lg-12" style="margin-top:12px; padding-top:10px; border-radius: 12px; height:45px; background: white;">
+                                <span style="font-size: 18px; font-weight:bold; color:#002c63;">Callout Type:</span>
+                                @Html.RadioButtonFor(m => m.CalloutType, "fm", new { @id = "rbCalloutType" })
+                                <label for="rbCalloutType" style="margin-right:10px; color:#002c63;">Reactive Callout</label>
+                                @Html.RadioButtonFor(m => m.CalloutType, "ins", new { @id = "rbCalloutType2" })
+                                <label for="rbCalloutType2" style="color:#002c63;  ">Insurance Callout</label>
+                                @Html.HiddenFor(x => x.CalloutType)
+                                @Html.HiddenFor(x => x.Area)
+                                @Html.HiddenFor(x => x.Phone)
+                                @Html.HiddenFor(x => x.SchoolEmail)
+                                @Html.HiddenFor(x => x.SchoolId)
+                                @Html.HiddenFor(x => x.PropertyId)
+                                @Html.HiddenFor(x => x.SchoolName)
+                                @Html.HiddenFor(x => x.LossItems)
+                                @Html.HiddenFor(x => x.SchooLimitId)
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="card" style=" border: 1px solid #FFFFFF; border-top-left-radius: 20px; border-top-right-radius: 20px; height: 15px; ">
+                    <div class="row d-none d-lg-block" style="margin-top:-32px;">
+                        <div class="col-12">
+                            <div class="alert alert-gradient-1 alert-text" style="height: 50px;">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="ribbon ribbon-bookmark" style=" background-color:#1E88E5; font-weight:700;"><i class="mdi mdi-lightbulb-on mr-1 ml-3" style="font-size:16px; color:yellow;"></i>Quick Tips!</div>
+                                            </td>
+                                            <td><span style="display: inline-block; margin-top:6px; margin-left:135px;">School user to determine whether callout is 'Reactive' or 'Insurance' by selecting appropriate option from Callout Type.</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+
+
+                <div class="row no-gutters" style="margin-top:-21px;" id="reactiveForm">
+                    <div class="col-xl-12">
+                        <div class="card d-block" style="background: #ddc737;  /* fallback for old browsers */
+													background: -webkit-linear-gradient(to right, #eed844, #ddc737);  /* Chrome 10-25, Safari 5.1-6 */
+													background: linear-gradient(to right, #eed844, #ddc737); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ border: 1px solid #FFFFFF; height: 100%; overflow: hidden;">
+                            <div class="card-header" style="height:48px; border-bottom: 1px dashed #FFFFFF;">
+                                <label style="font-size:21px; font-weight:900 !important; color:#000000; margin-top:2px;">Reactive Callout</label>
+                            </div>
+                            <div class="card-base" style="margin-bottom:-54px;">
+                                <div class="row" style="margin-top:0px;">
+                                    <div class="col-xl-12">
+                                        <div class="card" style="background-color:#edf5f8; border:none !important;">
+                                            <div>
+                                                <div class="card-body collapse show" style="margin-bottom:-27px;  padding-left:10px !important; padding-right:10px !important;">
+                                                    <div class="row" style="margin-top:-5px;">
+                                                        <div class="col-12">
+                                                            <div class="container-full">
+                                                                <div class="row">
+                                                                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb rcmb-2">
+                                                                        <div class="ribbon-wrapper card">
+                                                                            <div class="ribbon ribbon-info">Callout ID</div>
+                                                                            <p class="ribbon-content text-red"><span style="color:red"><strong>Auto Generated Once Saved</strong></span></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb rcmb-2">
+                                                                        <div class="ribbon-wrapper card">
+                                                                            <div class="ribbon ribbon-info">School ID</div>
+                                                                            <p class="ribbon-content"><strong>@Model.SchoolId</strong></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb rcmb-2">
+                                                                        <div class="ribbon-wrapper card">
+                                                                            <div class="ribbon ribbon-info">School</div>
+                                                                            <p class="ribbon-content"><strong>@Model.SchoolName</strong></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb-2">
+                                                                        <div class="ribbon-wrapper card">
+                                                                            <div class="ribbon ribbon-info"> Phone</div>
+                                                                            <p class="ribbon-content"><strong>@Model.Phone</strong></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb-3">
+                                                                        <div class="ribbon-wrapper card">
+                                                                            <div class="ribbon ribbon-info">School Limit</div>
+                                                                            <p class="ribbon-content"><strong>@if (Model.SchoolLimit == null) { Model.SchoolLimit = 0; } @(((decimal)Model.SchoolLimit).ToString("C"))</strong></p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                                                        <div class="ribbon-wrapper card">
+                                                                            <div class="ribbon ribbon-info">Area</div>
+                                                                            <p class="ribbon-content"><strong>@Model.Area</strong></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" style="margin-top:-22px;">
+                                                        <div class="col-xl-2 col-lg-3 col-md-5">
+                                                            <div class="card card-inverse card-blue-gradient" style="border: 1px solid #FFFFFF;">
+                                                                <div class="card-base" style="margin-top:64px; margin-bottom:50px; margin-left:-14px;">
+                                                                    <div class="col" style="margin-top:-48px;">
+                                                                        <h4 class="text-white" style="font-weight:700;">ALERT:</h4>
+                                                                        <br>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @Html.CheckBoxFor(x => x.WHSIssue, new RouteValueDictionary(new { @class = "filled-in cx chk-col-light-blue" }))
+                                                                        <label style="font-size:14px; margin-top:10px; color:#FFFFFF; margin-right:0px;" for="WHSIssue">WHS Issue</label>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @Html.CheckBoxFor(x => x.TreeSafetyIssue, new RouteValueDictionary(new { @class = "filled-in cx chk-col-light-blue" }))
+                                                                        <label style="font-size:14px; margin-top:10px; color:#FFFFFF; margin-right:0px;" for="TreeSafetyIssue">Tree Safety Issue</label>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @Html.CheckBoxFor(x => x.PWANotInvolved, new RouteValueDictionary(new { @class = "filled-in cx chk-col-light-blue" }))
+                                                                        <label style="font-size:14px; margin-top:10px; color:#FFFFFF; margin-right:0px;" for="PWANotInvolved">PWA Not Involved</label>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @Html.CheckBoxFor(x => x.AMUEUR, new RouteValueDictionary(new { @class = "filled-in cx chk-col-light-blue ", disabled = "disabled" }))
+                                                                        <label style="font-size:14px; margin-top:10px; color:#FFFFFF; margin-right:0px;" for="AMUEUR">100% AMU EUR</label>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        @Html.CheckBoxFor(x => x.SchEUR, new RouteValueDictionary(new { @class = "filled-in cx chk-col-light-blue" }))
+                                                                        <label style="font-size:14px; margin-top:10px; color:#FFFFFF; margin-right:0px;" for="SchEUR">100% School EUR</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-4 col-lg-4 col-md-7">
+                                                            <div class="card inner-border">
+                                                                <div class="card-base mtmx-0" style="margin-bottom:0px;">
+                                                                    <div class="col">
+                                                                        <div class="form-group">
+                                                                            <label>Date and Time Reported (24hr Format HH:MM)<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            <div class="input-group w-100 ed-4">
+                                                                                @Html.EditorFor(m => m.CallDate, new { htmlAttributes = new { @placeholder = "dd/mm/yyyy", @class = "form-control form-control-sm datepicker-control", @onchange = "$(this).validateElem();", @id = "txtCallDate", @Value = ((Model.CallDate.HasValue) ? Model.CallDate.Value.ToString("dd/MM/yyyy") : "") } })
+                                                                                <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                                                    <span class="input-group-text mr-2" id="basic-addon1">
+                                                                                        <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div class="sm-1">
+
+                                                                                    <div class="row ml-2 date" id="tpCallLogTimeFrom" data-target-input="nearest">
+                                                                                        <input id="CallLogTime" name="CallLogTime" type="text" class="form-control datetimepicker-input dtTimeWidth" style="width:60px" data-target="#tpCallLogTimeFrom" onchange="callLogTimeChanged('txtCallDate', 'CallLogTime');" Value="@((Model.CallLogTime.HasValue) ? Model.CallLogTime.Value.ToString("HH:mm") : "")" placeholder="" data-val-required="Call Log Time is required" data-val="true" />
+                                                                                        <div class="input-group-append" data-target="#tpCallLogTimeFrom" data-toggle="datetimepicker">
+                                                                                            <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                                                                                        </div>
+                                                                                        <button type="button" class="btn btn-info h-32" id="btnSetCurrentDate" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            @Html.ValidationMessageFor(m => m.CallDate, null, new { @style = "float:left" })
+                                                                            <text>&nbsp;&nbsp;</text>
+                                                                            <span class="field-validation-error" id="dateTimeMsg" style="float:right"></span>
+                                                                            <text>&nbsp;&nbsp;</text>
+                                                                            @Html.ValidationMessageFor(m => m.CallLogTime, null, new { @style = "float:right" })
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col" style="margin-top:-7px;">
+                                                                        <div class="form-group">
+                                                                            <label>Work Category - School<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            @Html.DropDownListFor(x => x.WorkCategoryId, (IEnumerable<SelectListItem>)ViewData["WorkCategoryList"],
+                                             new RouteValueDictionary(new { @class = "custom-select" }))
+                                                                            @Html.ValidationMessageFor(x => x.WorkCategoryId)
+
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col" style="margin-top:-8px;" id="workTypeRow">
+                                                                        <div class="form-group">
+                                                                            <label>Work Type<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            @Html.DropDownListFor(x => x.WorkTypeId, (IEnumerable<SelectListItem>)ViewData["WorkTypes"], "---Select---",
+                                                            new RouteValueDictionary(new { @class = "custom-select" }))
+                                                                            @Html.ValidationMessageFor(x => x.WorkTypeId)
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col" style="margin-top: -8px;" id="workTypeDescRow">
+                                                                        <div class="form-group" style="margin-bottom: 0px;">
+                                                                            <label>Work Type Description</label>
+                                                                            <textarea class="form-control form-control-sm blue-border-1 ea-triggers-bound" id="workTypeDesc" rows="5" style="height: 54px;" readonly=""></textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col" style="margin-top:-20px;" id="reaMaintenanceCallIdRow">
+                                                                        <div class="form-group" style="width:100%;">
+                                                                            <label id="mainTskLabel">Reactive Maintenance Task  </label><span id="reactiveMaintenaceSpan" style="vertical-align: super; color:#d7153a; ">*</span>
+                                                                            @Html.DropDownListFor(x => x.SelectedMaintenanceCallLogId,
+                                                                          new SelectList((List<CustomDropdownItem>)ViewData["MaintenanceCallLog"], "Value", "Text"),
+                                                                           "---Select---", new RouteValueDictionary(new { @class = "custom-select" }))
+                                                                            @Html.ValidationMessageFor(x => x.SelectedMaintenanceCallLogId)
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col" style="margin-top:-10px;" id="equipmentTypeRow">
+                                                                        <label>Assembly <span class="ml-1 label-desc"> ( Industrial Arts only ) </span></label>
+
+                                                                        @Html.DropDownListFor(x => x.SelectedEquipmentTypeId, (IEnumerable<SelectListItem>)ViewData["AssemblyEquipmentTypes"],
+                                                                        "---Select---", new RouteValueDictionary(new { @class = "custom-select" }))
+                                                                        @Html.ValidationMessageFor(x => x.SelectedEquipmentTypeId)
+
+
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-6 col-lg-4">
+                                                            <div class="card inner-border">
+                                                                <div class="card-base" style="margin-bottom:-12px;">
+
+
+                                                                    <div class="col-12">
+
+                                                                        <div class="form-group m-t-10" style="margin-top: 3px;">
+                                                                            <label><span><strong>Callout Description<span style="vertical-align: super; color:#d7153a; ">*</span> (Maximum 1000 Characters) </strong></span><!--<span class="ml-1 label-desc d-none d-xl-block"> </span>--></label>
+                                                                            @Html.TextAreaFor(m => m.CallLogDesc, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", rows = "5", style = "height: 146px;", @maxLength = 1000 }))
+                                                                            @Html.ValidationMessageFor(m => m.CallLogDesc, string.Empty, new { style = "float:none" })
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="col-12" style="margin-top:-16px;">
+                                                                        <div class="row">
+                                                                            <div class="col-12 ">
+                                                                                <label>Buildings Affected<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                                @Html.ListBoxFor(m => m.JobBuildingIDs, new MultiSelectList((IEnumerable<BuildingViewModel>)ViewData["BuildingsList"],
+                                            "BuildingID", "BuildingDesc", Model.JobBuildingIDs),
+                                            new RouteValueDictionary(new
+                                                         {
+                                                     @class = "select2 m-b-10 select2-multiple select2-hidden-accessible",
+                                                         @style = "width:100%; margin-bottom: 16px;",
+                                                @onchange = "updateErrorSummary('JobBuildingIDs');"
+                                            }))
+                                                                                @Html.ValidationMessageFor(m => m.JobBuildingIDs, string.Empty, new { style = "margin-top:0px;" })
+
+                                                                                <br>
+                                                                                <br>
+
+
+                                                                            </div>
+                                                                            <div class="col-6">
+                                                                                <label>Room No(s)<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                                <div class="form-group">
+                                                                                    @Html.TextBoxFor(m => m.Rooms, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 15 }))
+                                                                                    @Html.ValidationMessageFor(m => m.Rooms)
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-6" style="margin-top:4px;">
+                                                                                <label>Room Location<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                                <div class="form-group">
+                                                                                    @Html.TextBoxFor(x => x.RoomLocation, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 50 }))
+                                                                                    @Html.ValidationMessageFor(m => m.RoomLocation)
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                            <div class="card-body collapse show" style="margin-bottom:-27px;">
+                                                <div class="row" style="margin-top:-21px;">
+                                                    <div class="col-12">
+                                                        <div class="card inner-border">
+                                                            <div class="card-header" style="height:44px;">
+                                                                @Html.CheckBoxFor(x => x.EmailToSchoolAndEmc, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue" }).AddIf(false, "disabled", "disabled"))
+                                                                <label class="mr-3" style="font-size:14px; margin-left:-6px; margin-top: 2px;padding-left: 26px;line-height: 21px;" for="EmailToSchoolAndEmc">Email to School and FMC</label>
+
+                                                            </div>
+                                                            <div class="card-base mbr-1" style="margin-bottom:-13px;">
+                                                                <div class="row" style="margin-left:-5px; margin-top:0px;">
+                                                                    <div class="col-xl-3 col-lg-3 col-md-1">
+                                                                        <div class="form-group">
+                                                                            <label>Response Time Required<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            @Html.DropDownListFor(x => x.SelectedCallLogFinanceUrgenyId, (IEnumerable<SelectListItem>)ViewData["CallLogUrgency"], "---Select---", new RouteValueDictionary(new { @class = "custom-select", @id = "callLogTypeSelectList" }))
+                                                                            @Html.ValidationMessageFor(m => m.SelectedCallLogFinanceUrgenyId)
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-3 col-lg-3 col-md-1">
+                                                                        <div class="form-group">
+                                                                            <label>Requested by<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            @Html.TextBoxFor(x => x.RequestedBy, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-1px;", @maxlength = "30" }))
+                                                                            @Html.ValidationMessageFor(x => x.RequestedBy)
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-3 col-lg-3 col-md-1">
+                                                                        <div class="form-group">
+                                                                            <label>Call Status<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            @Html.DropDownListFor(x => x.SelectedCallStatusId, (IEnumerable<SelectListItem>)ViewData["CallLogStatus"], "---Select---",
+                                                    new RouteValueDictionary(new { @class = "custom-select", @id = "callLogTypeSelectList" }))
+                                                                            @Html.ValidationMessageFor(x => x.SelectedCallStatusId)
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-3 col-lg-3 col-md-1">
+                                                                        <div class="form-group">
+                                                                            <label>Requester Title<span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                                            @Html.TextBoxFor(x => x.RequestorTitle, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-1px;", @maxlength = "30" }))
+                                                                            @Html.ValidationMessageFor(x => x.RequestorTitle)
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row no-gutters" style="margin-top:-21px;" id="insuranceForm">
+                    <div class="col-xl-12">
+                        <div class="card d-block" style="background: #ddc737;  /* fallback for old browsers */
+													background: -webkit-linear-gradient(to right, #eed844, #ddc737);  /* Chrome 10-25, Safari 5.1-6 */
+													background: linear-gradient(to right, #eed844, #ddc737); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ border: 1px solid #FFFFFF; height: 100%; overflow: hidden; ">
+                            <div class="card-header" style="height:48px; border-bottom: 1px dashed #FFFFFF;">
+                                <label style="font-size:21px; font-weight:900 !important; color:#000000; margin-top:2px;">Insurance Callout</label>
+                            </div>
+                            <div class="card-base" style="margin-bottom:-54px;">
+                                <div class="row" style="margin-top:1px; padding-left:15px; padding-right:15px;">
+                                    <div class="col-xl-12" style="background-color: #edf5f8;  margin-bottom: 10px;">
+
+                                        <div class="row" style="margin-top:10px;">
+                                            <div class="col-12">
+                                                <div class="container-full">
+                                                    <div class="row">
+                                                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb rcmb-2">
+                                                            <div class="ribbon-wrapper card">
+                                                                <div class="ribbon ribbon-info">Incident ID</div>
+                                                                <p class="ribbon-content"><span style="color:red"><strong>Auto Generated Once Saved</strong></span></p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb rcmb-2">
+                                                            <div class="ribbon-wrapper card">
+                                                                <div class="ribbon ribbon-info">School ID</div>
+                                                                <p class="ribbon-content"><strong><strong>@Model.SchoolId</strong></strong></p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb rcmb-2">
+                                                            <div class="ribbon-wrapper card">
+                                                                <div class="ribbon ribbon-info">School</div>
+                                                                <p class="ribbon-content"><strong>@Model.SchoolName</strong></p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb-2">
+                                                            <div class="ribbon-wrapper card">
+                                                                <div class="ribbon ribbon-info">Phone</div>
+                                                                <p class="ribbon-content"><strong>@Model.Phone</strong></p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6 rcmb-3">
+                                                            <div class="ribbon-wrapper card">
+                                                                <div class="ribbon ribbon-info">School Limit</div>
+                                                                <p class="ribbon-content"><strong>@Model.SchoolLimit</strong></p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                                            <div class="ribbon-wrapper card">
+                                                                <div class="ribbon ribbon-info">Area</div>
+                                                                <p class="ribbon-content"><strong>@Model.Area</strong></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top:-21px;">
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-base p-b-0" style="margin-bottom:-38px;">
+                                                        <!-- Nav tabs -->
+                                                        <!-- Tab panes -->
+                                                        <div class="tab-content">
+                                                            <div class="tab-pane active" id="home7" role="tabpanel">
+                                                                <div class="p-20">
+
+                                                                    <div class="row">
+                                                                        <div class="col-12">
+                                                                            <div class="card inner-border" style="box-shadow: none; margin-top:-15px;">
+                                                                                <div class="card-header" style="height: 44px;">
+                                                                                    <div style="margin-top:1px;">
+                                                                                        @Html.CheckBoxFor(x => x.InsWHSIssue, new { @class = "filled-in chk-col-light-blue ea-triggers-bound" })
+                                                                                        <label class="float-left" for="InsWHSIssue" style="font-size:14px; margin-right:0px; margin-left: -6px;">WHS issue?</label>
+                                                                                        <span><label class="float-right align-self-center hidden-xs-down" style="margin-top: 4px; color: #d7153a;">All fields with<span class="ml-1 mr-1">*</span>are mandatory</label></span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="card-base" style="margin-bottom:-56px; margin-left:-2px;">
+                                                                                    <div class="row">
+                                                                                        <div class="col-12">
+                                                                                            @Html.ValidationSummary()
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="row">
+                                                                                        <div class="col-xl-4 col-lg-4 col-md-6">
+                                                                                            <div class="card mtmx-0" style="border: none; background-color: transparent; box-shadow: none;">
+                                                                                                <div class="card-base" style="margin-left:-28px; margin-top:-8px;">
+                                                                                                    <div class="col">
+                                                                                                        <div class="form-group" style=" margin-top:-8px; margin-left:0px;">
+                                                                                                            <label>Date and Time Reported<span style="vertical-align: super; color:#d7153a;">*</span> <span class="ml-1 label-desc"> ( 24-hr Format HH:MM )</span></label>
+                                                                                                            <table style="margin-top:0px;">
+                                                                                                                <tbody>
+                                                                                                                    <tr>
+                                                                                                                        <td></td>
+                                                                                                                        <td>
+                                                                                                                            <div class="input-group" style="width: 260px;">
+                                                                                                                                <input type="text" class="form-control form-control-sm" id="1" name="2" data-toggle="tooltip" data-placement="top" value="" placeholder="@Model.InsCallDate.ToString("dd/MM/yyyy")" readonly="" data-original-title="" title="">
+                                                                                                                                @Html.HiddenFor(x => x.InsCallDate)
+                                                                                                                                <div class="input-group-append" style="height: 33px;">
+                                                                                                                                    <span class="input-group-text mr-2" id="basic-addon1">
+                                                                                                                                        <img src="@Url.Content("~/theme2/assets/images/350.png")" alt="" style="height:20px;">
+                                                                                                                                    </span>
+                                                                                                                                    <input type="text" class="form-control form-control-sm mr-1 text-center hidden-xs-down" style="width:40px !important; margin-left:12px;" id="3" name="4" data-toggle="tooltip" data-placement="top" value="" placeholder="@Model.InsCallTime.ToString("HH")" readonly="" data-original-title="" title="">
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </td>
+                                                                                                                        <td><input type="text" class="form-control form-control-sm text-center hidden-xs-down" style="width:40px !important;" id="5" name="6" data-toggle="tooltip" data-placement="top" value="" placeholder="@Model.InsCallTime.ToString("mm")" readonly="" data-original-title="" title=""></td>
+                                                                                                                    </tr>
+                                                                                                                </tbody>
+                                                                                                            </table>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <div class="form-group" style="margin-top:-17px; margin-left:0px;">
+                                                                                                            <label>Incident Date and Time Range <span style="vertical-align: super; color:#d7153a; ">*</span> <span class="ml-1" style="font-weight: 400 !important;">BETWEEN </span></label>
+                                                                                                            <table>
+                                                                                                                <tbody>
+                                                                                                                    <tr>
+                                                                                                                        <td>
+                                                                                                                            <div class="input-group" style="width: 200px;">
+                                                                                                                                @Html.EditorFor(m => m.IncidentFrom, new { htmlAttributes = new { @placeholder = "dd/mm/yyyy", @class = "form-control form-control-sm datepicker-control", @onchange = "$(this).validateElem();", @Value = ((Model.IncidentFrom.HasValue) ? Model.IncidentFrom.Value.ToString("dd/MM/yyyy") : "") } })
+                                                                                                                                <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                                                                                                    <span class="input-group-text mr-2" id="basic-addon1">
+                                                                                                                                        <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                                                                                                    </span>
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                        </td>
+                                                                                                                        <td><span class="ml-2 mr-2 mt-1 hidden-xs-down"> AT </span></td>
+                                                                                                                        <td>
+                                                                                                                            <div class="input-group date" id="tpIncidentFrom" style="width: 125px; margin-top: -1px;" data-target-input="nearest">
+                                                                                                                                @*@Html.TextBoxFor(m => m.IncidentTimeFrom, new { @class = "form-control datetimepicker-input", style = "width:60px", data_target = "#tpIncidentFrom", @Value = (Model.IncidentTimeFrom.HasValue) ? Model.IncidentTimeFrom.Value.ToString("HH:mm") : "" })*@
+                                                                                                                                <input id="IncidentTimeFrom" name="IncidentTimeFrom" type="text" class="form-control datetimepicker-input" style="width:60px" data-target="#tpIncidentFrom" onchange="callLogTimeChanged('IncidentFrom', 'IncidentTimeFrom');" Value="@((Model.IncidentTimeFrom.HasValue) ? Model.IncidentTimeFrom.Value.ToString("HH:mm") : "")" placeholder="" data-val-required="'Incident Time From' is required" data-val="true" />
+                                                                                                                                <div class="input-group-append" data-target="#tpIncidentFrom" data-toggle="datetimepicker">
+                                                                                                                                    <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                        </td>
+                                                                                                                    </tr>
+
+                                                                                                                    <tr style="height:32px;"><td class="float-right mt-2" style="margin-right:10px;">AND</td><td></td></tr>
+                                                                                                                    <tr>
+                                                                                                                        <td>
+                                                                                                                            <div class="input-group">
+                                                                                                                                @Html.EditorFor(m => m.IncidentTo, new { htmlAttributes = new { @placeholder = "dd/mm/yyyy", @onchange = "$(this).validateElem();", @class = "form-control form-control-sm datepicker-control", @Value = ((Model.IncidentTo.HasValue) ? Model.IncidentTo.Value.ToString("dd/MM/yyyy") : "") } })
+                                                                                                                                <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                                                                                                    <span class="input-group-text mr-2" id="basic-addon1">
+                                                                                                                                        <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                                                                                                    </span>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </td>
+                                                                                                                        <td><span class="ml-2 mr-2 mt-1 hidden-xs-down"> AT </span></td>
+                                                                                                                        <td>
+                                                                                                                            <div class="input-group date" id="tpIncidentTo" style="width: 125px; margin-top: -1px;" data-target-input="nearest">
+                                                                                                                                @*@Html.TextBoxFor(m => m.IncidentTimeTo, new { @class = "form-control datetimepicker-input", style = "width:60px", data_target = "#tpIncidentTo", @Value = (Model.IncidentTimeTo.HasValue) ? Model.IncidentTimeTo.Value.ToString("HH:mm") : "" })*@
+                                                                                                                                <input id="IncidentTimeTo" name="IncidentTimeTo" type="text" class="form-control datetimepicker-input" style="width:60px" data-target="#tpIncidentTo" onchange="callLogTimeChanged('IncidentTo', 'IncidentTimeTo');" Value="@((Model.IncidentTimeTo.HasValue) ? Model.IncidentTimeTo.Value.ToString("HH:mm") : "")" placeholder="" data-val-required="'Incident Time To' is required" data-val="true" />
+                                                                                                                                <div class="input-group-append" data-target="#tpIncidentTo" data-toggle="datetimepicker">
+                                                                                                                                    <div class="input-group-text"><i class="fa fa-clock-o"></i></div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+
+                                                                                                                        </td>
+                                                                                                                    </tr>
+                                                                                                                </tbody>
+                                                                                                            </table>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-xl-4 col-lg-4 col-md-6">
+                                                                                            <div class="card mtmxx-20" style="border: none; background-color: transparent; box-shadow: none;">
+                                                                                                <div class="card-base" style="margin-left:-28px; margin-top:-8px;">
+                                                                                                    <div class="col">
+                                                                                                        <div class="form-group" style="margin-top:-4px;">
+                                                                                                            <label>Who First Noticed This Incident ?<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                            @Html.DropDownListFor(x => x.SchoolAlarmNotificationId, (IEnumerable<SelectListItem>)ViewData["WhoNoticedIncident"], "Select Who First Noticed This Incident ?",
+                                                new RouteValueDictionary(new { @class = "custom-select", @id = "SchoolAlarmNotificationId" }))
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col" style="margin-top:-16px;">
+                                                                                                        <label>Type of Incident<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                        @Html.DropDownListFor(x => x.SchoolIncidentCauseId, (IEnumerable<SelectListItem>)ViewData["TypeOfIncident"], "Select Type of Incident",
+                                                 new RouteValueDictionary(new { @class = "custom-select", @id = "SchoolAlarmNotificationID" }))
+                                                                                                    </div>
+                                                                                                    <div class="col">
+                                                                                                        <div class="form-group" style="margin-top:4px;">
+                                                                                                            <label>Location Details<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                            @Html.TextBoxFor(m => m.LocationDesc, new { @class = "form-control form-control-sm" })
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-xl-4 col-lg-4 col-md-6 mtm-56 mbp-24">
+                                                                                            <div class="card" style="border: none; background-color: transparent; box-shadow: none;">
+                                                                                                <div class="card-base" style="margin-left:-28px; margin-top:-8px;">
+                                                                                                    <div class="col" style="margin-top:-4px;">
+                                                                                                        <label>Person Reported<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                        <div class="form-group">
+                                                                                                            @Html.TextBoxFor(m => m.InsCallTakenBy, new { @style = "margin-top: 0px;", @class = "form-control form-control-sm", @id = "txtInsCallTakenBy" })
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div class="col" style="margin-top:-16px;">
+                                                                                                        <label>Person's Role in SINSW FMWeb <span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                        @Html.TextBoxFor(m => m.LoggerRoleDesc, new { @style = "margin-top: 0px;", @readonly = "", @class = "form-control form-control-sm", @id = "txtLoggerRole" })
+                                                                                                    </div>
+                                                                                                    <div class="col" style="margin-top:-16px;">
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row d-none d-lg-block" style="margin-top:-21px;">
+
+                                                                            </div>
+                                                                            <div class="row d-block d-lg-none" style="margin-top:-9px;">
+                                                                                <div class="col-12">
+                                                                                    <div class="alert alert-gradient-1 alert-text">
+                                                                                        <span style="margin-top:0px; margin-left:0px;">
+                                                                                            <i class="mdi mdi-lightbulb-on mr-1 mb-2" style="font-size:16px; color:yellow;"></i>Describe how the damage was done, including any tools or objects left behind which were used to cause the damage. Please describe as you would in a Police Report: e.g. Unknown offenders entered school grounds at approximately 8pm. They forced entry through a window in Block 5 (Room 5R0021). 15 ipads were stolen, including 2 carry totes from PC Locking Trolley.
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-12" style="margin-top:-7px;">
+                                                                                    <div class="row mtp-12">
+                                                                                        <div class="col-12">
+                                                                                            <div class="card inner-border" style="box-shadow: none; margin-top:10px;">
+                                                                                                <div class="card-header" style="height: 44px; font-weight: 500 !important;">
+                                                                                                    <span style="margin-top:3px !important; margin-left: -8px;">
+                                                                                                        <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;">
+                                                                                                            <label style="font-size: 14px; font-weight: 500 !important;">Did the incident result in damage needs repair ?</label>
+                                                                                                        </span>
+                                                                                                        <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                                                                            @Html.RadioButtonFor(m => m.ContractorRepaired, true, new { @id = "rbContractorRepaired" })
+                                                                                                            <label for="rbContractorRepaired" style="margin-right:10px;">Yes</label>
+                                                                                                            @Html.RadioButtonFor(m => m.ContractorRepaired, false, new { @id = "rbContractorRepaired2" })
+                                                                                                            <label for="rbContractorRepaired2">No</label>
+                                                                                                        </span>
+                                                                                                    </span>
+                                                                                                </div>
+                                                                                                <div class="card-base" style="margin-bottom:-15px; margin-right: 21px;">
+                                                                                                    <div class="row mtpx-24">
+                                                                                                        <div class="col-12" style="margin-top:0px;">
+                                                                                                            <div class="form-group">
+                                                                                                                <label>Incident Description<span style="vertical-align: super; color:#d7153a;">*</span> <span class="ml-1 label-desc"> ( Max. 1000 Characters ) </span></label>
+                                                                                                                <div class="col-md-12">
+                                                                                                                    <div class="row">
+                                                                                                                        @Html.TextAreaFor(m => m.SchoolIncidentDesc, new { @style = "height: 128px !important; margin-top: 0px; margin-right: -30px; margin-left: 0px;", @rows = "5", @col = "80", @class = "form-control form-control-sm" })
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                <div class="row " style="margin-top:10px;">
+                                                                                                                    <div class="col-xl-9 col-lg-9 col-md-6 col-sm-6 col-xs-3">
+                                                                                                                        <label>Buildings Affected<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                                        @Html.ListBoxFor(m => m.InsJobBuildingIDs, new MultiSelectList((IEnumerable<BuildingViewModel>)ViewData["BuildingsList"],
+                                                                                                                          "BuildingID", "BuildingDesc", Model.InsJobBuildingIDs),
+                                                                                                                          new RouteValueDictionary(new
+                                                                                                                                       {
+                                                                                                                                   @class = "select2 m-b-10 select2-multiple select2-hidden-accessible",
+                                                                                                                                       @style = "width:100%; margin-bottom: 16px;",
+                                                                                                                              @onchange = "updateErrorSummary('InsJobBuildingIDs');"
+                                                                                                                          }))
+                                                                                                                        @Html.ValidationMessageFor(m => m.InsJobBuildingIDs, string.Empty, new { style = "margin-top:0px;" })
+
+                                                                                                                        <br>
+                                                                                                                        <br>
+                                                                                                                    </div>
+                                                                                                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-3 ">
+                                                                                                                        <label>Room No(s)<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                                        <div class="form-group" style="margin-right:0px;">
+                                                                                                                            @Html.TextBoxFor(m => m.InsRooms, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 15 }))
+                                                                                                                            @Html.ValidationMessageFor(m => m.InsRooms)
+                                                                                                                        </div>
+                                                                                                                    </div>
+
+
+                                                                                                                </div>
+                                                                                                                <div class="row">
+
+                                                                                                                    <div class="col-xl-12 col-lg-12 col-md-12">
+
+                                                                                                                        <div class="row">
+                                                                                                                            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                                                                                                                <label>Requester <span class="ml-1 label-desc"> ( First Name )</span><span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                                                <div class="form-group">
+                                                                                                                                    @Html.TextBoxFor(m => m.ContactFirstName, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 25 }))
+
+
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                                                                                                                <label>Requester <span class="ml-1 label-desc"> ( Last Name )</span><span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                                                <div class="form-group">
+                                                                                                                                    @Html.TextBoxFor(m => m.ContactLastName, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 50 }))
+
+
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                                                                                                                <label>Requester <span class="ml-1 label-desc"> ( Phone Number ) </span><span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                                                <div class="form-group">
+                                                                                                                                    @Html.TextBoxFor(m => m.ContactPhone, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 50 }))
+
+
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                                                                                                                <label>Response Time Required <span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                                                <div class="form-group">
+                                                                                                                                    @Html.DropDownListFor(x => x.InsCallLogFinanceUrgenyId, (IEnumerable<SelectListItem>)ViewData["CallLogUrgency"], "---Select---", new RouteValueDictionary(new { @class = "custom-select", @id = "insCallLogTypeSelectList" }))
+                                                                                                                                    @Html.ValidationMessageFor(m => m.InsCallLogFinanceUrgenyId)
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </div>
+
+
+                                                                                                                    </div>
+
+                                                                                                                </div>
+                                                                                                            </div>
+
+                                                                                                        </div>
+                                                                                                    </div>
+
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- Is FMC div stars here -->
+                                                                            <div class="row mtpx-24" style="margin-top:-15px;">
+                                                                                <div class="col-12">
+                                                                                    <div class="card inner-border">
+                                                                                        <div class="card-header" style="height: 44px; padding-top:10px;">
+                                                                                            <span style="font-size: 14px; font-weight: 600; margin-left:-7px;">
+                                                                                                <label style="font-size: 14px; font-weight: 600; vertical-align: middle;"><label class="badge badge-info  rtxt" style="font-size:14px; margin-top:-4px;">Is the FMC required to repair the damage ?</label></label>
+                                                                                                <span class="ml-1" style="vertical-align: middle; margin-top: -11px;">
+                                                                                                    @Html.RadioButtonFor(m => m.ContractorCalledOut, true, new { @id = "rbContractorCalledOut" })
+                                                                                                    <label class="mtp-8" for="rbContractorCalledOut" style="margin-right:10px;">Yes</label>
+                                                                                                    @Html.RadioButtonFor(m => m.ContractorCalledOut, false, new { @id = "rbContractorCalledOut2" })
+                                                                                                    <label class="mtp-8" for="rbContractorCalledOut2">No</label>
+                                                                                                </span>
+                                                                                            </span>
+                                                                                            <span style="margin-top:-2px !important; ">
+                                                                                                @Html.CheckBoxFor(m => m.ContractorEmailed, new { @class = "filled-in chk-col-light-blue", @id = "cbContractorEmailed" })
+                                                                                                <label class="ml-5 mr-5 mlxx-5" style="font-size:14px;" for="cbContractorEmailed">If Yes, notify FMC</label>
+
+                                                                                            </span>
+
+
+                                                                                            <span id="pnlMaintComplete" class="float-right mlxx-5">
+                                                                                                <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle; font-size: 14px; font-weight: 500 !important;"><label style="font-size: 14px; font-weight: 500 !important;">Repair complete ?</label></span>
+                                                                                                <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                                                                    @Html.RadioButtonFor(m => m.MaintComplete, true, new { @class = "check", @style = "margin-left:5px; margin-right:20px;", @name = "minimal-radio-2", @id = "rbMaintComplete" })
+                                                                                                    <label for="rbMaintComplete" style="margin-right:10px;">Yes</label>
+                                                                                                    @Html.RadioButtonFor(m => m.MaintComplete, false, new { @class = "check", @name = "minimal-radio-2", @id = "rbMaintComplete2" })
+                                                                                                    <label for="rbMaintComplete2">No</label>
+                                                                                                </span>
+                                                                                            </span>
+                                                                                        </div>
+                                                                                        <div class="card-base" style="margin-bottom:10px; margin-right: 21px;">
+                                                                                            <div class="row mtpxx-100" style="margin-top:0px;">
+                                                                                                <div class="col-12 mtp-16" style="margin-top:0px;">
+                                                                                                    <label>Damage Details<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                    @Html.TextAreaFor(m => m.DamageDetailDesc, new { @style = "height: 128px !important; margin-top: 0px; margin-right: -30px; margin-left: 0px;", @rows = "5", @col = "80", @onchange = "$(this).validateElem();", @class = "form-control form-control-sm", @id = "txtDamageDetailDesc" })
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- Is FMC div ends here -->
+                                                                            <!-- lost item div starts here -->
+                                                                            <div class="row" style="margin-top:-15px;">
+                                                                                <div class="col-12">
+                                                                                    <div class="card inner-border" style="box-shadow: none;">
+                                                                                        <div class="card-header" style="height:48px;">
+                                                                                            <span style="margin-left:-7px;"><span style="display: inline-block; vertical-align: middle; margin-top:4px;">Lost Item Details</span></span>
+                                                                                            <span><button id="btnAddLossItems" class="btn btn-outline-info waves-effect waves-light float-right" type="button" style="margin-top:-5px; margin-right:0px;"><span class="btn-label"><i class="mdi mdi-plus"></i></span>Add Loss Item to List</button></span>
+                                                                                        </div>
+                                                                                        <div class="card-base" style="margin-bottom:-13px;">
+                                                                                            <div class="row">
+                                                                                                <div class="col-xl-3 col-lg-3 col-md-6" style="margin-top:0px;">
+                                                                                                    <div class="row">
+                                                                                                        <div class="col" style="margin-top:0px; margin-left:0px;">
+                                                                                                            <label>Quantity<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                            <div class="form-group">
+                                                                                                                @Html.TextBoxFor(m => m.Quantity, new { @type = "number", @style = "margin-top:0px;max-width: 360px;", @placeholder = "", @class = "form-control form-control-sm", @onchange = "updateLossDetailsErrorSummery(this);" })
+
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="col-xl-3 col-lg-3 col-md-6" style="margin-top:0px;">
+                                                                                                    <div class="row">
+                                                                                                        <div class="col" style="margin-top:0px; margin-left:0px;">
+                                                                                                            <label>Current Status<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                            <div class="form-group">
+                                                                                                                @Html.DropDownListFor(x => x.SchoolIncidentLossStatusID, (IEnumerable<SelectListItem>)ViewData["LossStatus"], "Select Loss Status", new RouteValueDictionary(new { @class = "custom-select", @id = "SchoolIncidentLossStatusID" }))
+
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="col-xl-3 col-lg-3 col-md-6">
+                                                                                                    <div class="col">
+                                                                                                        <label>Estimated Repair / Replacement Cost<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                        <div class="form-group">
+                                                                                                            <div class="input-group">
+                                                                                                                <div class="input-group-prepend">
+                                                                                                                    <span class="input-group-text" id="">
+                                                                                                                        <span style="margin-left:4px; font-size:13px;">
+                                                                                                                            $
+                                                                                                                        </span>
+                                                                                                                    </span>
+                                                                                                                </div>
+                                                                                                                @Html.TextBoxFor(m => m.EstRepairCost, new { @style = "max-width: 360px;", @placeholder = "", @class = "form-control form-control-sm", @onchange = "updateLossDetailsErrorSummery(this);", @id = "txtEstRepairCost" })
+
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="col">
+                                                                                                    <label style="margin-left:-16px;">Asset Description<span style="vertical-align: super; color:#d7153a;">*</span></label>
+                                                                                                    <div class="form-group">
+                                                                                                        @Html.EditorFor(m => m.LossDesc, new { htmlAttributes = new { @style = "margin-left:-16px;", @rows = "5", @placeholder = "", @class = "form-control form-control-sm blue-border-1", @onchange = "updateLossDetailsErrorSummery(this);", @id = "txtLossDesc" } })
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="row" id="lossItemErrorDiv" style="display:none">
+                                                                                                <div class="col">
+                                                                                                    <div class="validation-summary-errors" style="display:flex; justify-content:center">
+                                                                                                        <ul>
+                                                                                                            <li>Please correct your selections.</li>
+                                                                                                        </ul>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="row" style="margin-top:0px;">
+                                                                                                <div class="col">
+                                                                                                    <h4 class="card-title" style="font-size: 14px !important; font-weight: 600;">Loss Items List</h4>
+                                                                                                    <div class="table-responsive m-t-0">
+                                                                                                        <table id="tblSchoolIncidentLossItems" class="display nowrap table table-hover display table-bordered table-striped dataTable" cellpadding="0" style="width:100%;">
+                                                                                                            <thead>
+                                                                                                                <tr>
+                                                                                                                    <th>Actions</th>
+                                                                                                                    <th>Quantity</th>
+                                                                                                                    <th>Status</th>
+                                                                                                                    <th>Loss Description</th>
+                                                                                                                    <th>Est. Repair Cost</th>
+                                                                                                                </tr>
+                                                                                                            </thead>
+                                                                                                        </table>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <!-- lost item div ends here -->
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- End Container fluid  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- footer -->
+        <!-- ============================================================== -->
+        <footer class="footer mt-5"> © 2021 NSW Department of Education School Infrastructure SINSW FMWeb Maintenance System </footer>
+        <!-- ============================================================== -->
+        <!-- End footer -->
+        <!-- ============================================================== -->
+    }
+
+</div>
+@section Scripts
+{
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+
+    <style type="text/css">
+        .validation-summary-valid {
+            display: none;
+        }
+
+        .field-validation-valid {
+            display: none;
+        }
+
+        .validation-summary-errors, .validation-summary-errors1, .validation-summary-errors2, .validation-summary-errors3 {
+            display: block;
+            color: red;
+        }
+        /* Validation */
+        .input-validation-error {
+            border-color: red !important;
+        }
+
+        .field-validation-error {
+            font-size: 10px;
+            float: right;
+            padding-top: 6px;
+            color: red !important;
+        }
+
+        [type=checkbox].filled-in:not(:checked) + label:after {
+            background-color: #FFFFFF;
+        }
+
+        .input-validation-error ~ .select2 .select2-selection {
+            border: 1px solid red;
+        }
+
+      /*  .btn-outline-info.focus,
+        .btn-outline-info:focus,
+        .btn-outline-info:hover {
+            background: #1e88e5;
+        }
+
+        .breadcrumb-item a {
+            color: #002664 !important;
+        }*/
+
+       
+
+        @@media screen and (max-width: 768px) {
+            .mt-down {
+                margin-top: -8px !important;
+            }
+        }
+
+        .table-hover tbody tr:hover td {
+            background: #ccd3e0;
+        }
+
+        .page-link {
+            position: relative;
+            display: block;
+            padding: .5rem .75rem;
+            margin-left: -1px;
+            line-height: 1;
+            color: #007bff;
+            background-color: #fff;
+            border: 0px solid #dee2e6;
+        }
+
+        .page-item:last-child .page-link {
+            border-top-right-radius: 0rem !important;
+            border-bottom-right-radius: 0rem !important;
+        }
+
+        .page-item:first-child .page-link {
+            border-top-right-radius: 0rem !important;
+            border-bottom-right-radius: 0rem !important;
+        }
+
+        .ribbon {
+            padding: 0 12px;
+        }
+
+        .ribbon-bookmark:before {
+            border: 15px solid #1E88E5;
+            border-right: 10px solid transparent;
+        }
+
+        #element-with-background-image {
+            background-image: linear-gradient( 109.6deg, rgba(204,228,247,0.8) 11.2%, rgba(237,246,250,0.9) 88.2% ), url('assets/images/test1.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        .bg-gradient-2 {
+            background: #8E0E00; /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #1F1C18, #8E0E00); /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #1F1C18, #8E0E00); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+
+        @@media (max-width: 576px) {
+            .d-ec-block {
+                display: block !important;
+            }
+
+            .fred {
+                font-size: 16px !important;
+                line-height: 1.4 !important;
+                margin-bottom: 16px !important;
+            }
+
+            .tw {
+                max-width: 90% !important;
+            }
+
+            .mtaut1 {
+                margin-top: -40px !important;
+            }
+        }
+
+        @@media (min-width: 767px) and (max-width: 1194px) {
+            .push {
+                padding-top: 40px;
+            }
+
+            .push2 {
+                padding-top: 64px;
+            }
+
+            .d-ec3-none {
+                display: none !important;
+            }
+        }
+
+        @@media (max-width: 1200px) {
+            .mtxs-tm16 {
+                margin-top: -16px !important;
+            }
+        }
+
+        @@media (max-width: 568px) {
+            .fmcr-btn {
+                margin-top: 12px;
+                float: left !important;
+            }
+
+            .dataTables_filter {
+                float: left;
+                margin-top: 0px;
+            }
+        }
+
+        @@media (max-width: 767px) {
+            .d-ec-block {
+                display: block !important;
+            }
+
+            .xsmb {
+                margin-bottom: 18px !important;
+            }
+
+            .mtm-10 {
+                margin-top: -10px;
+            }
+
+            .push-back {
+                margin-top: -46px;
+            }
+
+            .help-mtb {
+                margin-top: -38px !important;
+            }
+        }
+
+        .ribbon {
+            padding: 0 12px;
+        }
+
+        .ribbon-bookmark:before {
+            border: 15px solid #1E88E5;
+            border-right: 10px solid transparent;
+        }
+
+        .shorten-x {
+            width: 100%;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+        }
+
+        table.dataTable thead > tr > th.sorting_asc, table.dataTable thead > tr > th.sorting_desc, table.dataTable thead > tr > th.sorting,
+        table.dataTable thead > tr > td.sorting_asc,
+        table.dataTable thead > tr > td.sorting_desc,
+        table.dataTable thead > tr > td.sorting {
+            padding-right: 20px;
+        }
+
+        @@media (min-width: 767px) and (max-width: 1194px) {
+            .push {
+                padding-top: 40px;
+            }
+
+            .d-ec3-none {
+                display: none !important;
+            }
+        }
+
+        .btn-waratah-red {
+            color: #ffffff;
+            background-color: #d7153a;
+            border-color: #d7153a;
+        }
+
+        .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+            color: #fbf5ee !important;
+            background-color: #d7153a;
+            border-bottom: none !important;
+            border-radius: 0px !important;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        .list-group-item {
+            border: none !important;
+            background-color: transparent !important;
+            color: #fbf5ee;
+            border-radius: 0px !important;
+        }
+
+            .list-group-item:hover {
+                background-color: #d7153a !important;
+                color: #FFFFFF;
+            }
+
+        @@media (min-width: 767px) and (max-width: 1194px) {
+            .push {
+                padding-top: 40px;
+            }
+
+            .d-ec3-none {
+                display: none !important;
+            }
+        }
+
+        .customtab li a.nav-link {
+            color: #fbf5ee;
+        }
+
+        .nav-tabs {
+            border-bottom: none !important;
+        }
+
+        .help-module-card {
+            border: none !important;
+        }
+
+        .customtab li a.nav-link:hover, .profile-tab li a.nav-link:hover {
+            color: #FFFFFF !important;
+        }
+
+        @@media (min-width: 1600px) {
+            .d-xlarge-block {
+                display: block !important;
+            }
+
+            .xl-center {
+                display: flex !important;
+                justify-content: center !important;
+            }
+        }
+
+        @@media (max-width: 1600px) {
+            .header-sm-1 {
+                background-position: 44px 0px !important;
+                height: 128px !important;
+            }
+        }
+
+        #ws {
+            overflow-y: initial !important;
+            max-width: 79% !important;
+        }
+
+        .modal-body {
+            max-height: calc(100vh - 210px);
+        }
+
+        .modal-body-x {
+            max-height: calc(100vh - 376px);
+            overflow-y: auto;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        @@media (max-width: 1200px) {
+            #ws {
+                max-width: 92% !important;
+            }
+        }
+
+        @@media (min-width: 1200px) and (max-width: 1400px) {
+            .ec4 {
+                display: none !important;
+            }
+
+            .customtab3 {
+                padding-left: 210px !important;
+            }
+        }
+
+        @@media screen and (max-width: 1200px), screen and (max-height: 800px) {
+            .ec5 {
+                display: none !important;
+            }
+        }
+
+        .help-p {
+            line-height: 1.4;
+            font-size: 14px;
+            padding-left: 0px;
+            padding-right: 0px;
+        }
+
+        .help-sect-title {
+            font-size: 20px;
+            color: #000000;
+            font-weight: 900;
+            font-family: 'Roboto';
+        }
+
+        .help-title {
+            color: #000000;
+            font-weight: 900;
+            font-size: 16px;
+            font-family: 'Roboto';
+        }
+
+        .help-subtitle {
+            color: #1e88e5 !important;
+            font-weight: 900;
+            font-size: 15px;
+        }
+
+        .icon {
+            position: relative;
+            top: 3px;
+            left: 0px;
+        }
+
+        .title-x {
+            font-family: 'Roboto', serif;
+            line-height: 1;
+            color: white;
+            text-shadow: 0 0 10px #000000;
+        }
+
+        @@media only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape) {
+            .cbmb {
+                margin-bottom: -61px !important;
+            }
+        }
+
+        .modal-title {
+            color: #002664;
+            font-weight: 700;
+        }
+
+        .modal-content {
+            border-radius: 0rem;
+            border: 1px solid #002664 !important;
+            outline: 0;
+        }
+
+        .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+            color: #002664;
+            font-weight: 600;
+            font-size: 16px;
+            background-color: #FFFFFF;
+            padding: 12px;
+            border-radius: 0px;
+        }
+
+        .customtab3 {
+            padding-left: 290px;
+            margin-bottom: -5px;
+        }
+    </style>
+    <style type="text/css">
+        .jqstooltip {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            visibility: hidden;
+            background: rgb(0, 0, 0) transparent;
+            background-color: rgba(0,0,0,0.6);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+            -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+            color: white;
+            font: 10px arial, san serif;
+            text-align: left;
+            white-space: nowrap;
+            padding: 5px;
+            border: 1px solid white;
+            z-index: 10000;
+        }
+
+        .jqsfield {
+            color: white;
+            font: 10px arial, san serif;
+            text-align: left;
+        }
+    </style>
+
+    @{
+        var sessionAgencyId = Session["AgencyDetails"] != null ? ((KeyValuePair<int, string>
+    )Session["AgencyDetails"]).Key.ToString() : "0";
+
+    }
+
+    <script>
+
+            var maintenanceTaskList = @Html.Raw(JsonConvert.SerializeObject(ViewData["MaintenanceCallLog"]));
+            var equipmentType = @Html.Raw(JsonConvert.SerializeObject(ViewData["AssemblyEquipmentTypes"]));
+            var workTypesList = @Html.Raw(JsonConvert.SerializeObject(ViewData["WorkTypeList"]));
+        var cancelUrl = '@Url.Content("~")';
+        var lossItemList = [];
+    </script>
+    @Scripts.Render("~/bundles/consolditedCallout")
+
+}
+
+
+
+

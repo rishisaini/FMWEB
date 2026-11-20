@@ -1,0 +1,274 @@
+﻿@model AssetCare.Model.ViewModels.CallOutAddEditViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutPopup.cshtml";
+}
+<div class="container-fluid">
+    <div class="row" style="display: flex; justify-content: center;">
+        <div class="col-md-12">
+            <div class="card card-body printableArea" style="border: none !important;">
+                <h2 class="text-center mb-3" style="font-family: Roboto; margin-bottom:-4px; font-weight:700; color:#002664;">Callout Advice Form</h2>
+                <div class="container-fluid">
+                    <div class="col-md-12 mt-1">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-5px;">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>To</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style="font-size: 14px;">
+                                                    <tr>
+                                                        <td><span style="font-weight:700; color:#002664;">Contractor</span></td>
+                                                        <td>@Model.Contractor.ContactName</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Phone</span></td>
+                                                        <td style="background: #eff6f9;">@Model.Contractor.Phone</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Contact Name</span></td>
+                                                        <td>@Model.Contractor.ContactName </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>From</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style="font-size: 14px;">
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">School</span></td>
+                                                        <td>@Model.SchoolName</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Contact Name</span></td>
+                                                        <td style="background: #eff6f9;">
+                                                            @{
+                                                                if (string.IsNullOrEmpty(Model.SchoolDetails.ContactName))
+                                                                {
+                                                                    <text>@Model.RequestedBy</text>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <text>@Model.SchoolDetails.ContactName</text>
+                                                                }
+                                                            }
+                                                           
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Street</span></td>
+                                                        <td>@Model.SchoolDetails.Street</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Suburb</span></td>
+                                                        <td style="background: #eff6f9;">@Model.SchoolDetails.Suburb</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Postcode</span></td>
+                                                        <td>@Model.SchoolDetails.Postcode</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Postal Address</span></td>
+                                                        <td style="background: #eff6f9;">@Model.SchoolDetails.Address</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Phone</span></td>
+                                                        <td>@Model.SchoolDetails.Phone</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Date</span></td>
+                                                        <td style="background: #eff6f9;">
+                                                            @{
+                                                                <text>@DateTime.Now.ToString("dd/MM/yyyy")</text>                                                            
+                                                            }
+
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="vertical-align: top;"><span style="font-weight:700; color:#002664;">Signature</span></td>
+                                                        <td class="text-center" style="height: 88px; background-color: #F4F7F9;"><span style="opacity: 0.33; font-style: italic; font-family: 'Roboto Slab'; font-size: 15px;">Signature Here</span></td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-5px;">
+                                        <p style="font-size:14px; font-weight: 600; color: #1e88e5; line-height: 1.2; text-decoration: underline; ">The Principal / Stakeholder requests the Contractor carry out the following Essential Urgent Repairs Tasks</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <tbody style="font-size: 14px;">
+                                                    <tr>
+                                                        <td><span style="font-weight:700; color:#002664;">Date</span></td>
+                                                        <td>
+                                                            @{
+                                                                if (Model.CallDate.HasValue)
+                                                                {
+                                                                    <text>@Model.CallDate.Value.ToString("dd/MM/yyyy")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Time</span></td>
+                                                        <td style="background: #eff6f9;">
+                                                            @{
+                                                                if (Model.CallLogTime.HasValue)
+                                                                {
+                                                                    <text>@Model.CallLogTime.Value.ToString("HH:mm")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Initiated By</span></td>
+                                                        <td>@Model.RequestedBy</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Description</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.CallLogDesc</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Building</th>
+                                                    <th>Room</th>
+                                                    <th>Element / Item / Quantity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody style="font-size: 14px;">
+                                                <tr>
+                                                    <td style="font-weight: 900; color: #002664;">1</td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 900; color: #002664;">2</td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" style="margin-top:8px;">
+                                                <tbody style="font-size: 14px;">
+                                                    <tr>
+                                                        <td><span style="font-weight:700; color:#002664;">Event Date</span></td>
+                                                        <td>
+                                                            @{
+                                                                if (Model.CallDate.HasValue)
+                                                                {
+                                                                    <text>@Model.CallDate.Value.ToString("dd/MM/yyyy")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Event Time</span></td>
+                                                        <td style="background: #eff6f9;">
+                                                            @{
+                                                                if (Model.CallLogTime.HasValue)
+                                                                {
+                                                                    <text>@Model.CallLogTime.Value.ToString("HH:mm")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Reported By</span></td>
+                                                        <td></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Date Found</span></td>
+                                                        <td style="background: #eff6f9;"></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Time Notified</span></td>
+                                                        <td style="background: #eff6f9;"></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Found By</span></td>
+                                                        <td style="background: #eff6f9;"></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Emergency Works</span></td>
+                                                        <td style="background: #eff6f9;"></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Date</span></td>
+                                                        <td style="background: #eff6f9;"></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Time In / Time Out</span></td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-6px;">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Terms</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody style="font-size: 14px;">
+                                                <tr>
+                                                    <td style="font-weight: 900; color: #002664;">1</td>
+                                                    <td style="background: #eff6f9; line-height: 1.2; font-style: italic; color: #002664;">The Contractor agrees to carry out the Works in accordance with this Callout Request and, where applicable, the DET Asset Maintenance Contract dated.</td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 900; color: #002664;">2</td>
+                                                    <td style="background: #eff6f9; line-height: 1.2; font-style: italic; color: #002664;">The Contractor must submit claims in accordance with Clause 6.5.2 of Section 6 of the DET Asset Maintenance Contract.</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <hr class="mt-5">
+                        <div class="text-right">
+                            <button id="print" class="btn btn-default btn-outline" type="button"> <span><i class="fa fa-print" onclick="window.print()"></i> Print</span> </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

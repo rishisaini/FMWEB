@@ -1,0 +1,321 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@{
+    Layout = "~/Views/Shared/_LayoutPopup.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row" style="display: flex; justify-content: center;">
+        <div class="col-md-12">
+            <div class="card card-body printableArea" style="border: none !important;">
+                <h2 class="text-center mb-3" style="font-family: Roboto; margin-bottom:-4px; font-weight:700; color:#002664;">
+                    Asset Maintenance Service Report
+                </h2>
+                <div class="container-fluid">
+                    <div class="col-md-12 mt-1">
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body" style="margin-bottom:-31px; margin-top:-14px;">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Contractor:</th>
+                                                        <td style="font-size: 15px; font-weight:800;">@Model.AgencyContractor.ContractorName</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top:-22px;">
+                            <div class="col-md-12">
+                                <div class="card inner-border-1">
+                                    <div class="card-body">
+                                        <p style="font-size:15px; font-weight: 800; color: #002664; line-height: 1.2; color:#1e88e5; text-decoration: underline;">Complete a Service Report for Callouts or Demountable work site visits only</p>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped">
+                                                <tbody style="font-size: 14px;">
+                                                    <tr>
+                                                        <td><span style="font-weight:700; color:#002664;">Work Type</span></td>
+                                                        <td>@Model.WorkCategoryDesc</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Job Number</span></td>
+                                                        <td style="background: #eff6f9;">@Model.AgencySequenceId</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td><span style="font-weight:700; color:#002664;">Site Visit Date</span></td>
+                                                        <td>
+                                                            @{
+                                                                if (Model.DetailsTab.FirstVisitDate.HasValue)
+                                                                {
+                                                                    <text>@Model.DetailsTab.FirstVisitDate.Value.ToString("dd/MM/yyyy")</text>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">DET Facility Name</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.SchoolName</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">DET Facility SEA</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.Area</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">DET Facility Code</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.SchoolId</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;" colspan="2"><span style="font-weight:700; color:#002664;">Location of Work</span></td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Building No.</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.BuildingsList</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Room No.</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.RoomNumber</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">School Limit</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">@Model.SchoolLimit</td>
+                                                    </tr>
+                                                    <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                        <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Was The Job Completed ?</span></td>
+                                                        <td style="background: #eff6f9; line-height: 1.2;">
+                                                            <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                                <input tabindex="7" type="radio" class="check" style="margin-left:5px; margin-right:20px;" id="minimal-radio-3" name="minimal-radio">
+                                                                <label for="minimal-radio-3" style="margin-right:10px; font-size:14px; font-weight: 500 !important;">Yes</label>
+                                                                <input tabindex="8" type="radio" class="check" id="minimal-radio-4" name="minimal-radio">
+                                                                <label for="minimal-radio-4" style="font-size:14px; font-weight: 500 !important;">No</label>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p style="font-size: 14px; font-weight: 400; font-style: italic; line-height: 1.2; color: #002664;">Include detailed scope of work and location plan for all insurance work and also include two photographs, one wide angle and one detailed close up for insurance work over $1000 with this service report.</p>
+                                                <div class="form-group text-left ml-1">
+                                                    <input type="checkbox" id="md_checkbox_555" class="filled-in chk-col-light-blue" unchecked="">
+                                                    <label style="font-size:14px; margin-right:0px; margin-left: -6px;" for="md_checkbox_555">Site Visit</label>
+                                                    <input type="checkbox" id="md_checkbox_556" class="filled-in chk-col-light-blue" unchecked="">
+                                                    <label class="ml-5" style="font-size:14px; margin-right:0px; margin-left: -6px;" for="md_checkbox_556">Contractor Contacted</label>
+                                                    <input type="checkbox" id="md_checkbox_557" class="filled-in chk-col-light-blue" unchecked="">
+                                                    <label class="ml-5" style="font-size:14px; margin-right:0px; margin-left: -7px;" for="md_checkbox_557">Others</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="mb-4" style="font-size: 14px; font-weight: 400; font-style: italic; line-height: 1.2; color: #002664; margin-top:-21px;">Labour (Each Trade)</p>
+                                        <table class="table table-striped" style="margin-top:-21px;">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Trade</th>
+                                                    <th>Time In</th>
+                                                    <th>Time Out</th>
+                                                    <th>Hrs</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody style="font-size: 14px;">
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9;"></td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                    <td style="background: #eff6f9;"></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="font-weight: 700; color: #002664;" colspan="5">Material and Equipment</td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;" colspan="4">Description</td>
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;">Qty</td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;" colspan="4"></td>
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;"></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;" colspan="4"></td>
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;"></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;" colspan="4"></td>
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;"></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;" colspan="4"></td>
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;"></td>
+                                                </tr>
+                                                <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;" colspan="4"></td>
+                                                    <td style="background: #eff6f9; font-weight: 700; color: #002664;"></td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+                                    </div>
+                                    <div class="row" style="margin-top:-20px; margin-left:4px; margin-right:4px;">
+                                        <div class="col-12">
+                                            <div class="card card-inverse card-blue-gradient" style="margin-top:0px; border: 1px solid #FFFFFF;">
+                                                <div class="card-header" style="border-bottom: 1px solid #FFFFFF;">
+                                                    <h4 class="m-b-0 text-white" style="font-size:15px !important; font-weight: 900; font-family:'Roboto';">Quality Self Audit</h4>
+                                                </div>
+                                                <div class="card-base">
+                                                    <div class="form-group" style="margin-top: 8px; margin-left: 7px; margin-bottom: -8px;">
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" value="x" name="styled_checkbox" required="" class="custom-control-input"> <span class="ml-2 custom-control-label text-white" style="padding-top:4px;"> All Materials comply with The Contract Details ? </span>
+                                                        </label>
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" value="x" name="styled_checkbox" required="" class="custom-control-input"> <span class="ml-2 custom-control-label text-white" style="padding-top:4px;"> All Workmanship complies with The Contract Details ? </span>
+                                                        </label>
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" value="x" name="styled_checkbox" required="" class="custom-control-input"> <span class="ml-2 custom-control-label text-white" style="padding-top:4px;"> Have Excess Materials been removed from site ?  </span>
+                                                        </label>
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" value="x" name="styled_checkbox" required="" class="custom-control-input"> <span class="ml-2 custom-control-label text-white" style="padding-top:4px;"> All Workers Sign In and Out of DoE Facility site ? </span>
+                                                        </label>
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" value="x" name="styled_checkbox" required="" class="custom-control-input"> <span class="ml-2 custom-control-label text-white" style="padding-top:4px;"> Is Site Safe and Fit for Intented Use ?  </span>
+                                                        </label>
+                                                        <label class="custom-control custom-checkbox">
+                                                            <input type="checkbox" value="x" name="styled_checkbox" required="" class="custom-control-input"> <span class="ml-2 custom-control-label text-white" style="padding-top:4px;"> Have All Hazards been made Safe ? </span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" style="margin-top:-16px; margin-left:4px; margin-right:4px;">
+                                        <div class="col-md-12">
+                                            <h4 class="mb-3" style="font-size:15px !important; font-weight: 900; font-family:'Roboto'; margin-left: 10px; color: #1e88e5;">DoE Facility Manager's Sign Off</h4>
+                                            <p style="font-size: 14px; font-weight: 400; font-style: italic; line-height: 1.2; color: #002664;">I certify that the above work has been completed.</p>
+                                            <p style="font-size: 14px; font-weight: 400; font-style: italic; line-height: 1.2; color: #002664;">For Insurance Work, I certify that the work undertaken meets the criteria of the Treasury Management Fund.</p>
+                                            <p style="font-size: 14px; font-weight: 400; font-style: italic; line-height: 1.2; color: #002664;">For Insurance Work, (For insurance work, Police report details must be completed by the DET Facility Manager)</p>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <tbody style="font-size: 14px;">
+                                                        <tr>
+                                                            <td><span style="font-weight:700; color:#002664;">Facility Manager Name</span></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Position</span></td>
+                                                            <td style="background: #eff6f9;"></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td><span style="font-weight:700; color:#002664;">Date</span></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="vertical-align: top; background: #eff6f9;"><span style="font-weight:700; color:#002664;">Signature</span></td>
+                                                            <td class="text-center" style="height: 88px; background-color: #F4F7F9;"><span style="opacity: 0.33; font-style: italic; font-family: 'Roboto Slab'; font-size: 15px;">Signature Here</span></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9; font-weight: 600 !important; color: #002664 !important; line-height: 1.2;" colspan="2">
+                                                                Description <br> <span style="font-weight: 400; font-style: italic;">( For Insurance Work, provide full description of the cause )</span>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2" style="background: #eff6f9;"><textarea style="height:64px; width:100%; margin-top:-4px;"> </textarea></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="table-responsive" style="margin-top:-8px;">
+                                                <table class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Insurance Work - Police Report</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody style="font-size: 14px;">
+                                                        <tr>
+                                                            <td><span style="font-weight:700; color:#002664;">Police Station</span></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Officer's Name</span></td>
+                                                            <td style="background: #eff6f9;"></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td><span style="font-weight:700; color:#002664;">PAL / Event No.</span></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Report Date and Time</span></td>
+                                                            <td style="background: #eff6f9;"></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Incident Date</span></td>
+                                                            <td style="background: #eff6f9;"></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Incident Time</span></td>
+                                                            <td style="background: #eff6f9;"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top:-16px; margin-left:4px; margin-right:4px;">
+                                        <div class="col-md-12">
+                                            <h4 class="mb-2 mt-3" style="font-size:15px !important; font-weight: 900; font-family:'Roboto'; margin-left: 10px; color: #1e88e5;">Contractor's Sign Off</h4>
+                                            <p style="font-size: 14px; font-weight: 400; font-style: italic; line-height: 1.2; color: #002664;">The above labour, materials and equipment were used on this job.</p>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped">
+                                                    <tbody style="font-size: 14px;">
+                                                        <tr>
+                                                            <td><span style="font-weight:700; color:#002664;">Contractor Name</span></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="background: #eff6f9;"><span style="font-weight:700; color:#002664;">Company</span></td>
+                                                            <td style="background: #eff6f9;"></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td><span style="font-weight:700; color:#002664;">Date</span></td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr style="border-top: 1px solid #FFFFFF; margin-top: 8px;">
+                                                            <td style="vertical-align: top; background: #eff6f9;"><span style="font-weight:700; color:#002664;">Signature</span></td>
+                                                            <td class="text-center" style="height: 88px; background-color: #F4F7F9;"><span style="opacity: 0.33; font-style: italic; font-family: 'Roboto Slab'; font-size: 15px;">Signature Here</span></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <hr class="mt-5">
+                <div class="text-right">
+                    <button id="print" class="btn btn-default btn-outline" type="button" onclick="window.print()"> <span><i class="fa fa-print"></i> Print</span> </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

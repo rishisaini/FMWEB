@@ -1,0 +1,77 @@
+﻿@model AssetCare.Model.ViewModels.CallOutAddEditViewModel
+@using AssetCare.Helpers
+
+<div class="row">
+
+    <div class="col-xl-12 col-lg-12">
+        <div class="card ">
+            <div class="card-header">
+                <strong>Capital Defect Details</strong> 
+            </div>
+            <div class="card-base">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-6">
+                            <div class="card inner-border-1 white-bg">
+                                <div class="card-base" style="margin-bottom:-18px; margin-left:-9px;">
+                                    <div class="row" style="margin-left:-5px;">
+
+                                        <div class="col-xl-12 col-lg-12 col-md-12 ">
+                                            @Html.CheckBoxFor(x => x.CapitalDefect, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue", @id = "chkCapitalDefect", style = "border:white;opacity:1;z-index:2;" })
+                                               .AddIf(Model.DisableField("mainSection", "CapitalDefect"), "disabled", "disabled"))
+                                            <label style="font-size:14px; margin-right:25px" class="" for="CapitalDefect"> <strong>Capital Defect</strong></label>
+
+                                            <div class="row" style="background: #f2f2f2;">
+                                                <div class="col-lg-6 col-sm-12 float-left" style="border-top: 1px dotted #BBBBBB;">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px">
+                                                        <label><i class="fa fa-calendar fa-color"></i> <strong style="border-left:1px dotted #AAA7A7;"> &nbsp; Defect Flagged Date:</strong> </label> 
+                                                        <br><label style="padding: 3px; border-radius: 5px !important;">@Model.CapitalDefectCalloutViewModel.DefectFlaggedDate</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12 float-left" style="border-top: 1px dotted #BBBBBB;">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px">
+                                                        <label><i class="fa fa-calendar fa-color"></i> <strong style="border-left:1px dotted #AAA7A7;"> &nbsp;Defect Reversal Date:</strong> </label> 
+                                                        <br><label style="padding: 3px; border-radius: 5px !important;">@Model.CapitalDefectCalloutViewModel.DefectReversalDate</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id ="divDefectemail" class="col-xl-6 col-lg-6">
+                            <div class="card inner-border-1 white-bg">
+                                <div class="card-base" style="margin-bottom:-18px; margin-left:-9px;">
+                                    <div class="row" style="margin-left:-5px;">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 ">
+                                            @Html.CheckBoxFor(x => x.CapitalDefectCalloutViewModel.DefectEmailToSchoolAndPMPD, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue", @id = "chkDefectEmailToSchoolAndPMPD", style = "border:white;opacity:1;z-index:2;" })
+                                             .AddIf(Model.DisableField("capitalDefectSection", "DefectEmailToSchoolAndPMPD"), "disabled", "disabled"))
+                                            <label style="font-size:14px;" class="" for="DefectEmailToSchoolAndPMPD"><strong>Email to School & DLP</strong></label>
+
+                                            <div class="row" style="background: #f2f2f2;">
+                                                <div class="col-lg-6 col-sm-12 float-left" style="border-top: 1px dotted #BBBBBB;">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px">
+                                                        <label><i class="fa fa-calendar"></i> <strong style="border-left:1px dotted #AAA7A7;"> &nbsp;First Email Date:</strong> </label> 
+                                                        <br><label style="padding: 3px; border-radius: 5px !important;">@Model.CapitalDefectCalloutViewModel.FirstEmailSentDate</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12 float-left" style="border-top: 1px dotted #BBBBBB;">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px">
+                                                        <label><i class="fa fa-calendar fa-color"></i> <strong style="border-left:1px dotted #AAA7A7;"> &nbsp;Last Email Date:</strong> </label> 
+                                                        <br><label style="padding: 3px; border-radius: 5px !important;">@Model.CapitalDefectCalloutViewModel.LastEmailSentDate</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

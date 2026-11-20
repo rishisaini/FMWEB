@@ -1,0 +1,371 @@
+﻿@model AssetCare.Model.ViewModels.CallOutAddEditViewModel
+@using AssetCare.Helpers
+@using Newtonsoft.Json
+@using AssetCare.Common
+
+@{
+    var canViewIRCMSection = User.IsInRoles("ADMIN,ADMINGEN,MFUMGR,MFUOFFICER,DETAMU,AMUOFFICER,CALLCENTERSTAFF");
+}
+<div id="divReactiveCalloutDetail">
+    @{
+        if (canViewIRCMSection)
+        {
+            <div class="row">
+                <div class="col-xl-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header" style="min-height:40px; padding-bottom:0px!important">
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1" style="padding-left:0px"><strong>IRCM Team Use Only</strong> </div>
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1"> <strong>Processed By:</strong> <span> @Model.ProcessedByIRCM </span> </div>
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1"><strong>Processed Date / Time:</strong> <span>@Model.ProcessedDateByIRCM </span> </div>
+                            <div class="col-lg-3 col-sm-12 float-right" style="text-align: right;">
+                            </div>
+                        </div>
+                        <div class="card-base" style="margin-bottom:-18px; margin-left:-9px;">
+                            <div class="row" style="margin-left:-5px;">
+
+                                <div class="col-xl-4 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="txtClaimNumber"><strong>Claim Number (CN)</strong></label>
+                                        @Html.EditorFor(m => m.ClaimNumber, new { htmlAttributes = new RouteValueDictionary(new { @Class = "form-control form-control-sm w-32em", @placeholder = "Input Claim Number", @id = "txtClaimNumber" }).AddIf(Model.DisableField("ircmSection", "ClaimNumber"), "disabled", "disabled") })
+                                        @Html.ValidationMessageFor(m => m.ClaimNumber)
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="txtCORPFileNo"><strong>CORP File No</strong></label>
+                                        @Html.EditorFor(m => m.CORPFileNo, new { htmlAttributes = new RouteValueDictionary(new { @Class = "form-control form-control-sm w-32em", @placeholder = "Input CORP File No", @id = "txtCORPFileNo" }).AddIf(Model.DisableField("ircmSection", "CORPFileNo"), "disabled", "disabled") })
+                                        @Html.ValidationMessageFor(m => m.CORPFileNo)
+                                    </div>
+                                </div>
+                                <div class="col-xl-4 col-lg-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="ddlAssessorStatus"><strong>Assessor Appointed / Waive Assessor</strong></label>
+                                        @Html.DropDownListFor(x => x.AssessorStatusID, (IEnumerable<SelectListItem>)ViewData["AssessorStatus"], "---Select---",
+    new RouteValueDictionary(new { @class = "custom-select", @id = "ddlAssessorStatus" }).AddIf(Model.DisableField("ircmSection", "AssessorStatusID"), "disabled", "disabled"))
+                                    </div>
+                                </div>
+                                <div class="col-xl-12 col-lg-12 col-md-12">
+                                    <div class="form-group m-t-10" style="">
+                                        <label><span style="margin-right:5px;"><strong>IRCM Comments </strong></span><span class="ml-1 label-desc"> (Maximum 1000 Characters) </span></label>
+                                        @Html.TextAreaFor(m => m.CommentsByIRCM, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", @id = "txtCWOCommentsByIRCM", rows = "5", style = "height:45px", maxlength = 997 }).AddIf(Model.DisableField("ircmSection", "CommentsByIRCM"), "readonly", "readonly"))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+    @{
+        if (Model.DisableField("mainSection", "hideControls"))
+        {
+            <div class="row">
+                <div class="col-xl-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header" style="min-height:40px; padding-bottom:0px!important">
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1" style="padding-left:0px"><strong>@(Model.IsAMURegion? "AMU Use Only": "FMC Use Only")</strong> </div>
+
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1"> <strong>Processed By:</strong> <span> @Model.ProcessedBy </span> </div>
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1"><strong>Processed Date / Time:</strong> <span>@Model.ProcessedDate </span> </div>
+
+                            <div class="col-lg-3 col-sm-12 float-right" style="text-align: right;">
+                                @Html.CheckBoxFor(x => x.Complete, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue", @id = "chkComplete", style = "border:white;opacity:1;z-index:2;" }).AddIf(Model.DisableField("callCenterSection", "Complete"), "disabled", "disabled"))
+                                <label style="font-size:14px;" class="" for="Complete">Completed</label>
+                            </div>
+                        </div>
+                        <div class="card-base">
+                            <div class="col-lg-12">
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-12">
+                                        <div class="card inner-border-1 white-bg">
+                                            <div class="card-base" style="margin-left:-9px;">
+                                                <div class="row" style="margin-left:-5px;">
+                                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                                        <label><strong>Service Type</strong></label>
+                                                        @Html.DropDownListFor(x => x.SubContractorBusinessTypeId, (IEnumerable<SelectListItem>)ViewData["SubContractorBusinessType"], "---Select---",
+    new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("callCenterSection", "SubContractorBusinessTypeId"), "disabled", "disabled"))
+                                                    </div>
+                                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                                        <label><strong>Local Contractor</strong></label>
+                                                        @Html.DropDownListFor(x => x.SubContractorId, Enumerable.Empty<SelectListItem>(), "---Select---",
+    new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("callCenterSection", "SubContractorId"), "disabled", "disabled"))
+                                                        @Html.ValidationMessageFor(x => x.SubContractorId)
+                                                        @{
+                                                            if (Model.DisableField("callCenterSection", "SubContractorId"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.SubContractorId)
+                                                            }
+                                                        }
+                                                    </div>
+                                                    <div class="col-xl-12 col-lg-12 col-md-12" style="margin-bottom:-10px">
+                                                        <div class="form-group m-t-10" style="">
+                                                            <label><span style="margin-right:5px;"><strong>Description of Trade(s) </strong></span><span class="ml-1 label-desc"> </span></label>
+                                                            @Html.TextAreaFor(m => m.TradesDescription, new RouteValueDictionary(new { @readonly = "readonly", @class = "form-control form-control-sm blue-border-1", @id = "txtTradesDescription", rows = "5", style = "height:45px", maxlength = 1000 }))@*.AddIf(Model.DisableField("callCenterSection", "txtTradesDescription"), "disabled", "disabled"))*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="lc-wo-count col-xl-6 col-lg-6 col-md-6" style="display:none;">
+                                                        <i class="fa fa-list fa-color"></i>
+                                                        <label class="left-bdr"><strong>Total WO count : <span id="TotalWOCount"></span></strong></label>
+                                                    </div>
+                                                    <div class="lc-wo-count col-xl-6 col-lg-6 col-md-6" style="display:none;">
+                                                        <i class="fa fa-tag fa-color" style="color: #43bd00"></i>
+                                                        <label class="left-bdr"><strong>Active WO count : <span id="ActiveWOCount"></span></strong></label>
+                                                    </div>
+                                                    <div class="col-xl-12 col-lg-12 col-md-12" style="margin-bottom:-10px">
+                                                        <div class="form-group m-t-10" style="">
+                                                            <label><span style="margin-right:5px;"><strong>Comments </strong></span><span class="ml-1 label-desc"> (Maximum 1000 Characters) </span></label>
+                                                            @Html.TextAreaFor(m => m.Comments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", @id = "txtCWOComments", rows = "5", style = "height:45px", maxlength = 997 }).AddIf(Model.DisableField("callCenterSection", "Comments"), "disabled", "disabled"))
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-12">
+                                        <div class="card white-bg">
+                                            <div class="card-base">
+                                                <div class="col-12" style="margin: 0px; padding:0px;">
+                                                    <div class="col-8 ml-0 float-left" style="margin: 0px; padding:0px;">
+                                                        <div class="col-12" style="margin-left:8px; margin-right:8px;">
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>ABN</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="subABN">@Model.SubContractor.ABN</label>
+
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Licence Number</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="subLicense">@Model.SubContractor.LicenseNumber</label>
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Licence Expiry</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="subLicenseExpiry">@Model.SubContractor.LicenseExpiryDate</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-8 col-lg-8 float-left">
+                                                                    <label><strong>Email</strong></label><br>
+                                                                    <label style="color:cornflowerblue"><i class="fa fa-envelope fa-color"></i> <strong> 
+                                                                       @* <a >&nbsp;@Model.SubContractor.Email</a>*@  
+                                                                        <a id="subEmail" href="mailto:@Model.SubContractor.Email" >
+                                                                            &nbsp;
+                                                                            @Model.SubContractor.Email
+                                                                        </a>
+                                                                             </strong></label>
+
+                                                                </div>
+                                                                <div class="col-xl-4 col-lg-4 float-left">
+                                                                    <label><strong>Mobile</strong></label><br>
+                                                                    <label style="color:cornflowerblue"><i class="fa fa-mobile-alt fa-color"></i> <strong> <a id="subMobile" href="tel:@Model.SubContractor.Mobile">@Model.SubContractor.Mobile</a> </strong></label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-12 col-lg-12 float-left">
+                                                                    <label><strong>Aboriginal and Torres Strait Islander Verified</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="atsiVerified">@Model.SubContractor.ATSIVerified  </label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row label-bdr">
+                                                                <div class="col-xl-6 col-lg-6 float-left">
+                                                                    <label><strong>Distance</strong></label><br>
+                                                                    <label style="color:#5f5f5f" id="distanceKm"></label>
+                                                                    <label style="color:#5f5f5f; padding-left:12px;" id="distanceDrive"></label>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-12 float-right mt-3">
+                                                        <label><strong>Address</strong></label><br>
+                                                        <label style="color:cornflowerblue"><i class="fa fa-map-marker fa-color"></i> <strong> <a id="subAddress"> @string.Format("{0} {1} {2} {3}", Model.SubContractor.AddressLine1, Model.SubContractor.Suburb, Model.SubContractor.Postcode, Model.SubContractor.State)</a></strong></label>
+
+                                                        <iframe id="addressMap" width="200" height="160" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"> </iframe>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 float-left">
+                                                    <div class="row pt-1">
+                                                        <div class="col-lg-3 col-sm-12">
+                                                            @{
+                                                                if (Model.DisableField("callCenterSection", "SubContractorId"))
+                                                                {
+                                                                    <button type="button" disabled class="btn btn-sm btn-outline-info waves-effect waves-light float-left" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-case-sensitive-alt"></i></span>Create Work Order</button>
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (Model.DisableField("callCenterSection", "CallCenter"))
+                                                                    {
+                                                                        <button type="button" disabled class="btn btn-sm btn-outline-info waves-effect waves-light float-left" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-case-sensitive-alt"></i></span>Create Work Order</button>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <button type="button" id="btnAddLocalContractor" data-toggle="modal" data-target=".bs-variation-modal" class="btn btn-sm btn-outline-info waves-effect waves-light float-left" data-toggle="button" aria-pressed="false"><span class="btn-label"><i class="mdi mdi-case-sensitive-alt"></i></span>Create Work Order</button>
+                                                                    }
+                                                                }
+                                                            }
+
+                                                        </div>
+                                                        <div class="col-lg-9 col-sm-10 text-danger" id="tradieMessage" style="padding-top:8px;display:none;"></div>
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @*<div class="row" style="margin-left:-5px;height:50px;">
+                                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                                    </div>
+                                                </div>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="float-left align-self-center" style="margin-top: 5px; margin-left: -7px;"><strong>Work Orders</strong>  </span>
+                        </div>
+                        <div class="card-base">
+                            <div class="table-responsive m-t-0">
+                                <table id="tblLocalContractorList" class="table display table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th style="display:none">ID</th>
+                                            <th style="display:none">ServiceReportId</th>
+                                            <th>Actions</th>
+                                            <th>Local Contractor</th>
+                                            <th>Assigned Date</th>
+                                            <th>LC Responded Date</th>
+                                            <th>Accepted?</th>
+                                            <th>Status</th>
+                                            <th>WO ID</th>
+                                            <th>WO Category</th>
+                                            <th>WO creation date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var subcontractor in Model.LocalContractorWorkOderDetails)
+                                        {
+                                            <tr>
+                                                <td style="display:none">@subcontractor.SubContractorId</td>
+                                                <td style="display:none">@subcontractor.ServiceReportId </td>
+                                                <td style="float:left">
+                                                    @{
+                                                        if (subcontractor.Accepted != true && !Model.DisableField("callCenterSection", "Complete") && @subcontractor.WorkOrderId <= 0)
+                                                        {
+                                                            <a href="#" onclick="return removeLocalContractor(this, @subcontractor.SubContractorId)"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Remove sub contracor" style="font-size: 21px; margin-top: -3px; margin-left: 16px;"></i></a>
+                                                        }
+                                                        else if (subcontractor.WorkOrderId > 0)
+                                                        {
+                                                            var woUrl = Url.Action("Detail", "WorkOrder") + "?wrkId=" + subcontractor.ServiceReportId + "&sig=" + subcontractor.Sig + "&callbackUrl=" + HttpUtility.UrlEncode(Request.RawUrl);
+
+                                                            if (Model.CurrentRoleID == "F" || Model.CurrentRoleID == "SM")
+                                                            {
+                                                                <a href="#" disabled="disabled"><i class="fa fa-pencil-square" data-toggle="tooltip" data-placement="top" title="" data-original-title="Remove sub contracor" style="font-size:21px; margin-top:-3px; margin-left:16px;"></i></a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a href="@woUrl"><i class="fa fa-pencil-square" data-toggle="tooltip" data-placement="top" title="" data-original-title="Remove sub contracor" style="font-size:21px; margin-top:-3px; margin-left:16px;"></i></a>
+
+                                                            }
+                                                        }
+                                                    }
+                                                </td>
+                                                <td><span class="seqHandle">@subcontractor.SubContractorName</span> </td>
+                                                <td>
+                                                    @{
+                                                        if (subcontractor.SubContractorAssignedDate.HasValue)
+                                                        {
+                                                            <text>@subcontractor.SubContractorAssignedDate.Value.ToString("dd/MM/yyyy") </text>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        if (subcontractor.SubContractorRespondedDate.HasValue)
+                                                        {
+                                                            <text>@subcontractor.SubContractorRespondedDate.Value.ToString("dd/MM/yyyy") </text>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        if (subcontractor.Accepted == true)
+                                                        {
+                                                            <text>Yes</text>
+                                                        }
+                                                        else if (subcontractor.Accepted == null)
+                                                        {
+                                                            <text>Pending</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>No</text>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>@subcontractor.WorkOrderStatus</td>
+                                                <td>
+                                                    @{
+                                                        var jobUrl = Url.Action("Detail", "WorkOrder") + "?wrkId=" + subcontractor.ServiceReportId + "&sig=" + subcontractor.Sig + "&callbackUrl=" + HttpUtility.UrlEncode(Request.RawUrl);
+                                                        if (Model.CurrentRoleID == "F" || Model.CurrentRoleID == "SM")
+                                                        {
+                                                            <a href="#" disabled="disabled"> @subcontractor.WorkOrderId</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="@jobUrl"> @subcontractor.WorkOrderId </a>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>@subcontractor.WorkOrderCategory</td>
+                                                <td>@subcontractor.WorkOrderCreatedDate.Value.ToString("dd/MM/yyyy")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="float-left align-self-center" style="margin-top: 5px; margin-left: -7px;"><strong>Trades Person List</strong>  </span>
+                        </div>
+                        <div class="card-base">
+                            <div class="table-responsive m-t-0">
+                                <table id="tblTradesPeopleList" class="table display table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Action</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Mobile</th>
+                                            <th>Email</th>
+                                            <th>Trades</th>
+                                            <th>Licence Issue</th>
+                                            <th>Licence Expiry</th>
+                                            <th>Verified</th>
+                                            <th>NTBEL</th>
+                                            <th>WWCC</th>
+                                            <th>NCCHC</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

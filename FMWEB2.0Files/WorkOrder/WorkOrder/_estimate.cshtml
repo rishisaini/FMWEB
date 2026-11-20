@@ -1,0 +1,301 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Model.ViewModels
+@using AssetCare.Helpers
+
+
+<div class="p-20">
+
+    @{
+        if (!Model.DisableField("detailSection", "raiseVariation"))
+        {
+            <div class="row" style="text-align:right;">
+                <div class="col-12">
+                        <button class="btn btn-outline-info waves-effect waves-light  mr-2" type="button" data-toggle="modal" data-target=".bs-variation-modal"><span class="btn-label"><i class="fa fa-arrow-up"></i></span>Raise New Work Order</button>
+                </div>
+            </div>
+        }
+    }
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="row mt-2">
+                <div class="col-xl-4 col-lg-6">
+                    <div class="card inner-border-1">
+                        <div class="card-header blue-theme" style="max-height: 45px;">
+                            <span class="float-right">
+                                @{ if (Model.Estimate.EstimateDate != null)
+                                    {
+                                        <label style="font-size:14px;" class="">Date:</label>
+                                        <label style="font-size:14px;" class="">
+                                            <text>@Model.Estimate.EstimateDate.Value.ToString("dd/MM/yyyy") </text>
+                                        </label>
+                                    }
+                                }
+                                @Html.CheckBoxFor(x => x.Estimate.EstimateFinalised, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue", style = "outline: 1px #5a5a5a;" })
+  .AddIf(Model.DisableField("estimateSection", "EstimateFinalised"), "disabled", "disabled")
+  .AddIf(Model.DisableField("estimateSection", "EstimateFinalised"), "class", "filled-in chk-col-grey"))
+                                <label style="font-size:14px;" for="Estimate_EstimateFinalised">Submit</label>
+
+                            </span>
+
+                            <span class="float-left mt-1">LC</span>
+                        </div>
+
+                        <div class="card-base mtmx-0 white-bg" style="margin-left:-7px; margin-bottom:-14px;">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label><strong>Estimated Amount</strong></label>
+                                    <div class="input-group" style="margin-top:0px;margin-bottom:3px">
+                                        <div class="input-group-prepend" style="height: 33px;">
+                                            <span class="input-group-text aud" id="basic-addon1">$</span>
+                                        </div>
+                                        @Html.TextBoxFor(x => x.Estimate.EstimatedAmount, new RouteValueDictionary(new { @class = "form-control form-control-sm", }).AddIf(Model.DisableField("estimateSection", "EstimatedAmount"), "disabled", "disabled"))
+                                        @{
+                                            @Html.HiddenFor(x => x.Estimate.LRLV)
+                                            if (Model.DisableField("estimateSection", "EstimatedAmount"))
+                                            {
+                                                @Html.HiddenFor(x => x.Estimate.EstimatedAmount)
+
+                                            }
+                                        }
+                                    </div>
+                                    @Html.ValidationMessageFor(x => x.Estimate.EstimatedAmount)
+                                    <span class="field-validation-error" id="validEstimateAmount" style="float:left">Estimate amount cannot be greater than 30K</span>
+                                </div>
+                            </div>
+                            @{
+                                if (Model.Estimate.OriginalEstimate > 0)
+                                {
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label><strong>Original Estimate</strong></label>
+                                            <div class="input-group" style="margin-top:0px;margin-bottom:3px">
+                                                <div class="input-group-prepend" style="height: 33px;">
+                                                    <span class="input-group-text aud" id="basic-addon1">$</span>
+                                                </div>
+                                                @Html.TextBoxFor(x => x.Estimate.OriginalEstimate, new RouteValueDictionary(new { @class = "form-control form-control-sm", }).AddIf(true, "disabled", "disabled"))
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+
+
+                            @{
+                                if (Model.CurrentRoleID!="DE")
+                                {
+                                    <div class="col" style="margin-top:-5px;">
+                                        <div class="form-group">
+                                            <label><strong>Comments (1000 Characters)</strong></label>
+                                            @Html.TextAreaFor(x => x.Estimate.EstimateComments, new RouteValueDictionary(new { @class = "form-control form-control-sm", rows = 3, style = "height:98px", maxlength = 1000 }).AddIf(Model.DisableField("estimateSection", "EstimateComments"), "disabled", "disabled"))
+                                            @Html.ValidationMessageFor(x => x.Estimate.EstimateComments)
+                                        </div>
+                                    </div>
+                                    } }
+                                    @*<div class="col" style="margin-top:-10px;">
+                    <div class="form-group">
+                        <label><strong>Estimated By</strong></label>
+                        @Html.TextBoxFor(x => x.Estimate.EstimatedBy, new RouteValueDictionary(new { @class = "form-control form-control-sm" }).AddIf(Model.DisableField("estimateSection", "EstimatedBy"), "disabled", "disabled"))
+
+                    </div>
+                </div>*@
+                                    <div class="col" style="margin-top:-10px;">
+                                        <div class="form-group">
+                                            <label><strong>Support Documents</strong></label>
+                                            @{
+                                                if (Model.DisableField("estimateSection", "deleteDocument"))
+                                                {
+                                                    <input id="btnQuoteFileSelected" type="file" class="form-control ea-triggers-bound" disabled name="fileSelectedBtn" accept="@Model.AcceptedFileTypes">
+                                                }
+                                                else
+                                                {
+                                                    <input id="btnQuoteFileSelected" type="file" class="form-control ea-triggers-bound" name="fileSelectedBtn" accept="@Model.AcceptedFileTypes">
+                                                }
+                                            }
+                                            <span class="field-validation-error float-left" id="fileErrQuote"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col" style="margin-top:-10px;">
+                                        @{
+                                            if (Model.DisableField("estimateSection", "deleteDocument"))
+                                            {
+                                                <button class="btn btn-sm btn-outline-info waves-effect waves-light pull-right" type="button" id="btnUploadQuote" disabled> <span class="btn-label"><i class="fa fa-file"></i></span>Upload</button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-outline-info waves-effect waves-light pull-right" type="button" id="btnUploadQuote"> <span class="btn-label"><i class="fa fa-file"></i></span>Upload</button>
+                                            }
+                                        }
+                                    </div>
+                                    <div class="col">
+                                        <div class="table-responsive m-t-0">
+                                            <table id="quoteDocumentList" class="table display table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Actions</th>
+                                                        <th>Document</th>
+                                                        <th>Uploaded On</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var document in Model.SupportQuoteDocuments)
+                                                    {
+                                                        <tr>
+                                                            <td style="float:left">
+                                                                @{
+                                                                    if (!Model.DisableField("estimateSection", "deleteDocument"))
+                                                                    {
+                                                                        <a href="#" onclick="return remove(this, @document.SupportDocumentID, 'quote')"><i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete the callout" style="font-size: 21px; margin-top: -3px; margin-left: 16px;"></i></a>
+
+                                                                    }
+                                                                }
+                                                            </td>
+                                                            <td><a href="@document.AttachmentLink" target="_blank">@document.ClientDocumentName</a></td>
+                                                            <td>@document.RecordedDate</td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                    </div>
+                </div>
+                @if (!Model.IsAMURegion) { 
+                <div class="col-xl-4 col-lg-6 mtm-10">
+                    <div class="card inner-border-1">
+                        <div class="card-header blue-theme" style="max-height: 45px;">
+                            @*<span class="float-right">
+                                    <label style="font-size:14px; margin-top:1px; margin-left: -6px;" class="" >Recommend</label>
+                                    @Html.RadioButtonFor(m => m.Estimate.FMCApproved, "TRUE", new RouteValueDictionary(new { @id = "fmcApprovedYes" }).AddIf(Model.DisableField("estimateSection", "FMCApproved"), "disabled", "disabled")
+                                    .AddIf(Model.DisableField("estimateSection", "FMCApproved"), "class", "filled-in chk-col-grey"))
+                                    <label for="fmcApprovedYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                    @Html.RadioButtonFor(m => m.Estimate.FMCApproved, "FALSE", new RouteValueDictionary(new { @id = "fmcApprovedNo" }).AddIf(Model.DisableField("estimateSection", "FMCApproved"), "disabled", "disabled"))
+                                    <label for="fmcApprovedNo" style="margin-left:40px; font-size:14px;">No</label>
+                                </span>*@
+
+
+                            <div class="float-right" style="margin-top:1px; margin-left: -3px;">
+                                <label style="margin-top:0px; font-size:14px;">Recommend</label>
+                                @Html.RadioButtonFor(m => m.Estimate.FMCApproved, "TRUE", new RouteValueDictionary(new { @id = "fmcApprovedYes" }).AddIf(Model.DisableField("estimateSection", "FMCApproved"), "disabled", "disabled")
+                               .AddIf(Model.DisableField("estimateSection", "FMCApproved"), "class", "filled-in chk-col-grey"))
+                                <label style="font-size:14px; margin-left: 0px; margin-top: 0px;" for="fmcApprovedYes">Yes</label>
+                                @Html.RadioButtonFor(m => m.Estimate.FMCApproved, "FALSE", new RouteValueDictionary(new { @id = "fmcApprovedNo" }).AddIf(Model.DisableField("estimateSection", "FMCApproved"), "disabled", "disabled"))
+                                <label style="font-size:14px; margin-left: 20px; margin-right: 16px; margin-top: 0px;" for="fmcApprovedNo">No</label>
+                            </div>
+
+                            <span class="float-left mt-1">FMC</span>
+                        </div>
+
+                        <div class="card-base mbm-0 mtmx-0 white-bg">
+
+
+
+                            <div class="col" style="margin-top:10px;">
+                                <div class="form-group">
+                                    <label><strong>Comments (1000 Characters)</strong></label>
+                                    @Html.TextAreaFor(x => x.Estimate.FMCApprovalComments, new RouteValueDictionary(new { @class = "form-control form-control-sm", rows = 3, style = "height:147px", maxlength = 997 }).AddIf(Model.DisableField("estimateSection", "FMCApprovalComments"), "disabled", "disabled"))
+                                    @Html.ValidationMessageFor(x => x.Estimate.FMCApprovalComments)
+                                </div>
+                            </div>
+                            <div class="col-6 float-left" style="margin-top:-11px;">
+                                <div class="form-group">
+                                    <label><strong>Recommended By</strong></label>
+                                    @Html.TextBoxFor(x => x.Estimate.FMCApprovedBy, new RouteValueDictionary(new { @class = "form-control form-control-sm" }).AddIf(Model.DisableField("estimateSection", "FMCApprovedBy"), "disabled", "disabled"))
+                                    @Html.ValidationMessageFor(x => x.Estimate.FMCApprovedBy)
+                                </div>
+                            </div>
+                            <div class="col-6 float-right" style="margin-top:-11px;">
+                                <div class="form-group">
+                                    <label><strong>Recommended Date</strong> </label>
+                                    <p type="text" class="static-readonly" style="width:100%;" value="" placeholder="">
+                                        <span id="spnFMCApprovalDate">
+                                            @{
+                                                if (Model.Estimate.FMCApprovedDate.HasValue)
+                                                {
+                                                    @Model.Estimate.FMCApprovedDate.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                                }
+                                            }
+
+                                        </span>
+                                        <span class="float-right" style="margin-top:-5px; margin-right:8px;"><img src=@Url.Content("~/assets/images/350.png") style="height:20px;"></span>
+                                    </p>
+                                    </div>
+                                </div>
+                            <div class="col-12 float-left">
+                                <div class="form-group">
+                                    <label><strong>Recommended Action</strong></label>
+                                    @Html.TextBoxFor(x => x.Estimate.FMCRecommendedAction, new RouteValueDictionary(new { @class = "form-control form-control-sm" }).AddIf(Model.DisableField("estimateSection", "FMCRecommendedAction"), "disabled", "disabled"))
+                                    @Html.ValidationMessageFor(x => x.Estimate.FMCRecommendedAction)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+                <div class="col-xl-4 col-lg-6 mtm-10">
+                    <div class="card inner-border-1">
+                        <div class="card-header blue-theme" style="max-height: 45px;">
+                            <div class="float-right" style="margin-top:1px; margin-left: -3px;">
+                                <label style="margin-top:0px; font-size:14px;">Approved</label>
+                                @Html.RadioButtonFor(m => m.Estimate.AMUApproved, "TRUE", new RouteValueDictionary(new { @id = "AMUApprovedYes" }).AddIf(Model.DisableField("estimateSection", "AMUApproved"), "disabled", "disabled")
+                                .AddIf(Model.DisableField("estimateSection", "AMUApproved"), "class", "filled-in chk-col-grey"))
+                                <label style="font-size:14px; margin-left: 0px; margin-top: 0px;" for="AMUApprovedYes">Yes</label>
+                                @Html.RadioButtonFor(m => m.Estimate.AMUApproved, "FALSE", new RouteValueDictionary(new { @id = "AMUApprovedNo" }).AddIf(Model.DisableField("estimateSection", "AMUApproved"), "disabled", "disabled"))
+
+                                <label style="font-size:14px; margin-left: 20px; margin-right: 16px; margin-top: 0px;" for="AMUApprovedNo">No</label>
+                            </div>
+
+                            <span class="float-left mt-1">AMU</span>
+                        </div>
+
+                        <div class="card-base mbm-0 mtmx-0 white-bg">
+                            <div class="col" style="margin-top:10px;">
+                                <div class="form-group">
+                                    <label><strong>Comments (1000 Characters)</strong></label>
+                                    @Html.TextAreaFor(x => x.Estimate.AMUApprovalComments, new RouteValueDictionary(new { style = "height:147px;margin-bottom:3px", rows = 3, @class = "form-control form-control-sm", maxlength = 997 }).AddIf(Model.DisableField("estimateSection", "AMUApprovalComments"), "disabled", "disabled"))
+                                    @Html.ValidationMessageFor(x => x.Estimate.AMUApprovalComments)
+                                </div>
+                            </div>
+
+                            <div class="col-6 float-left" style="margin-top:-11px;">
+                                <div class="form-group">
+                                    <label><strong>Approved By</strong></label>
+                                    @Html.TextBoxFor(x => x.Estimate.AMUApprovedBy, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-bottom:3px" }).AddIf(Model.DisableField("estimateSection", "AMUApprovedBy"), "disabled", "disabled"))
+                                    <br />
+                                    @Html.ValidationMessageFor(x => x.Estimate.AMUApprovedBy)
+                                </div>
+
+                            </div>
+                            <div class="col-6 float-right" style="margin-top:-11px;">
+                                <div class="form-group">
+                                    <label><strong>Approval Date</strong></label>
+                                    <p type="text" class="static-readonly" style="width:100%;" value="" placeholder="">
+                                        <span id="spnAMUApprovalDate">
+                                            @{
+                                                if (Model.Estimate.AMUApprovedDate.HasValue)
+                                                {
+                                                    @Model.Estimate.AMUApprovedDate.Value.ToString("dd/MM/yyyy")
+                                                }
+                                            }
+                                        </span>
+                                        <span class="float-right" style="margin-top:-5px; margin-right:8px;"><img src=@Url.Content("~/assets/images/350.png") style="height:20px;"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--OLD CODE-->
+

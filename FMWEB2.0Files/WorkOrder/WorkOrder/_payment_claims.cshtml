@@ -1,0 +1,197 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Helpers
+@using AssetCare.Model.Models;
+<div class="row">
+    <div class="col-xl-5 col-lg-5 col-md-6">
+        <div class="card inner-border-1" style="margin-top: 1px;">
+            <div class="card-header" style="max-height:48px;">
+                @Html.CheckBoxFor(x => Model.Claim.ClaimFinalized, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue float-right" })
+               .AddIf(Model.DisableField("claimSection", "ClaimFinalized"), "disabled", "disabled")
+               .AddIf(Model.DisableField("claimSection", "ClaimFinalized"), "class", "filled-in chk-col-grey float-right"))
+                <label style="font-size:13px;margin-left: -6px; margin-top:1px; margin-right: 20px; margin-bottom: 20px;" for="Claim_ClaimFinalized">Finalise this month Claim ?</label>
+                @{
+                    if (!Model.DisableField("claimSection", "ClaimFinalized"))
+                    {
+                        @Html.ValidationMessageFor(x => x.Claim.ClaimFinalized)
+                    }
+                }
+
+
+                <div class="form-group float-right fmcf d-none d-lg-block" style="margin-top:4px;">
+                    <span class="ml-5" style="margin-right:0px;display:inline-block">
+                        Finalised Date:<span class="ml-1" style="font-weight: 700; color: #1e88e5;">
+                            @if (Model.Claim != null && Model.Claim.ClaimFinalizedDate.HasValue)
+                            {
+                                <text>@Model.Claim.ClaimFinalizedDate.Value.ToString("dd/MM/yyyy") </text>
+                            }
+                            else
+                            {
+                                <text>NA</text>
+                            }
+
+                        </span>
+                    </span>
+                </div>
+
+            </div>
+            <div class="card-base p-b-0" style="margin-bottom:-14px;">
+
+                @{
+                    if (string.IsNullOrEmpty(Model.ClaimMonthYear) && Model.AgencySequenceId > 0 && Model.WorkCategoryId == 1 && !Model.DisableField("claimSection", "ClaimedAmount"))
+                    {
+                        <div class="col">
+                            <span style="color:red">To claim this job in the system, please contact System Administrator to make appropriate month available for this region.</span>
+                        </div>
+                    }
+                }
+
+                <div class="col">
+                    <table class="mb-2" style="margin-top:-4px;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span style="background: #0575E6; /* fallback for old browsers */ background: -webkit-linear-gradient(to right, #021B79, #0575E6); /* Chrome 10-25, Safari 5.1-6 */ background: linear-gradient(to right, #021B79, #0575E6); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ padding: 4px; font-weight: 700; border: 1px solid #FFFFFF; color: #FFFFFF; margin-right: 0px; margin-top: 0px;"> 6C </span>
+                                </td>
+                                <td><label class="ml-1 mt-2">Current Month and Year</label></td>
+                                <td><label class="badge badge-info text-white mb-3 ml-2 mt-3" style="font-size: 13px;" id="" name="" value="" placeholder=""> @Model.ClaimMonthYear</label></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col">
+                    <fieldset disabled="">
+                        <label>Total Amount</label>
+                        <p type="text" class="static-readonly"><span class="aud-w"> $ @Math.Round(Model.Claim.TotalAmount, 2)</span></p>
+                    </fieldset>
+                </div>
+                <div class="col">
+                    <fieldset disabled="">
+                        <label>Total Approved </label>
+                        <p type="text" class="static-readonly">
+                            <span class="aud-w">
+                                $
+                                @{
+                                    if (Model.Estimate.ApproveAmount.HasValue)
+                                    {
+                                        <text> @Math.Round(Model.Estimate.ApproveAmount.Value, 2)</text>
+
+                                    }
+                                }
+                            </span>
+                        </p>
+
+                    </fieldset>
+                </div>
+                <div class="col">
+                    <fieldset disabled="">
+                        <label>Total Claimed</label>
+                        <p type="text" class="static-readonly"><span class="aud-w"> $ @Math.Round(Model.Claim.TotalAmount, 2)</span></p>
+                    </fieldset>
+                </div>
+                <div class="col">
+                    <fieldset disabled="">
+                        <label>Claim Approved </label>
+                        <p type="text" class="static-readonly"><span class="aud-w"> @Math.Round(Model.Claim.ApprovedClaimAmount, 2) </span></p>
+                    </fieldset>
+                </div>
+                <div class="col">
+                    <fieldset disabled="">
+                        <label>Remaining Claim</label>
+                        @*<p type="text" class="static-readonly"><span class="aud-w"> $ @Math.Round(Model.Claim.RemainingClaimed, 2)</span></p>*@
+                      
+                        @Html.HiddenFor(x => x.Claim.ServiceReportStatusIdForValidation)
+                      
+
+                    </fieldset>
+                </div>
+                <div class="col">
+                    <fieldset disabled="">
+                        <label>This Month to Claim</label>
+                        <p type="text" class="static-readonly">
+                            $ <span class="aud-w" id="totalAvailabelClaimInClaim">
+
+                                @{
+
+                                    if (!Model.DisableField("claimSection", "ClaimedAmount"))
+                                    {
+
+                                        if (Model.Claim.TotalAvailableToClaimThisMonth.HasValue)
+                                        {
+                                            <text>@Math.Round(Model.Claim.TotalAvailableToClaimThisMonth.Value, 2)</text>
+                                        }
+                                        else
+                                        {
+                                            <text>0.00</text>
+                                        }
+
+
+
+                                    }
+                                    else
+                                    {
+                                        <text>0.00</text>
+                                    }
+                                }
+
+                            </span>
+                        </p>
+
+
+                    </fieldset>
+                </div>
+
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+</div>
+<div class="row mt-down" style="margin-top:-21px;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-base">
+                <div class="table-responsive m-t-0" style="margin-top:-9px;">
+                    <div id="myTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+                        <table id="tblClaimsHistory" class="display table table-hover display table-bordered table-striped dataTable no-footer" role="grid">
+                            <thead>
+                                <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Actions: activate to sort column descending" style="width: 58.5px;">Work Category</th><th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Line Item No.: activate to sort column ascending" style="width: 99.5px;">Month</th><th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Element: activate to sort column ascending" style="width: 70.5px;">Claimed Amt.</th><th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Assembly: activate to sort column ascending" style="width: 170.5px;">Approved Amt.</th><th class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Component: activate to sort column ascending" style="width: 129px;">Comments</th></tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (Claim c in Model.Claims)
+                                    {
+                                        <tr>
+                                            <td>@Model.WorkCategoryDesc</td>
+                                            <td>
+                                                @{
+                                                    var claimDate = new DateTime(c.ClaimYear, c.ClaimMonth, 1).ToString("MMM yyyy");
+                                                    <text>@claimDate</text>
+                                                }
+                                            </td>
+                                            <td>$ @Math.Round(c.ClaimedAmount, 2)</td>
+                                            <td>
+                                                $
+                                                @{
+                                                    if (c.Approved.HasValue && c.Approved.Value && c.ApprovedAmount.HasValue)
+                                                    {
+                                                        <text>@Math.Round(c.ApprovedAmount.Value, 2)</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>0.00</text>
+                                                    }
+                                                }
+                                            </td>
+                                            <td>@c.CommerceComment</td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

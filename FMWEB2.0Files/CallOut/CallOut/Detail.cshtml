@@ -1,0 +1,1567 @@
+﻿@model AssetCare.Model.ViewModels.CallOutAddEditViewModel
+@using AssetCare.Model.ViewModels
+@using AssetCare.Helpers
+@using Newtonsoft.Json
+@using System.Configuration
+@using AssetCare.Common
+@using AssetCare.Service
+@{
+    string Google_apiKey = ConfigurationManager.AppSettings["Google_apiKey"];
+    var totalEstimationOverLimitThresholdText = CalloutSharedFunctions.GetTotalEstimationThresholdText();
+    var isTotalEstimationOverLimitLable = $"Is total estimated cost over ${totalEstimationOverLimitThresholdText} ?";
+    string InvalidFilenameCharacters = ConfigurationManager.AppSettings["InvalidFilenameCharacters"];
+}
+<div class="container-fluid">
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    @{
+        string callDescHeight = "121px";
+        string leftPanelHeight = "350px";
+        if (!Model.DisableField("mainSection", "hideControls"))
+        {
+            leftPanelHeight = "310px";
+            callDescHeight = "78px";
+        }
+    }
+
+    @using (Html.BeginForm("Detail", "CallOut", FormMethod.Post, new { id = "frmCalloutDetails" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="row" style="margin-top:-8px;">
+            <div class="col-12">
+                <div class="card white-bg">
+
+                    <div class="row">
+                        <div class="col-12 float-right mm-15">
+                            <div class="col-lg-6 col-sm-12 float-left">
+                                @if (Model.CapitalDefect)
+                                {
+                                    <h4><strong>Capital Defects Details</strong></h4>
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item float-left"><a href="@Url.Action("Index", "Home", new { Area = "" })">Home</a></li>
+                                        <li class="breadcrumb-item"><a href="#">Callouts</a></li>
+                                        <li class="breadcrumb-item"><a href="@Url.Action("DefectListIndex", "Defect", new { Area = "FMWorks" })">Capital Defects</a></li>
+                                        <li href="#" class="breadcrumb-item active">Capital Defects Details</li>
+                                    </ol>
+                                }
+                                else
+                                {
+                                    <h4><strong>Reactive Callout Details</strong></h4>
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item float-left"><a href="@Url.Action("Index", "Home", new { Area = "" })">Home</a></li>
+                                        <li class="breadcrumb-item"><a href="#">Callouts</a></li>
+                                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "CallOut", new { Area = "FMWorks" })">Reactive Callouts</a></li>
+                                        <li href="#" class="breadcrumb-item active">Reactive Callout Details</li>
+                                    </ol>
+                                }
+                            </div>
+                            <div class="col-lg-6 col-sm-12 float-right" style="text-align:right;">
+                                @{
+                                    var cancelUrl = "/";
+                                    if (Model.CapitalDefect || User.IsInRoles("PROJECTMNGR,PROJECTDIR"))
+                                    {
+                                        cancelUrl = Url.Action("DefectListIndex", "Defect");
+                                    }
+                                    else if (string.IsNullOrEmpty(Model.CallbackUrl))
+                                    {
+                                        cancelUrl = Url.Action("Index", "Callout");
+                                    }
+                                    else
+                                    {
+                                        cancelUrl = Model.CallbackUrl;
+                                    }
+                                }
+
+                                @{
+                                    if (Model.ShowSave)
+                                    {
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20  mr-2" type="submit" id="btnSave"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save</button>
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="submit" id="btnSaveAndClose"><span class="top-btn-label"><i class="fa fa-save"></i></span>Save and Exit</button>
+                                    }
+                                    else
+                                    {
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20  mr-2" type="submit" id="btnSave" disabled><span class="top-btn-label"><i class="fa fa-save"></i></span>Save</button>
+                                        <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" type="submit" id="btnSaveAndClose" disabled><span class="top-btn-label"><i class="fa fa-save"></i></span>Save and Exit</button>
+                                    }
+                                }
+                                <button id="btnCancel" class="top-btn btn-outline-info waves-effect waves-light tm-20" onclick="cancelButtonClicked(event,'@cancelUrl')" type="button"><span class="top-btn-label"><i class="fa fa-eraser"></i></span>Cancel</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-bottom:15px!important">
+            <div class="col-lg-6">
+                @Html.Partial("_QuickHelp", Model)
+            </div>
+        </div>
+        @*<div class="row" style="margin-bottom:15px!important">
+                <div class="col-lg-6 col-sm-12">
+                    <p class="text-danger">
+                        @Html.ValidationSummary()
+                    </p>
+                </div>
+            </div>*@
+        <div class="row" style="margin-top:-12px;">
+            <div class="col-12">
+                <div class=" blue-header">
+                    <div class="card-header" style="padding-left:0px"><strong>Details</strong></div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row" style="margin-top:-12px;">
+            <div class="col-xl-12">
+                <div class="card">
+
+                    <div class="card-body collapse show mt-0">
+                        <div class="row top-ribbon">
+                            <div class="col-lg-2 col-sm-12  float-left mb1-mt1 mt-2">
+                                <i class="fa fa-edit fa-color"></i> <strong class="left-bdr">Callout ID:</strong>
+                                @{
+                                    if (Model.CallOutId == null || Model.CallOutId == 0)
+                                    {
+                                        <text><span style="color:red">Auto Generate</span> </text>
+                                    }
+                                    else
+                                    {
+                                        <text>
+                                            @Model.AgencySequenceID.ToString()
+                                        </text>
+                                    }
+                                }
+
+                            </div>
+
+                            <div class="col-lg-4 col-sm-12 float-left mb1-mt1 mt-2">
+                                <i class="fa fa-map-marker fa-color right-bdr" style="float:left;"></i>
+
+                                <button style="float: left; margin-left: 4px; background: none; border: none; font-weight: bold; color: #007bff;" id="mapPreviewButton" type="button" data-toggle="modal" data-target=".bs-map-modal">@Model.SchoolName</button>
+
+
+                            </div>
+
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2">
+                                <i class="fa fa-building fa-color"></i> <strong class="left-bdr">School ID:</strong> <span> @Model.SchoolId </span>
+                                @Html.Partial("_SitePlan")
+                            </div>
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2"><i class="fa fa-phone fa-color fa-color"></i> <strong class="left-bdr">Phone:</strong> <strong><a href="tel:@Model.Phone">@Model.Phone </a></strong></div>
+                            <div class="col-lg-2 col-sm-12  float-left mb1-mt1 mt-2 "><i class="fa fa-user-circle fa-color"></i> <strong class="left-bdr">ASO:</strong> @Model.ASOName </div>
+                            <div class="col-lg-4 col-sm-12 float-left mb1-mt1 mt-2"><i class="fa fa-mobile-alt fa-color"></i> <strong class="left-bdr">ASO Mobile:</strong> <strong><a href="tel:@Model.ASOContactNumber">@Model.ASOContactNumber </a></strong></div>
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2 "><i class="fa fa-user-circle fa-color"></i> <strong class="left-bdr">Group Leader (GL):</strong> @Model.GLName </div>
+                            <div class="col-lg-3 col-sm-12 float-left mb1-mt1 mt-2"><i class="fa fa-mobile-alt fa-color"></i> <strong class="left-bdr">GL Mobile:</strong> <strong><a href="tel:@Model.GLContactNumber">@Model.GLContactNumber </a></strong></div>
+                            <div class="col-lg-2 col-sm-12  float-left mb1-mt1 mt-3">
+                                <i class="fa fa-flag fa-color fa-color" title="High Risk"></i> <strong class="left-bdr">High Risk:</strong>
+                                <strong>
+                                    @{
+                                        if (Model.AsbestosHR == true)
+                                        {
+
+                                            <a style="color: red;">Yes</a>
+
+                                        }
+                                        else
+                                        {
+                                            <a style="color: green;">No</a>
+                                        }
+                                    }
+                                </strong>
+                            </div>
+                            @{
+                                if (Model.DefectMgmt == true)
+                                {
+                                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-3">
+                                        <strong>
+                                            <i class="fa fa-wrench fa-color" title="Capital Defect" style="font-size: 15px;"></i>  <span class="left-bdr" style="margin-left:3px;background-color: #29caff;color:white;padding:5px;border-radius:8px;">Capital Defect</span>
+                                        </strong>
+                                    </div>
+                                }
+                            }
+                            @{
+                                if (Model.ProposalId > 0)
+                                {
+                                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-3">
+                                        <strong>
+                                            <i class="fa fa-edit fa-color" title="LRLV Id" style="margin-left:-7px;"></i>  <span class="left-bdr">LRLV Id: </span>
+                                        </strong>
+                                        @if (Model.CurrentRoleID == "C" || Model.CurrentRoleID == "LC")
+                                        {
+                                            <a style="color: #007bff"> @Model.ProposalId.ToString()</a>
+
+                                        }
+                                        else
+                                        {
+                                            <a href="@Url.Action("Detail", "Proposals", new { Area = "FMWorks" })?id=@Model.ProposalId&sig=@Model.SigProposal"> @Model.ProposalId.ToString()</a>
+                                        }
+
+
+                                    </div>
+                                    @*@Html.HiddenFor(x => x.CallLogDesc)*@
+                                }
+                            }
+
+                        </div>
+                        @Html.HiddenFor(x => x.AgencyID)
+                        @Html.HiddenFor(x => x.SchoolId)
+                        @Html.HiddenFor(x => x.PropertyID)
+                        @Html.HiddenFor(x => x.WorkCategoryID)
+                        @Html.HiddenFor(x => x.CallOutId)
+                        @Html.HiddenFor(x => x.AcceptedFileTypes)
+                        @Html.HiddenFor(x => x.SchoolEmail)
+                        @Html.HiddenFor(x => x.SchoolName)
+                        @Html.HiddenFor(x => x.Area)
+                        @Html.HiddenFor(x => x.Phone)
+                        @Html.HiddenFor(x => x.mode)
+                        @Html.HiddenFor(x => x.CallLogFITSID)
+                        @Html.HiddenFor(x => x.AgencySequenceID)
+                        @Html.HiddenFor(x => x.JobId)
+                        @Html.HiddenFor(x => x.NewContractors)
+                        @Html.HiddenFor(x => x.NewQuoteRequests)
+                        @Html.HiddenFor(x => x.SchoolAddress)
+                        @Html.HiddenFor(x => x.EmailAlertTypes)
+                        @Html.HiddenFor(x => x.HAZMAT)
+                        @Html.HiddenFor(x => x.CallLogTypeID)
+                        @Html.HiddenFor(x => x.HasAtleastOneJob)
+                        @Html.HiddenFor(x => x.SaveType)
+                        @Html.HiddenFor(x => x.RoleID)
+                        @Html.HiddenFor(x => x.CurrentRoleID)
+                        @Html.HiddenFor(x => x.IsInsuranceEventByWO)
+                        @Html.HiddenFor(x => x.Complete)
+                        @Html.HiddenFor(x => x.DefectMgmt)
+                        @Html.HiddenFor(x => x.WorkCategoryID)
+                        @Html.HiddenFor(x => x.SupportDocument.SupportDocumentClassID, new { id = "SupportDocumentClassID" })
+                        @Html.HiddenFor(x => x.SupportDocs)
+                        @Html.HiddenFor(x => x.Comments)
+                        @Html.HiddenFor(x => x.CommentsByIRCM)
+                        @Html.HiddenFor(x => x.ClaimNumber)
+                        @Html.HiddenFor(x => x.CORPFileNo)
+                        @Html.HiddenFor(x => x.AssessorStatusID)
+
+                        @Html.HiddenFor(x => x.CapitalDefect)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.CallLogFITSID)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.PSMDefectCallLogId)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.CompletedDate)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.CallAssignedDate)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.CallLogStatusIDForValidation)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.CapitalDefectCheckForValidation)
+                        @Html.HiddenFor(x => x.CapitalDefectCompleteForValidation)
+                        @Html.HiddenFor(x => x.CapitalDefectWorkAssignmentForValidation)
+                        @Html.HiddenFor(x => x.CanAddEditCapitalDefect)
+                        @Html.HiddenFor(x => x.UsersCanAddEditCapitalDefect)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.DefectFlaggedDate)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.DefectReversalDate)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.DefectEmailToSchoolAndPMPD)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.FirstEmailSentDate)
+                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.LastEmailSentDate)
+                        @Html.HiddenFor(x => x.ProposalId)
+                        @Html.HiddenFor(x => x.ConceptEstimate)
+
+                        @for (int i = 0; i < Model.SupportDocuments.Count; i++)
+                        {
+                            @Html.HiddenFor(model => Model.SupportDocuments[i], new { @value = @Html.Raw(JsonConvert.SerializeObject(Model.SupportDocuments[i])) })
+                        }
+                        <div class="row">
+                            <div class="col-xl-6 col-lg-6 col-sm-12">
+                                <div class="card inner-border-1 white-bg">
+                                    <div class="card-base" style="margin-bottom:-12px;">
+
+
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label><strong>Callout Description </strong><span>( Max. 1000 Characters )</span><span style="vertical-align: super; color:#d7153a; ">*</span> </label>
+                                                @Html.TextAreaFor(m => m.CallLogDesc, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", rows = "5", style = "height:" + @callDescHeight, maxlength = 997 }).AddIf(Model.DisableField("mainSection", "CallLogDesc"), "disabled", "disabled"))
+                                                @{
+                                                    if (Model.DisableField("mainSection", "CallLogDesc"))
+                                                    {
+                                                        @Html.HiddenFor(x => x.CallLogDesc)
+                                                    }
+                                                }
+
+                                                @Html.ValidationMessageFor(m => m.CallLogDesc, string.Empty, new { style = "float:none" })
+                                            </div>
+                                        </div>
+                                        <div class="col-12" style="margin-top:-16px;">
+                                            <div class="row">
+                                                <div class="col-12 ">
+                                                    <label><strong>Buildings Affected</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                    @Html.ListBoxFor(m => m.JobBuildingIDs, new MultiSelectList((IEnumerable<BuildingViewModel>)ViewData["BuildingsList"],
+                                                    "BuildingID", "BuildingDesc", Model.JobBuildingIDs),
+                                                    new RouteValueDictionary(new
+                                                    {
+                                                    @class = "select2 m-b-10 select2-multiple select2-hidden-accessible",
+                                                    @style = "width:100%; margin-bottom: 16px;",
+                                                    @onchange = "updateErrorSummary();"
+                                                    }).AddIf(Model.DisableField("mainSection", "JobBuildingIDs"), "disabled", "disabled"))
+                                                    @Html.ValidationMessageFor(m => m.JobBuildingIDs, string.Empty, new { style = "margin-top:0px;" })
+                                                    @{
+                                                        if (Model.DisableField("mainSection", "JobBuildingIDs"))
+                                                        {
+                                                            if (Model.JobBuildingIDs != null)
+                                                            {
+                                                                for (int i = 0; i < Model.JobBuildingIDs.Count; i++)
+                                                                {
+                                                                    @Html.HiddenFor(model => Model.JobBuildingIDs[i])
+                                                                }
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                    <br>
+                                                    <br>
+                                                </div>
+                                                <div class="col-6">
+                                                    <label><strong>Room No(s)</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                    <div class="form-group">
+                                                        @Html.TextBoxFor(m => m.RoomNumber, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 100, @id = "rooms" }).AddIf(Model.DisableField("mainSection", "RoomNumber"), "disabled", "disabled"))
+                                                        <span class="field-validation-error" id="roomValidation" style="float:right">Rooms are required</span>
+                                                        @{
+                                                            if (Model.DisableField("mainSection", "RoomNumber"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.RoomNumber)
+                                                            }
+                                                        }
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-6" style="margin-top:4px;">
+                                                    <label><strong>Room Location</strong></label>
+                                                    <div class="form-group">
+                                                        @Html.TextBoxFor(x => x.RoomLocation, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxLength = 50 }).AddIf(Model.DisableField("mainSection", "RoomLocation"), "disabled", "disabled"))
+                                                        @{
+                                                            if (Model.DisableField("mainSection", "RoomLocation"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.RoomLocation)
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-12 col-sm-12 mt-2">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12" style="margin-top:5px;">
+                                                            @Html.Partial("_AsbestosRegister")
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12" style="margin-left:-10px;height:2.5em">
+                                                </div>
+                                                <div id="divTotalEstimationOverLimit" class="col-12" style="margin-left:-10px;">
+                                                    <div class="col-xl-6 col-lg-6 col-sm-12 float-left"><span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">@(isTotalEstimationOverLimitLable)</label></span></div>
+                                                    <div class="col-lg-6 col-sm-12 float-left">
+                                                        <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                            @Html.RadioButtonFor(m => m.IsTotalEstimationOverLimit, "True", new RouteValueDictionary(new { @id = "isTotalEstimationOverLimitYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsTotalEstimationOverLimit"), "disabled", "disabled"))
+                                                            <label for="isTotalEstimationOverLimitYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                            @Html.RadioButtonFor(m => m.IsTotalEstimationOverLimit, "False", new RouteValueDictionary(new { @id = "isTotalEstimationOverLimitNo" }).AddIf(Model.DisableField("mainSection", "IsTotalEstimationOverLimit"), "disabled", "disabled"))
+                                                            <label for="isTotalEstimationOverLimitNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                            @*@Html.ValidationMessageFor(x => x.IsTotalEstimationOverLimit)*@
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div id="divInsuranceEvent" class="col-12" style="margin-left:-10px;">
+                                                    <div class="col-xl-6 col-lg-6 col-sm-12 float-left"><span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is this an Insurance Event? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span></div>
+                                                    <div class="col-lg-6 col-sm-12 float-left">
+                                                        <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                            @Html.RadioButtonFor(m => m.IsInsuranceEvent, "True", new RouteValueDictionary(new { @id = "insYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsInsuranceEvent"), "disabled", "disabled"))
+                                                            <label for="insYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                            @Html.RadioButtonFor(m => m.IsInsuranceEvent, "False", new RouteValueDictionary(new { @id = "insNo" }).AddIf(Model.DisableField("mainSection", "IsInsuranceEvent"), "disabled", "disabled"))
+                                                            <label for="insNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                            @Html.ValidationMessageFor(x => x.IsInsuranceEvent)
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div id="divSecurityIncident" class="col-12" style="margin-left:-10px;">
+                                                    <div class="col-xl-6 col-lg-6 col-sm-12 float-left"><span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is this a security incident? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span></div>
+                                                    <div class="col-lg-6 col-sm-12 float-left">
+                                                        <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                            @Html.RadioButtonFor(m => m.IsSecurityIncident, "True", new RouteValueDictionary(new { @id = "secYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsSecurityIncident"), "disabled", "disabled"))
+                                                            <label for="secYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                            @Html.RadioButtonFor(m => m.IsSecurityIncident, "False", new RouteValueDictionary(new { @id = "secNo" }).AddIf(Model.DisableField("mainSection", "IsSecurityIncident"), "disabled", "disabled"))
+                                                            <label for="secNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                            @Html.ValidationMessageFor(x => x.IsSecurityIncident)
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" id="IsSecurityIncident" name="IsSecurityIncident" value="False" />
+
+                                                @{
+                                                    if (Model.IsInsuranceEventByWO == true)
+                                                    {
+                                                        <div class="col-12">
+                                                            <div class="alert alert-info" role="alert">
+                                                                Marked as Insurance Event from a Work Order.
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                }
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-6">
+                                <div class="card inner-border-1 white-bg">
+                                    <div class="card-base" style="min-height:@leftPanelHeight;">
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-sm-12">
+                                                    <label><strong>Date and Time Reported</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                    <div class="input-group">
+
+                                                        @Html.EditorFor(m => m.CallDate, new
+                                                   {
+                                                       htmlAttributes = new RouteValueDictionary(new
+                                                       {
+                                                           @placeholder = "dd/mm/yyyy",
+                                                           @class = "form-control form-control-sm datepicker-control",
+                                                           @Value = ((Model.CallDate.HasValue) ? Model.CallDate.Value.ToString("dd/MM/yyyy") : ""),
+                                                           id = "txtCallDate",
+
+                                                       }).AddIf(Model.DisableField("mainSection", "CallDate"), "disabled", "disabled")
+                                                   })
+                                                        @{
+                                                            if (Model.DisableField("mainSection", "CallDate"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.CallDate)
+                                                                @Html.HiddenFor(x => x.CallLogTime)
+
+                                                            }
+                                                        }
+                                                        <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                            <span class="input-group-text mr-2" id="basic-addon1">
+                                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="sm-1">
+                                                            <div class="row ml-2 date" id="tpIncidentFrom" data-target-input="nearest">
+                                                                @{
+                                                                    if (Model.DisableField("mainSection", "CallLogTime"))
+                                                                    {
+                                                                        <input id="CallLogTime" name="CallLogTime" type="text" class="form-control datetimepicker-input" style="width:60px" data-target="#tpIncidentFrom" Value="@((Model.CallLogTime.HasValue) ? Model.CallLogTime.Value.ToString(" HH:mm") : "" )" placeholder="" data-val-required="Callout time is required" data-val="true" readonly />
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input id="CallLogTime" name="CallLogTime" type="text" class="form-control datetimepicker-input dtTimeWidth" style="width:60px" data-target="#tpIncidentFrom" onchange="callLogTimeChanged();" Value="@((Model.CallLogTime.HasValue) ? Model.CallLogTime.Value.ToString(" HH:mm") : "" )" placeholder="" data-val-required="Callout Time is required" data-val="true" />
+                                                                    }
+                                                                    <button type="button" class="btn btn-info h-32" id="btnSetCurrentDate" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @{
+                                                        if (!Model.DisableField("mainSection", "CallLogTime"))
+                                                        {
+                                                            @Html.ValidationMessageFor(m => m.CallDate, null, new { @style = "float:left" })
+                                                            <span class="field-validation-error" id="dateTimeMsg" style="float:right"></span>
+                                                            @Html.ValidationMessageFor(m => m.CallLogTime, string.Empty, new { @style = "float:right" })
+                                                        }
+                                                    }
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12">
+                                                    <label><strong>Requested Response Time</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                    <div class="form-group">
+                                                        @Html.DropDownListFor(x => x.SchoolUrgencyID, (IEnumerable<SelectListItem>
+                         )ViewData["CallLogUrgency"], "---Select---", new RouteValueDictionary(new { @class = "custom-select", @id = "SchoolUrgencyID" }).AddIf(Model.DisableField("mainSection", "SchoolUrgencyID"), "disabled", "disabled"))
+                                                        @Html.ValidationMessageFor(m => m.SchoolUrgencyID)
+                                                        @{
+                                                            if (Model.DisableField("mainSection", "SchoolUrgencyID"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.SchoolUrgencyID)
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Start-->
+                                        <div class="col-12">
+                                            <div class="row" style="margin-top:0px">
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><strong>Requested By</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label><br>
+                                                    <label style="color:#5f5f5f">@Model.RequestedBy</label>
+                                                    @Html.ValidationMessageFor(x => x.RequestedBy)
+                                                    @{
+                                                        if (!Model.DisableField("mainSection", "RequestedBy"))
+                                                        {
+                                                            @Html.HiddenFor(x => x.RequestedBy)
+                                                        }
+                                                    }
+                                                </div>
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><strong>Requester Title</strong></label><br>
+                                                    <label style="color:#5f5f5f">@Model.RequesterPosition</label>
+                                                    @{
+                                                        if (!Model.DisableField("mainSection", "RequesterPosition"))
+                                                        {
+                                                            @Html.HiddenFor(x => x.RequesterPosition)
+                                                        }
+                                                    }
+                                                </div>
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><strong>Requester Contact</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label><br>
+                                                    <label style="color:cornflowerblue"><i class="fa fa-mobile-alt fa-color"></i> <strong><a href="tel:@Model.RequesterContact">@Model.RequesterContact </a></strong></label>
+                                                    @Html.ValidationMessageFor(x => x.RequesterContact)
+                                                    @{
+                                                        if (!Model.DisableField("mainSection", "RequesterContact"))
+                                                        {
+                                                            @Html.HiddenFor(x => x.RequesterContact)
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="row label-bdr">
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><strong>Call Status</strong></label>
+                                                    @if (Model.CapitalDefect)
+                                                    {
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.CallLogStatusID, (IEnumerable<SelectListItem>
+                                                             )ViewData["CallLogStatus"], "---Select---",
+                                                             new RouteValueDictionary(new { @class = "custom-select", @id = "SelectedDefectCallStatusId" }).AddIf(Model.DisableField("mainSection", "CallLogStatusID"), "disabled", "disabled"))
+                                                            @Html.ValidationMessageFor(x => x.CallLogStatusID)
+
+                                                            @if (!Model.DisableField("callCenterSection", "Complete"))
+                                                            {
+                                                                @Html.ValidationMessageFor(x => x.Complete)
+                                                            }
+
+                                                            @if (!Model.DisableField("capitalDefectSection", "Complete"))
+                                                            {
+                                                                @Html.ValidationMessageFor(x => x.CapitalDefectCalloutViewModel.Complete)
+                                                            }
+
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "CallLogStatusID"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.CallLogStatusID)
+                                                                }
+                                                            }
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.CallLogStatusID, (IEnumerable<SelectListItem>
+                                                             )ViewData["CallLogStatus"], "---Select---",
+                                                             new RouteValueDictionary(new { @class = "custom-select", @id = "SelectedCallStatusId" }).AddIf(Model.DisableField("mainSection", "CallLogStatusID"), "disabled", "disabled"))
+                                                            @Html.ValidationMessageFor(x => x.CallLogStatusID)
+
+                                                            @if (!Model.DisableField("callCenterSection", "Complete"))
+                                                            {
+                                                                @Html.ValidationMessageFor(x => x.Complete)
+                                                            }
+
+                                                            @if (!Model.DisableField("capitalDefectSection", "Complete"))
+                                                            {
+                                                                @Html.ValidationMessageFor(x => x.CapitalDefectCalloutViewModel.Complete)
+                                                            }
+
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "CallLogStatusID"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.CallLogStatusID)
+                                                                }
+                                                            }
+                                                        </div>
+
+                                                    }
+                                                </div>
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><strong>Site Contact Person</strong></label>
+                                                    @Html.TextBoxFor(x => x.SiteContactPerson, new RouteValueDictionary(new { @class = "form-control form-control-sm", @maxlength = "200" }).AddIf(Model.DisableField("mainSection", "SiteContactPerson"), "disabled", "disabled"))
+                                                    @Html.ValidationMessageFor(x => x.SiteContactPerson)
+                                                </div>
+                                                <div class="col-lg-4 col-sm-12">
+                                                    <label><strong>Site Contact Number</strong></label>
+                                                    @Html.TextBoxFor(x => x.SiteContact, new RouteValueDictionary(new { @class = "form-control form-control-sm", @maxlength = "10" }).AddIf(Model.DisableField("mainSection", "SiteContact"), "disabled", "disabled"))
+                                                    @Html.ValidationMessageFor(x => x.SiteContact)
+                                                </div>
+
+
+
+
+
+                                            </div>
+                                        </div>
+                                        @*<div class="col-12" id="divComments" style="display:none">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-sm-12">
+                                                        <label><strong>Comments (If Cancelled)</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                        <div class="form-group">
+                                                            @Html.TextAreaFor(m => m.CallStatusComments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", rows = "4", style = "height:65", maxlength = 1000, @id = "CSComments" }).AddIf(Model.DisableField("mainSection", "CallStatusComments"), "disabled", "disabled"))
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "CallStatusComments"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.CallStatusComments)
+                                                                }
+                                                            }
+
+                                                            @Html.ValidationMessageFor(m => m.CallStatusComments, string.Empty, new { style = "float:none" })
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>*@
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="col-lg-4 col-sm-12" style="margin-top:10px">
+                                                    <label style="visibility:hidden;"><strong>School Funded</strong></label>
+                                                    <div class="form-group">
+                                                        <div>
+                                                            @*@Html.CheckBoxFor(x => x.SchoolFunded, new RouteValueDictionary(new { @id = "SchoolFunded", @class = "filled-in chk-col-light-blue q ea-triggers-bound", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "SchoolFunded"), "disabled", "disabled"))
+                                                                @Html.Label("SchoolFunded", "School Funded", new { style = "margin-right:10px; font-size:14px;" })
+                                                                @Html.ValidationMessageFor(m => m.SchoolFunded)*@
+
+                                                            @if (Model.DisableField("mainSection", "SchoolFunded"))
+                                                            {
+                                                                <input type="checkbox" id="SchoolFundedDisplay"
+                                                                       class="filled-in chk-col-light-blue q ea-triggers-bound"
+                                                                       @(Model.SchoolFunded ? "checked" : "") disabled />
+                                                                @Html.Label("SchoolFundedDisplay", "School Funded", new { style = "margin-right:10px; font-size:14px;" })
+                                                                @Html.HiddenFor(x => x.SchoolFunded)
+                                                            }
+                                                            else
+                                                            {
+                                                                @Html.CheckBoxFor(x => x.SchoolFunded, new RouteValueDictionary(new
+                                                                {
+                                                                    @id = "SchoolFunded",
+                                                                    @class = "filled-in chk-col-light-blue q ea-triggers-bound",
+                                                                    style = "margin-left:5px; margin-right:20px;"
+                                                                }))
+                                                                @Html.Label("SchoolFunded", "School Funded", new { style = "margin-right:10px; font-size:14px;" })
+                                                            }
+                                                            <button type="button" class=" btn-rounded " data-toggle="popover" data-html="true" data-content="By ticking this checkbox, associated work costs will be charged against School cost centre." style="vertical-align: middle; border: none; box-shadow: none;  padding: 3px 8px 3px 8px; background: #2196f3; margin-right: 3px !important;" data-original-title="" title="">
+                                                                <i class="fa fa-info" style=" color: white; font-size: 10px !important;"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @if (Model.DisableField("mainSection", "hideControls"))
+                                                {
+                                                    <div class="col-lg-4 col-sm-12" style="margin-top:10px">
+                                                        <label><strong>Work Type</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.WorkTypeId, (IEnumerable<SelectListItem>
+                             )ViewData["WorkTypes"], "---Select---", new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "WorkTypeId"), "disabled", "disabled"))
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "WorkTypeId"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.WorkTypeId)
+                                                                }
+
+                                                            }
+                                                            @Html.ValidationMessageFor(m => m.WorkTypeId)
+
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                <!-- Asbestos warning modal -->
+                                                <div id="asbestosWarningModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header" style="background-color: #002664; height: 40px; padding:10px;">
+                                                                <h5 class="modal-title" style="color:white !important;"><i class="fa fa-bolt title-icon" style="color:#f39c12; margin-right:8px;"></i> Alert</h5>
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color:white !important;">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p style="line-height:22px;">Please contact your ASO to raise asbestos related work. </p>
+                                                            </div>
+                                                            <div class="modal-footer" style="text-align: center; margin: 0 auto;">
+                                                                <button type="button" id="asbestosOk" class="btn btn-primary" style="background:#29caff !important; color:white; font-weight:bold;"><i class="fa fa-check" style="margin-right:6px;"></i> OK</button>
+                                                                <button type="button" id="asbestosCancel" class="btn btn-secondary" data-dismiss="modal" style="background: orange !important; color:white; font-weight: bold;"><i class="fa fa-times" style="margin-right:6px;"></i> Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @if (Model.DisableField("mainSection", "hideControls"))
+                                                {
+                                                    <div class="col-lg-4 col-sm-12" style="margin-top:10px">
+                                                        <label><strong>Reviewed Response Time</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.CallLogFinanceUrgencyID, (IEnumerable<SelectListItem>
+                             )ViewData["CallLogUrgency"], "---Select---", new RouteValueDictionary(new { @class = "custom-select", @id = "CallLogFinanceUrgencyID" }).AddIf(Model.DisableField("mainSection", "CallLogFinanceUrgencyID"), "disabled", "disabled"))
+                                                            @Html.ValidationMessageFor(m => m.CallLogFinanceUrgencyID)
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "CallLogFinanceUrgencyID"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.CallLogFinanceUrgencyID)
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (Model.DisableField("mainSection", "hideControls"))
+                                        {
+                                            <div class="col-12">
+                                                <div class="row">
+
+                                                    <div class="col-lg-4 col-sm-12">
+                                                        <label><strong>Element</strong><span style="color:#d7153a; "> *</span></label>
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.ElementId, (IEnumerable<SelectListItem>
+    )ViewData["Elements"], "---Select---",
+    new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "ElementId"), "disabled", "disabled"))
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "ElementId"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.ElementId)
+                                                                }
+
+                                                            }
+                                                            @Html.ValidationMessageFor(x => x.ElementId)
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-12">
+                                                        <label><strong>Component</strong></label>
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.AssemblyGroupId, (IEnumerable<SelectListItem>
+    )ViewData["Assembly"], "---Select---", new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "AssemblyGroupId"), "disabled", "disabled"))
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "AssemblyGroupId"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.AssemblyGroupId)
+                                                                }
+
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 col-sm-12">
+                                                        <label><strong>Item</strong></label>
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.ComponentCASId, (IEnumerable<SelectListItem>
+    )ViewData["SubAssembly"], "---Select---", new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "ComponentCASId"), "disabled", "disabled"))
+                                                            @{
+                                                                if (Model.DisableField("mainSection", "ComponentCASId"))
+                                                                {
+                                                                    @Html.HiddenFor(x => x.ComponentCASId)
+                                                                }
+
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        }
+                                        @{
+                                            if (Model.DisableField("mainSection", "IsReadyForReimbursement"))
+                                            {
+                                                @Html.HiddenFor(x => x.IsReadyForReimbursement)
+                                            }
+                                            if (Model.DisableField("mainSection", "IsReimbursementComplete"))
+                                            {
+                                                @Html.HiddenFor(x => x.IsReimbursementComplete)
+                                            }
+                                        }
+                                        <div class="row" style="height:2.5em">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row" id="insRow1">
+
+                            <div class="col-xl-12 col-lg-12">
+                                <div class="card inner-border-1 white-bg">
+                                    <div class="card-base">
+
+                                        <div class="col-12">
+
+                                            <div class="row">
+                                                @*<div class="col-lg-3 col-sm-12 mt-2">
+                                                        <label><strong>Police Event Number</strong></label>
+                                                        <div class="form-group" style="margin-bottom:0px;">
+                                                            @Html.TextBoxFor(x => x.EventNo, new RouteValueDictionary(new { @id = "eventNo", @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxlength = "30" }).AddIf(Model.DisableField("mainSection", "EventNo"), "readonly", "readonly"))
+                                                        </div>
+                                                        <span class="field-validation-error" id="eventNumberMessag" style="float:left">Police event number is required</span>
+                                                    </div>
+                                                    <div class="col-lg-3 col-sm-12 mt-2">
+                                                        <label><strong>Cause of the issue</strong></label>
+                                                        <div class="form-group">
+                                                            @Html.TextBoxFor(x => x.CauseOfTheIssue, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxlength = "30" }).AddIf(Model.DisableField("mainSection", "CauseOfTheIssue"), "readonly", "readonly"))
+
+                                                        </div>
+                                                    </div>*@
+
+
+                                                @*<div class="col-lg-6 col-sm-12" style="margin-top:20px;">
+                                                        <div class="col-lg-12 col-sm-12">
+                                                            <div class="col-lg-7 col-sm-12" style="float:left">
+                                                                <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is Local Contractor required to repair the damage? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span>
+                                                            </div>
+                                                            <div class="col-lg-5 col-sm-12" style="float:left">
+                                                                <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                                    @Html.RadioButtonFor(m => m.LocalCotractorToRepairDamage, "True", new RouteValueDictionary(new { @id = "repairYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "LocalCotractorToRepairDamage"), "disabled", "disabled"))
+                                                                    <label for="repairYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                                    @Html.RadioButtonFor(m => m.LocalCotractorToRepairDamage, "False", new RouteValueDictionary(new { @id = "repairNo" }).AddIf(Model.DisableField("mainSection", "LocalCotractorToRepairDamage"), "disabled", "disabled"))
+                                                                    <label for="repairNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                                    @Html.ValidationMessageFor(x => x.LocalCotractorToRepairDamage)
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>*@
+                                            </div>
+                                            @*<div class="row">
+                                                        <div class="col-lg-6 col-sm-12" style="margin-top:20px;">
+                                                            <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Callout Reimbursement Status</label></span>
+                                                            <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                                @Html.RadioButtonFor(m => m.IsReadyForReimbursement, "False", new RouteValueDictionary(new { @id = "IsReadyForIRCMPaymentNo" }).AddIf(Model.DisableField("mainSection", "IsReadyForReimbursement"), "disabled", "disabled"))
+                                                                <label for="IsReadyForIRCMPaymentNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">Not Ready</label>
+                                                                @Html.RadioButtonFor(m => m.IsReadyForReimbursement, "True", new RouteValueDictionary(new { @id = "IsReadyForIRCMPaymentYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsReadyForReimbursement"), "disabled", "disabled"))
+                                                                <label for="IsReadyForIRCMPaymentYes" style="margin-right:10px; font-size:14px;">Ready</label>
+                                                            </span>
+                                                            <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                                @Html.RadioButtonFor(m => m.IsReimbursementComplete, "True", new RouteValueDictionary(new { @id = "IsReimbursementCompleteYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsReimbursementComplete"), "disabled", "disabled"))
+                                                                <label for="IsReimbursementCompleteYes" style="margin-right:10px; font-size:14px;">Complete</label>
+                                                                @Html.RadioButtonFor(m => m.IsReadyForReimbursement, "False", new RouteValueDictionary(new { @id = "IsReadyForIRCMPaymentNo" }).AddIf(Model.DisableField("mainSection", "IsReadyForReimbursement"), "disabled", "disabled"))
+                                                <label for="IsReadyForIRCMPaymentNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-lg-6 col-sm-12" style="margin-top:20px;"></div>
+                                                    </div>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row" id="insRow">
+                            <div class="col-xl-12 col-lg-12 float-left">
+                                <div class="card inner-border-1 white-bg">
+                                    <div class="card-base">
+                                        <div class="row" style="background: #f2f2f2; height: 25px; padding:6px; border-bottom: 1px solid #1989e3;">
+                                            <i class="fa fa-window-restore" style=" color: #007cde; font-size: 11px !important; margin-left:5px; margin-right:8px;"></i>
+                                            <strong> Insurance Event  Details </strong>
+                                        </div>
+
+
+                                        <div class="col-6 float-left">
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6 col-sm-12">
+                                                    <label><strong>Incident Types</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.SchoolIncidentCauseId, (IEnumerable<SelectListItem>)ViewData["TypeOfIncident"], "Select Type of Incident",
+                   new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "SchoolIncidentCauseId"), "disabled", "disabled"))
+                                                            @Html.ValidationMessageFor(x => x.SchoolIncidentCauseId)
+                                                        </div>
+                                                        @*<span class="field-validation-valid" data-valmsg-for="SchoolIncidentCauseId" data-valmsg-replace="true"></span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12">
+                                                    <label><strong>Incident Date and Time</strong></label>
+                                                    <div class="input-group">
+
+                                                        @Html.EditorFor(m => m.IncidentDate, new
+                                                   {
+                                                       htmlAttributes = new RouteValueDictionary(new
+                                                       {
+                                                           @placeholder = "dd/mm/yyyy",
+                                                           @class = "form-control form-control-sm datepicker-control",
+                                                           @Value = ((Model.IncidentDate.HasValue) ? Model.IncidentDate.Value.ToString("dd/MM/yyyy") : ""),
+                                                           id = "txtIncidentDate",
+
+                                                       }).AddIf(Model.DisableField("mainSection", "IncidentDate"), "disabled", "disabled")
+                                                   })
+                                                        @{
+                                                            if (Model.DisableField("mainSection", "IncidentDate"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.IncidentDate)
+                                                                @Html.HiddenFor(x => x.IncidentLogTime)
+
+                                                            }
+                                                        }
+                                                        <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                            <span class="input-group-text mr-2" id="basic-addon1">
+                                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="sm-1">
+                                                            <div class="row ml-2 date" id="tpIncidentDateFrom" data-target-input="nearest">
+                                                                @{
+                                                                    if (Model.DisableField("mainSection", "IncidentLogTime"))
+                                                                    {
+                                                                        <input id="IncidentLogTime" name="IncidentLogTime" type="text" class="form-control datetimepicker-input" style="width:60px" data-target="#tpIncidentDateFrom" Value="@((Model.IncidentLogTime.HasValue) ? Model.IncidentLogTime.Value.ToString(" HH:mm") : "" )" placeholder="" data-val="true" readonly />
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input id="IncidentLogTime" name="IncidentLogTime" type="text" class="form-control datetimepicker-input dtTimeWidth" style="width:60px" data-target="#tpIncidentDateFrom" onchange="incidentLogTimeChanged();" Value="@((Model.IncidentLogTime.HasValue) ? Model.IncidentLogTime.Value.ToString(" HH:mm") : "" )" placeholder="" data-val="true" />
+                                                                    }
+                                                                    <button type="button" class="btn btn-info h-32" id="btnSetCurrentIncidentDate" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @{
+                                                        if (!Model.DisableField("mainSection", "IncidentLogTime"))
+                                                        {
+                                                            <span class="field-validation-error" id="incidentDateMessage" style="float:left">Incident date is required</span>
+                                                            <span class="field-validation-error" id="incidentTimeMessage" style="float:right">Incident time is required</span>
+                                                            @*@Html.ValidationMessageFor(m => m.IncidentDate, null, new { @style = "float:left" })*@
+                                                            <div>
+                                                                <span class="field-validation-error" id="incDateTimeMsg" style="float:left"></span>
+                                                            </div>
+                                                            @*@Html.ValidationMessageFor(m => m.IncidentLogTime, string.Empty, new { @style = "float:right" })*@
+                                                        }
+                                                    }
+                                                </div>
+
+
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-sm-12 mt-2">
+                                                    <label><strong>Police Event Number</strong></label>
+                                                    <div class="form-group" style="margin-bottom:0px;">
+                                                        @Html.TextBoxFor(x => x.EventNo, new RouteValueDictionary(new { @id = "eventNo", @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxlength = "30" }).AddIf(Model.DisableField("mainSection", "EventNo"), "readonly", "readonly"))
+                                                    </div>
+                                                    <span class="field-validation-error" id="eventNumberMessag" style="float:left">Police event number is required</span>
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12 mt-2">
+                                                    <label><strong>Cause of the issue</strong></label>
+                                                    <div class="form-group">
+                                                        @Html.TextBoxFor(x => x.CauseOfTheIssue, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxlength = "30" }).AddIf(Model.DisableField("mainSection", "CauseOfTheIssue"), "readonly", "readonly"))
+
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-sm-12">
+                                                    <span>
+                                                        <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Callout Reimbursement Status</label></span>
+                                                        <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                            @Html.RadioButtonFor(m => m.IsReadyForReimbursement, "False", new RouteValueDictionary(new { @id = "IsReadyForIRCMPaymentNo" }).AddIf(Model.DisableField("mainSection", "IsReadyForReimbursement"), "disabled", "disabled"))
+                                                            <label for="IsReadyForIRCMPaymentNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">Not Ready</label>
+                                                            @Html.RadioButtonFor(m => m.IsReadyForReimbursement, "True", new RouteValueDictionary(new { @id = "IsReadyForIRCMPaymentYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsReadyForReimbursement"), "disabled", "disabled"))
+                                                            <label for="IsReadyForIRCMPaymentYes" style="margin-right:10px; font-size:14px;">Ready</label>
+                                                        </span>
+                                                        <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                            @Html.RadioButtonFor(m => m.IsReimbursementComplete, "True", new RouteValueDictionary(new { @id = "IsReimbursementCompleteYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsReimbursementComplete"), "disabled", "disabled"))
+                                                            <label for="IsReimbursementCompleteYes" style="margin-right:10px; font-size:14px;">Complete</label>
+                                                            @*@Html.RadioButtonFor(m => m.IsReadyForReimbursement, "False", new RouteValueDictionary(new { @id = "IsReadyForIRCMPaymentNo" }).AddIf(Model.DisableField("mainSection", "IsReadyForReimbursement"), "disabled", "disabled"))
+                                                                <label for="IsReadyForIRCMPaymentNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>*@
+                                                        </span>
+                                                    </span>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                        <div class="col-6 float-right">
+                                            <div class="col-lg-12 col-sm-12 ">
+                                                <div class="col-lg-7 col-sm-12 mt-3" style="float:left">
+                                                    <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is there third party involved? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span>
+                                                </div>
+                                                <div class="col-lg-5 col-sm-12 mt-3" style="float:left">
+                                                    <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                        @Html.RadioButtonFor(m => m.IsThirdpartyInvolved, "True", new RouteValueDictionary(new { @id = "thirdPartyYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsThirdpartyInvolved"), "disabled", "disabled"))
+                                                        <label for="thirdPartyYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                        @Html.RadioButtonFor(m => m.IsThirdpartyInvolved, "False", new RouteValueDictionary(new { @id = "thirdPartyNo" }).AddIf(Model.DisableField("mainSection", "IsThirdpartyInvolved"), "disabled", "disabled"))
+                                                        <label for="thirdPartyNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                        @Html.ValidationMessageFor(x => x.IsThirdpartyInvolved)
+                                                    </span>
+
+                                                </div>
+                                                <div class="col-lg-7 col-sm-12 mt-3" style="float:left">
+                                                    <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is Local Contractor required to repair the damage? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span>
+
+                                                </div>
+                                                <div class="col-lg-5 col-sm-12 mt-3" style="float:left">
+                                                    <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                        @Html.RadioButtonFor(m => m.LocalCotractorToRepairDamage, "True", new RouteValueDictionary(new { @id = "repairYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "LocalCotractorToRepairDamage"), "disabled", "disabled"))
+                                                        <label for="repairYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                        @Html.RadioButtonFor(m => m.LocalCotractorToRepairDamage, "False", new RouteValueDictionary(new { @id = "repairNo" }).AddIf(Model.DisableField("mainSection", "LocalCotractorToRepairDamage"), "disabled", "disabled"))
+                                                        <label for="repairNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                        @Html.ValidationMessageFor(x => x.LocalCotractorToRepairDamage)
+                                                    </span>
+
+                                                </div>
+                                                <div class="col-lg-7 col-sm-12 mt-3" style="float:left">
+                                                    <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is this a security related Insurance Event? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span>
+                                                </div>
+                                                <div class="col-lg-5 col-sm-12 mt-3" style="float:left">
+                                                    <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                        @Html.RadioButtonFor(m => m.IsSecInsuranceEvent, "True", new RouteValueDictionary(new { @id = "lcsecYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsSecInsuranceEvent"), "disabled", "disabled"))
+                                                        <label for="lcsecYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                        @Html.RadioButtonFor(m => m.IsSecInsuranceEvent, "False", new RouteValueDictionary(new { @id = "lcsecNo" }).AddIf(Model.DisableField("mainSection", "IsSecInsuranceEvent"), "disabled", "disabled"))
+                                                        <label for="lcsecNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                        @Html.ValidationMessageFor(x => x.IsSecInsuranceEvent)
+                                                    </span>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="secRow" style="">
+
+
+
+                            <div class="col-xl-12 col-lg-12 float-left">
+                                <div class="card inner-border-1 white-bg">
+                                    <div class="card-base">
+                                        <div class="row" style="background: #f2f2f2; height: 25px; padding:6px; border-bottom: 1px solid #1989e3;">
+                                            <i class="fa fa-lock" style=" color: #007cde; font-size: 11px !important; margin-left:5px; margin-right:8px;"></i>
+                                            <strong> Security Incident  Details </strong>
+                                        </div>
+
+
+                                        <div class="col-6 float-left">
+                                            <div class="row mt-3">
+                                                <div class="col-lg-6 col-sm-12">
+                                                    <label><strong>Incident Types</strong><span style="vertical-align: super; color:#d7153a; ">*</span></label>
+                                                    <div class="form-group">
+                                                        <div class="form-group">
+                                                            @Html.DropDownListFor(x => x.SecSchoolIncidentCauseId, (IEnumerable<SelectListItem>)ViewData["SecTypeOfIncident"], "Select Type of Incident",
+                   new RouteValueDictionary(new { @class = "custom-select" }).AddIf(Model.DisableField("mainSection", "SecSchoolIncidentCauseId"), "disabled", "disabled"))
+                                                            @Html.ValidationMessageFor(x => x.SecSchoolIncidentCauseId)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12">
+                                                    <label><strong>Incident Date and Time</strong></label>
+                                                    <div class="input-group">
+
+                                                        @Html.EditorFor(m => m.SecIncidentDate, new
+                                                   {
+                                                       htmlAttributes = new RouteValueDictionary(new
+                                                       {
+                                                           @placeholder = "dd/mm/yyyy",
+                                                           @class = "form-control form-control-sm datepicker-control",
+                                                           @Value = ((Model.SecIncidentDate.HasValue) ? Model.SecIncidentDate.Value.ToString("dd/MM/yyyy") : ""),
+                                                           id = "txtSecIncidentDate",
+
+                                                       }).AddIf(Model.DisableField("mainSection", "SecIncidentDate"), "disabled", "disabled")
+                                                   })
+                                                        @{
+                                                            if (Model.DisableField("mainSection", "SecIncidentDate"))
+                                                            {
+                                                                @Html.HiddenFor(x => x.SecIncidentDate)
+                                                                @Html.HiddenFor(x => x.SecIncidentLogTime)
+
+                                                            }
+                                                        }
+                                                        <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                            <span class="input-group-text mr-2" id="basic-addon1">
+                                                                <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="sm-1">
+                                                            <div class="row ml-2 date" id="tpSecIncidentDateFrom" data-target-input="nearest">
+                                                                @{
+                                                                    if (Model.DisableField("mainSection", "SecIncidentLogTime"))
+                                                                    {
+                                                                        <input id="SecIncidentLogTime" name="SecIncidentLogTime" type="text" class="form-control datetimepicker-input" style="width:60px" data-target="#tpSecIncidentDateFrom" Value="@((Model.SecIncidentLogTime.HasValue) ? Model.SecIncidentLogTime.Value.ToString(" HH:mm") : "" )" placeholder="" data-val="true" readonly />
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input id="SecIncidentLogTime" name="SecIncidentLogTime" type="text" class="form-control datetimepicker-input dtTimeWidth" style="width:60px" data-target="#tpSecIncidentDateFrom" onchange="incidentSecLogTimeChanged();" Value="@((Model.SecIncidentLogTime.HasValue) ? Model.SecIncidentLogTime.Value.ToString(" HH:mm") : "" )" placeholder="" data-val="true" />
+                                                                    }
+                                                                    <button type="button" class="btn btn-info h-32" id="btnSetSecCurrentIncidentDate" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @{
+                                                        if (!Model.DisableField("mainSection", "SecIncidentLogTime"))
+                                                        {
+                                                            <span class="field-validation-error" id="SecincidentDateMessage" style="float:left">Incident date is required</span>
+                                                            <span class="field-validation-error" id="SecincidentTimeMessage" style="float:right">Incident time is required</span>
+                                                            <div>
+                                                                <span class="field-validation-error" id="SecincDateTimeMsg" style="float:left"></span>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+
+
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-sm-12 mt-2">
+                                                    <label><strong>Police Event Number</strong></label>
+                                                    <div class="form-group" style="margin-bottom:0px;">
+                                                        @Html.TextBoxFor(x => x.SecEventNo, new RouteValueDictionary(new { @id = "SeceventNo", @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxlength = "30" }).AddIf(Model.DisableField("mainSection", "SecEventNo"), "readonly", "readonly"))
+                                                    </div>
+                                                    <span class="field-validation-error" id="SeceventNumberMessag" style="float:left">Police event number is required</span>
+                                                </div>
+                                                <div class="col-lg-6 col-sm-12 mt-2">
+                                                    <label><strong>Cause of the issue</strong></label>
+                                                    <div class="form-group">
+                                                        @Html.TextBoxFor(x => x.SecCauseOfTheIssue, new RouteValueDictionary(new { @class = "form-control form-control-sm", style = "margin-top:-2px;", @maxlength = "30" }).AddIf(Model.DisableField("mainSection", "SecCauseOfTheIssue"), "readonly", "readonly"))
+
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+
+                                        </div>
+                                        <div class="col-6 float-right">
+                                            <div class="col-lg-12 col-sm-12 ">
+                                                <div class="col-lg-7 col-sm-12 mt-3" style="float:left">
+                                                    <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is there third party involved? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span>
+                                                </div>
+                                                <div class="col-lg-5 col-sm-12 mt-3" style="float:left">
+                                                    <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                        @Html.RadioButtonFor(m => m.SecIsThirdPartyInvolved, "True", new RouteValueDictionary(new { @id = "secthirdPartyYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "SecIsThirdPartyInvolved"), "disabled", "disabled"))
+                                                        <label for="secthirdPartyYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                        @Html.RadioButtonFor(m => m.SecIsThirdPartyInvolved, "False", new RouteValueDictionary(new { @id = "secthirdPartyNo" }).AddIf(Model.DisableField("mainSection", "SecIsThirdPartyInvolved"), "disabled", "disabled"))
+                                                        <label for="secthirdPartyNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                        @Html.ValidationMessageFor(x => x.SecIsThirdPartyInvolved)
+                                                    </span>
+
+                                                </div>
+                                                <div class="col-lg-7 col-sm-12 mt-3" style="float:left">
+                                                    <span style="font-size: 14px; font-weight: 500 !important; vertical-align: middle;"><label style="font-size: 14px; font-weight: 500 !important;">Is Local Contractor required to repair the damage? <span style="vertical-align: super; color:#d7153a; ">*</span></label></span>
+                                                </div>
+                                                <div class="col-lg-5 col-sm-12 mt-3" style="float:left">
+                                                    <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                        @Html.RadioButtonFor(m => m.SecLocalCotractorToRepairDamage, "True", new RouteValueDictionary(new { @id = "secrepairYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "SecLocalCotractorToRepairDamage"), "disabled", "disabled"))
+                                                        <label for="secrepairYes" style="margin-right:10px; font-size:14px;">Yes</label>
+                                                        @Html.RadioButtonFor(m => m.SecLocalCotractorToRepairDamage, "False", new RouteValueDictionary(new { @id = "secrepairNo" }).AddIf(Model.DisableField("mainSection", "SecLocalCotractorToRepairDamage"), "disabled", "disabled"))
+                                                        <label for="secrepairNo" style="margin-left:40px; font-size:14px;font-weight: 500 !important;">No</label>
+                                                        @Html.ValidationMessageFor(x => x.SecLocalCotractorToRepairDamage)
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        if (Model.DefectMgmt == true)
+        {
+            @Html.Partial("_CapitalDefectDetails")
+        }
+
+        if (!User.IsInRoles("DOEUSER,SINSW"))
+        {
+
+            @Html.Partial("_CalloutDocuments")
+        }
+
+        if (Model.DefectMgmt == true)
+        {
+            @Html.Partial("_CapitalDefectPMPDDetails")
+        }
+
+        @Html.Partial("_ReactiveCalloutDetail")
+
+    }
+
+    <div id="modalWO" style="display:none;" title="">This action will create a new Work Order and notify Local Contractor by email.</div>
+    <div id="modalDefectCheckBoxTicked" style="text-align: center; display: none;" title="">
+        <div style="text-align:center; margin-bottom:12px;">
+            <img src="@Url.Content("~/theme2/assets/images/defect-icon.png")" class="body-icon" style="width:52px; height:52px;" />
+        </div>
+        This school is under Project Completion Period, please allocate work order to
+        <a href="mailto:ID.project-remediation@det.nsw.edu.au" style="color: #007bff; text-decoration: underline;">
+            ID.project-remediation@det.nsw.edu.au
+        </a><br /><br />
+        On confirmation, this callout is converted to defect and moved under Capital Defects list.<br />
+
+    </div>
+    <div id="modalDefectWorkAssignedToFMC" style="display:none;" title="">This action will convert Defect into a Reactive callout and disappears from 'Capital Defects List' page.</div>
+    <div id="modalDisclaimer" style="display:none;" title="">Details of the third party are to be uploaded in Document section.</div>
+    <br>
+    <br>
+    <!-- ============================================================== -->
+    <!-- End Container fluid  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- footer -->
+    <!-- ============================================================== -->
+    <footer class="footer"> © 2023 NSW Department of Education School Infrastructure FMWeb 2.0 - Work Order Management System </footer>
+    <!-- ============================================================== -->
+    <!-- End footer -->
+    <!-- ============================================================== -->
+    <!--Google Map modal start-->
+    <div class="modal fade bs-gmap-modal" id="gmapModal" tabindex="-1" role="dialog" aria-labelledby="adminModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header card-header">
+                    <h4 class="modal-title" id="bs-qrcode-modal">Geo Location</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div id="map" style="height:100%"></div>
+                    @*<div class="row">
+                            <div class="col-12" >
+                                <div id="map" style="height:100%"></div>
+                            </div>
+                        </div>*@
+
+                </div>
+                <div class="modal-footer card-header" style="margin-top:-24px;">
+
+                    <button type="button" class="btn btn-default waves-effect waves-light" data-dismiss="modal"><span class="btn-label"><i class="fa fa-eraser"></i></span>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Google Map Ends-->
+</div>
+
+
+
+<div class="container-fluid">
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    @using (Html.BeginForm("Detail", "CallOut", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+
+        <div class="row" style="margin-top:-5px;">
+            <div class="col-xl-12">
+
+
+                @*Test*@
+
+
+            </div>
+        </div>
+
+
+    }
+
+    <!-- ============================================================== -->
+    <!-- End Container fluid  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- footer -->
+    <!-- ============================================================== -->
+    <footer class="footer"> © 2020 NSW Department of Education School Infrastructure SINSW FMWeb Maintenance System </footer>
+    <!-- ============================================================== -->
+    <!-- End footer -->
+    <!-- ============================================================== -->
+</div>
+
+<div id="mapPreviewModal" class="modal bs-map-modal" style="display: none;">
+    <!-- Modal content -->
+    <div class="modal-content" style="width: 40%; left: 27%; top: 20%; height: auto !important;">
+        <span class="close" data-dismiss="modal">×</span>
+        <iframe id="mapFrame" @*width="590"*@ height="300" style="z-index: 1;"></iframe>
+    </div>
+</div>
+<div id="modalDeleteDoc" style="text-align: center; display: none;" title="">
+    <div style="text-align:center; margin-bottom:12px;">
+        <img src="@Url.Content("~/theme_clean/assets/images/delete-icon-1.png")" class="body-icon" style="width:52px; height:52px;" />
+    </div>
+    Are you sure you want to delete this document?<br />
+
+</div>
+@section Scripts
+{
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+
+
+    <style type="text/css">
+        .validation-summary-valid {
+            display: none;
+        }
+
+        a[disabled="disabled"] {
+            pointer-events: none;
+        }
+
+        .field-validation-valid {
+            display: none;
+        }
+
+        .validation-summary-errors, .validation-summary-errors1, .validation-summary-errors2, .validation-summary-errors3 {
+            display: block;
+            color: red;
+        }
+        /* Validation */
+        .input-validation-error {
+            border-color: red !important;
+        }
+
+        .field-validation-error {
+            font-size: 10px;
+            float: right;
+            padding-top: 6px;
+            color: red !important;
+        }
+
+        .input-validation-error ~ .select2 .select2-selection {
+            border: 1px solid red;
+        }
+
+        .btn-outline-info.disabled, .btn-outline-info:disabled {
+            background-color: #5a7ca4;
+        }
+
+
+        [type=checkbox].filled-in:not(:checked) + label:after  {
+            background-color: #FFFFFF;
+        }
+
+        .modal-dialog,
+        .modal-content {
+            /* 80% of window height */
+        }
+
+        .modal-body {
+            /* 100% = dialog height, 120px = header + footer */
+            max-height: calc(100% - 120px);
+        }
+
+        .modal-header {
+            border-top-left-radius: 10px !important;
+            border-top-right-radius: 10px !important;
+        }
+
+        @@media (min-width: 348px) and (max-width: 720px) {
+            .label-bdr {
+                padding-bottom: 8px !important;
+            }
+        }
+
+        .no-close .ui-dialog-titlebar-close {
+            display: none
+        }
+
+        .w-32em {
+            width: 32em;
+        }
+        /* === Overlay === */
+        .ui-widget-overlay {
+            background: #000;
+            opacity: 0.6;
+        }
+
+        /* === Outer Dialog === */
+        .defect-convert-dialog.ui-dialog {
+            border: 1px solid #2c3e50;
+            border-radius: 6px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* === Title Bar === */
+        .defect-convert-dialog .ui-dialog-titlebar {
+            background: #2c3e50;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 12px 15px;
+            border-radius: 4px 4px 0 0;
+            border: none;
+        }
+
+        /* === Hide X Close Button === */
+        .defect-convert-dialog .ui-dialog-titlebar-close {
+            display: none;
+        }
+
+        /* === Dialog Body === */
+        .defect-convert-dialog .ui-dialog-content {
+            padding: 20px 15px;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+            line-height: 1.5;
+            display: block; /* ✅ changed from flex to block */
+        }
+
+        /* === Button Panel === */
+        .defect-convert-dialog .ui-dialog-buttonpane {
+            background: #f5f5f5;
+            border-top: 1px solid #ddd;
+            padding: 10px 15px;
+            margin: 0;
+        }
+
+        .defect-convert-dialog .ui-dialog-buttonset {
+            float: right;
+        }
+
+        /* === All Buttons Base === */
+        .defect-convert-dialog .ui-dialog-buttonpane button {
+            padding: 7px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-left: 8px;
+            transition: background 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .defect-convert-dialog .ui-dialog-buttonpane button:first-child,
+            .defect-convert-dialog .ui-dialog-buttonpane button:first-child:focus,
+            .defect-convert-dialog .ui-dialog-buttonpane button:first-child:active {
+                outline: none;
+                border: none;
+                box-shadow: none;
+            }
+
+            /* === Confirm Button (Green) === */
+            .defect-convert-dialog .ui-dialog-buttonpane button:first-child {
+                background: #29caff; /* <-- updated from #27ae60 to #29caff */
+                color: #fff;
+            }
+
+                .defect-convert-dialog .ui-dialog-buttonpane button:first-child:hover {
+                    background: #009efb;
+                }
+
+            /* === Cancel Button (Red) === */
+            .defect-convert-dialog .ui-dialog-buttonpane button:last-child {
+                background: #dca400;
+                color: #fff;
+            }
+
+                .defect-convert-dialog .ui-dialog-buttonpane button:last-child:hover {
+                    background: #ffc929;
+                }
+
+            /* === Button Icon spacing === */
+            .defect-convert-dialog .ui-dialog-buttonpane button i {
+                font-size: 13px;
+                pointer-events: none;
+            }
+    </style>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=@Google_apiKey&libraries=places&v=weekly"
+            defer></script>
+    <script>
+
+        var supportDocuments = @Html.Raw(JsonConvert.SerializeObject(Model.SupportDocuments));
+        var uploadUrl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })' + "/upload";
+        var saveWorkOrderurl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })' + "/SaveWorkOrder";
+
+        var maintenanceTaskList = @Html.Raw(JsonConvert.SerializeObject(ViewData["MaintenanceCallLog"]));
+        var equipmentType = @Html.Raw(JsonConvert.SerializeObject(ViewData["AssemblyEquipmentTypes"]));
+
+           var workTypesList = @Html.Raw(JsonConvert.SerializeObject(ViewData["WorkTypeList"]));
+
+        var modelWorkCategoryId = "@Model.WorkCategoryID";
+        var modelMaintCallLogId = '@Model.SelectedMaintenanceCallLogId';
+        var cancelUrl = '@Url.CancelURL()';
+        var delUrl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })' + "/delete?token=";
+        var dataLink = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })';
+        var editUrl = '@Url.Action("TradieDetails", "Tradie", new {area="" })?localContractorId=';
+        var jobHomeUrl = '@Url.Action("Detail", "Jobs")';
+        var calloutListUrl = '@Url.Action("Index", "CallOut")';
+        var assemblyUrl = '@Url.RouteUrl("DefaultApi", new {httproute = "", controller = "Assembly"})?elementId=';
+        var subAssemblyUrl = '@Url.RouteUrl("DefaultApi", new {httproute = "", controller = "SubAssembly"})?assemblyId=';
+        var callOutHomeUrl = '@Url.Action("Detail", "CallOut")';
+        var googleApikey = '@Google_apiKey';
+        var invalidFilenameCharacters = '@InvalidFilenameCharacters';
+        var propertyId = @Model.PropertyID;
+        var schoolId = @Model.SchoolId;
+        var supportDocuments = @Html.Raw(JsonConvert.SerializeObject(Model.SupportDocuments));
+
+        var root = '@Url.Content("~")';
+        var getSitePlanUrl = '@Url.Content("~/")api/GetSitePlan?token=@AesIdProtector.Encrypt(Model.SchoolId > 0 ? Model.SchoolId.ToString() : "0")';
+        //var getAsbestosRegisterUrl = '@Url.Content("~/")api/GetAsbestosRegister?schoolId=@Model.SchoolId';
+        var getAsbestosRegisterUrl = '@Url.Content("~/")api/GetAsbestosRegister?token=@AesIdProtector.Encrypt(Model.SchoolId > 0 ? Model.SchoolId.ToString() : "0")';
+        //var getAsbestosManagementPlanUrl = '@Url.Content("~/")api/GetAsbestosManagementPlan?schoolId=@Model.SchoolId';
+        var getSitePlanFromFMWebAPIUrl = '@Url.Content("~/")api/GetSitePlanFromFMWebAPI?schoolId=@Model.SchoolId';
+        var getAsbestosRegisterFromFMWebAPIUrl = '@Url.Content("~/")api/GetAsbestosRegisterFromFMWebAPI?schoolId=@Model.SchoolId';
+        var fileNotFoundErrorUrl = '@Url.Action("FileNotFoundError", "CallOut")';
+        var helpUrl = '@Url.Action("QuickHelp", "CallOut")';
+
+          $(".agencySelector").on("click", function (e) {
+            // stop anchor firing
+            e.preventDefault();
+            // set variables for inside the ajax post
+            var aid = $(this).data("id");
+            var an = $(this).data("name");
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SetAgency", "Home", new { area = "" })",
+                data: { agencyId: aid, agencyName: an },
+                success: function () {
+                   window.location.href = (aid == 7061009)? '@Url.Action("Index", "Home", new {area = ""})' : "@Url.Action("Index", "CallOut", new { area = "FMWorks" })";
+                }
+            });
+          });
+
+        $('#mapPreviewButton').click(function (e)
+        {
+            var iframeSrc = $("#mapFrame").attr("src");
+
+            if (typeof iframeSrc === "undefined")
+            {
+                var googleMapsUrl = "https://www.google.com/maps/embed/v1/place?key=@Google_apiKey&q=@Model.SchoolAddress";
+                $("#mapFrame").attr("src", googleMapsUrl);
+            }
+        });
+
+        $('[data-toggle="popover"]').popover({
+            placement: 'right',
+            trigger: 'focus'
+        });
+    </script>
+
+    @Scripts.Render("~/bundles/fmcallout")
+}

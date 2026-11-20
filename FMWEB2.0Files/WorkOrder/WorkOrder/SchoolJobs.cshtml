@@ -1,0 +1,125 @@
+﻿@using Newtonsoft.Json
+@using AssetCare.Helpers
+@model AssetCare.Model.ViewModels.JobListViewModel
+
+<div class="container-fluid mtp--4em">
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row page-titles push">
+        <div class="col-md-8 align-self-center" style="vertical-align: middle;">
+            <div class="row" style="margin-left: 0px; margin-right: 0px; ">
+                <h3 class="text-themecolor">@ViewBag.Title</h3>
+                <button type="button" class="btn btn-info btn-sm btn-rounded align-self-center ml-1" style="vertical-align: middle; border: none; box-shadow: none; margin-top:-7px; padding-bottom: 2px; padding-top: 2px; font-weight: 600; " data-info="SchoolJobs.FMWorks">
+                    <i class="fa fa-info-circle" style="font-weight: 600;"></i>
+                    Info
+                </button>
+            </div>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { Area = "" })?id=@Model.AgencyId">Home</a></li>
+                <li href="#" class="breadcrumb-item active">Callout Repairs List</li>
+            </ol>
+        </div>
+        <div class="col-md-4 align-self-center" style="vertical-align: middle;">
+            <button type="button" class="btn btn-info btn-sm btn-rounded align-self-center ml-1 float-right  d-none d-lg-block" data-toggle="modal" data-target="#HelpModal1" data-help="FMWorks" style="vertical-align: middle; border: none; box-shadow: none; margin-top:-20px; font-weight: 600; padding-bottom: 2px; padding-top: 2px; ">
+                <i class="fa fa-question-circle" style="font-weight: 600;"></i>
+                Help
+            </button>
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom:1em;">
+        <div class="col-12">
+            <button id="btnCancel" class="btn btn-outline-info waves-effect waves-light float-right" type="button"><span class="btn-label"><i class="fa fa-eraser"></i></span>Back to Home</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-base">
+                    <div class="table-responsive m-t-0" style="margin-top:-14px;">
+                        <div id="myTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <table id="fmSchoolJobsList" class="display nowrap table table-hover display table-bordered table-striped dataTable w-100">
+                                <thead>
+                                    <tr>
+                                        <th style="white-space: nowrap; width: 95.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Mode: activate to sort column ascending">Work Category</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Job ID: activate to sort column ascending">Job ID</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Callout ID: activate to sort column ascending">Call ID</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Callout ID: activate to sort column ascending">Call Date</th>
+                                        <th style="white-space: nowrap; width: 170px;" class="shorten-x sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Description: activate to sort column ascending">Description</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Buildings: activate to sort column ascending">Buildings</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Callout ID: activate to sort column ascending">Est. Completion Date</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="Callout ID: activate to sort column ascending">Date Completed</th>
+                                        <th style="white-space: nowrap; width: 96.5px;" class="sorting" tabindex="0" aria-controls="myTable" rowspan="1" colspan="1" aria-label="School ID: activate to sort column ascending">Job Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_InfoDynamic")
+@Html.Partial("_HelpDynamic")
+@section Scripts{
+    <script>
+
+        var schoolId = "@Model.SchoolId";
+        var agencyId = "@Model.AgencyId";
+        var callDetailUrl = "@Url.Action("Detail", "CallOut", new { Area = "FMWorks" })";
+        var detailUrl = "@Url.Action("Detail", "WorkOrder", new { Area = "FMWorks" })";
+        var baseUrl = "@Url.Content("~")";
+        var url = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "WorkOrder" })';
+        var cancelURL = '@Url.CancelURL(@Url.Action("index", "SchoolHome", new { Area = "" }))';
+
+    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+    @Scripts.Render("~/bundles/fmschooljoblist")
+
+    <style>
+        .validation-summary-valid {
+            display: none;
+        }
+
+        .field-validation-valid {
+            display: none;
+        }
+
+        .validation-summary-errors, .validation-summary-errors1, .validation-summary-errors2, .validation-summary-errors3 {
+            display: block;
+            color: red;
+        }
+        /* Validation */
+        .input-validation-error {
+            border-color: red !important;
+        }
+
+        .field-validation-error {
+            font-size: 10px;
+            float: right;
+            padding-top: 6px;
+            color: red !important;
+        }
+
+        .input-validation-error ~ .select2 .select2-selection {
+            border: 1px solid red;
+        }
+
+        .btn-outline-info.disabled, .btn-outline-info:disabled {
+            background-color: transparent;
+        }
+        @@media screen and (max-width: 575px) {
+            .mtp--4em {
+                margin-top: -4em !important;
+            }
+        }
+    </style>
+}
+

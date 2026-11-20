@@ -1,0 +1,24 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Helpers
+
+<div class="p-20">
+    <div class="row">
+        <div class="col-12">
+            <div class="row mt-2">
+                @if (!string.IsNullOrEmpty(ViewBag.QRCodeUrl))
+                {
+                    <div class="col-12">
+                        <p>Please present this QRCode to '@Model.SchoolName' when you visit '@Model.SchoolName'.</p>
+                    </div>
+                    <div class="col-12 m-4">
+                        <img src="@ViewBag.QRCodeUrl" alt="QR Code for HTML Page" height="250" width="250" />
+                    </div>
+                }
+                else
+                {
+                    <p>QR Code is not available.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

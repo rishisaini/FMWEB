@@ -1,0 +1,292 @@
+﻿@using MvcSiteMapProvider.Web.Html
+@using AssetCare.Model.Models
+@using Newtonsoft.Json
+@model AssetCare.Model.ViewModels.CallOutViewModel
+
+
+<div class="container-fluid">
+    <!-- quick tip start div -->
+    <div class="row tips">
+        <div class="col-12">
+            <div class="card " style="background-color: #009efb;">
+                <div class="col-12">
+
+                    <div style="background: white; padding:8px; border-radius:20px;">
+                        <span class="tip"><i class="fa fa-lightbulb"></i><strong> Search Tips: </strong></span>
+                        &nbsp;<span style="color:#007bff;">
+                            Search column, except columns with * requires a minimum of 3 characters in the search field.
+                        </span>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- quick tip end div -->
+    <!-- ============================================================== -->
+    <!-- Bread crumb and right sidebar toggle -->
+    <!-- ============================================================== -->
+    <div class="row" style="margin-top:-8px;">
+        <div class="col-12">
+            <div class="card white-bg">
+
+                <div class="row">
+                    <div class="col-12 float-right">
+                        <div class="col-xl-3 col-lg-12 col-sm-12 float-left">
+
+                            <h4><strong>Reactive Callout List</strong></h4>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { Area = "" })?id=@Model.AgencyId">Home</a></li>
+                                <li class="breadcrumb-item"><a href="#">Callouts</a></li>
+                                <li href="#" class="breadcrumb-item active">Reactive Callout List</li>
+                            </ol>
+
+                        </div>
+                        @using (Html.BeginForm("Detail", "CallOut", FormMethod.Get))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(x => x.WorkCategoryId)
+                            @Html.HiddenFor(x => x.ShowIsReadyForReimbursementOnly)
+                            @Html.HiddenFor(x => x.CurrentRoleID)
+                            <div class="col-lg-4 col-sm-12 tm-20 float-left">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(x => x.PropertyId, (IEnumerable<SelectListItem>)ViewData["SchoolsList"], "Select School", new { @class = "custom-select", @id = "schoolSelectList" })
+                                    @Html.ValidationMessageFor(x => x.PropertyId, null, new { @class = "text-danger", style = "float:left !important; margin-top:5px" })
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-sm-12  float-right" style="text-align:right;">
+                                <button class="top-btn btn-outline-info waves-effect waves-light tm-20 mr-2" id="btnViewList" type="button"><span class="top-btn-label"><i class="fa fa-eye"></i></span>View List</button>
+                                @if (Model.CanCreateCalout)
+                                {
+                                    <button class="top-btn btn-outline-info waves-effect waves-light tm-20  mr-2" type="submit" id="btnAddNewCallout"><span class="top-btn-label"><i class="fa fa-plus"></i></span>Add New</button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-bottom:15px!important">
+        <div class="col-lg-6">
+            @Html.Partial("_QuickHelp", Model)
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:-12px;">
+        <div class="col-12">
+            <div class=" blue-header">
+                <div class="card-base">
+                    <div class="row">
+                        <strong>View Callouts</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:-12px;">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body collapse show">
+                    <div class="row">
+                        <div class="col-xl-12 col-lg-12">
+                            <div class="card inner-border-1 white-bg">
+                                <div class="card-base">
+                                    <div class="table-responsive m-t-0" style="margin-top:-14px;">
+                                        <table id="fmCallOutDataTable" class="display nowrap table table-hover display table-bordered table-striped dataTable w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th>Actions</th>
+                                                    <th>Callout ID*</th>
+                                                    <th>Callout Date</th>
+                                                    <th>School Name</th>
+                                                    <th>Is Insurance Event?</th>
+                                                    <th>Reimbursement Ready?</th>
+                                                    <th>Assessor Appointed?</th>
+                                                    <th>Requested By</th>
+                                                    <th>Callout Description</th>
+                                                    <th>Subcategory</th>
+                                                    <th>Status</th>
+                                                    <th>Req. Response Time</th>
+                                                    <th>HAZMAT*</th>
+                                                    <th>Claim Number</th>
+                                                    <th>Incident Date</th>
+                                                    <th>Incident Type</th>
+                                                    <th>Work Order(s)*</th>
+                                                   
+                                                </tr>
+                                                <tr style="border: none;">
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"></td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchCallOutId" class="form-control form-control-sm" placeholder="Search" style="msc"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchCallDate" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchSchName" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchIsInsuranceEvent" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchIsReimbursementReady" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchAssessorStatus" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchReqBy" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchDesc" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchCategory" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchStatus" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchResponseTime" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchHazmat" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchClaimNumber" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchIncidentDate" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchIncidentType" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                    <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchJobId" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                   
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                            @*<tfoot>
+                                                    <tr style="border: none;">
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"></td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchCallOutId" class="form-control form-control-sm" placeholder="Search" style="msc"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchCallDate" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchSchName" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchIsInsuranceEvent" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchIsReimbursementReady" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchAssessorStatus" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchReqBy" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchDesc" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchCategory" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchStatus" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchResponseTime" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                        <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchHazmat" class="form-control form-control-sm" placeholder="Search"> </td>
+
+                                                        @{if (Model.CurrentRoleID != "F" || Model.CurrentRoleID != "SM")
+                                                            {
+                                                                <td style="vertical-align: middle; border: none; padding-top: 13px;"><input type="search" id="searchJobId" class="form-control form-control-sm" placeholder="Search"> </td>
+                                                            } }
+                                                    </tr>
+                                                </tfoot>*@
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("~/Views/SchoolHome/_workOrderDetails.cshtml", Model)
+    <br>
+    <br>
+    <!-- ============================================================== -->
+    <!-- End Container fluid  -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- footer -->
+    <!-- ============================================================== -->
+    <footer class="footer"> © 2023 NSW Department of Education School Infrastructure FMWeb 2.0 - Work Order Management System </footer>
+    <!-- ============================================================== -->
+    <!-- End footer -->
+    <!-- ============================================================== -->
+</div>
+
+
+@section Styles {
+    <style type="text/css">
+        .flagHover {
+            margin-top: -2px !important;
+            border-radius: 7px;
+            font-weight: 600;
+            background: black;
+            border: 1px solid #737373;
+            color: white;
+        }
+
+        @@media screen and (max-width:767px) {
+            .tip {
+                background-color: white !important;
+                border-radius: 18px;
+                margin-left: -6px;
+                padding: 5px;
+                color: #002664 !important;
+            }
+        }
+
+        @@media (min-width: 768px) and (max-width: 5000px) {
+            .tip {
+                background-color: #002664 !important;
+                border-radius: 18px;
+                margin-left: -6px;
+                padding: 5px;
+                color: white !important;
+            }
+        }
+
+        @@media screen and (max-width: 767px) {
+            .tip {
+                background-color: white !important;
+                border-radius: 18px;
+                margin-left: -6px;
+                padding: 5px;
+                color: #002664 !important;
+            }
+        }
+
+        #btnSearchIcon {
+            margin-right: 7px;
+            color: #2196f3;
+        }
+
+        #fmCallOutDataTable_filter {
+            height: 32px;
+        }
+
+        div.dataTables_wrapper div.dataTables_filter input {
+            border: 1px solid white !important;
+        }
+
+        .search-btn {
+            width: auto;
+            float: right;
+            margin-top: 10px;
+        }
+
+    </style>
+    }
+
+    @section Scripts
+{
+        <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.21/pagination/select.js"></script>
+        <script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.21/pagination/extjs.js"></script>
+        @*<script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>*@
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+
+        @Scripts.Render("~/bundles/jqueryval")
+        @{
+            var sessionAgencyId = Session["AgencyDetails"] != null ? ((KeyValuePair<int, string>
+        )Session["AgencyDetails"]).Key.ToString() : "0";
+
+        }
+
+<script>
+
+        var agencyId = '@Model.AgencyId';
+        var propertyId = '@Model.PropertyId';
+
+        var workCategoryId = '@Model.WorkCategoryId';
+
+        var srvMode = '@Model.CanDelete';
+        var srvCanDelete = '@Model.CanCreateJob';
+        var woDetailsApiUrl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "WorkOrder"  })';
+        var srvApiUrl = '@Url.RouteUrl("DefaultApi", new { httproute = "", controller = "CallOut" })';
+        var callOutHomeUrl = '@Url.Action("Detail", "CallOut")';
+        var jobHomeUrl = '@Url.Action("Detail", "WorkOrder")';
+        var calloutListUrl = '@Url.Action("Index", "CallOut")';
+
+        var baseUrl = "@Url.Content("~")";
+        var rptUrl = '@Url.Action("CalloutReport", "CallOut", new { Area = "FMWorks" })';
+        var readOnlySchoolList = @Html.Raw(JsonConvert.SerializeObject(ViewData["ReadonlySchools"]));
+        var currentUserRoleId = '@Model.CurrentRoleID';
+        var helpUrl = '@Url.Action("QuickHelp", "CallOut")';
+
+</script>
+        @Scripts.Render("~/bundles/fmcalloutlist")
+    }

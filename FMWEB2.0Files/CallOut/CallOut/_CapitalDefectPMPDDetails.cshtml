@@ -1,0 +1,115 @@
+﻿@model AssetCare.Model.ViewModels.CallOutAddEditViewModel
+@using AssetCare.Helpers
+@using Newtonsoft.Json
+@using AssetCare.Common
+@{
+    var canViewPMUseOnlySection = User.IsInRoles("ADMIN,CONTRACTOR,PROJECTDIR,PROJECTMNGR");
+}
+<div id="divCapitalDefectPMPDDetail">
+    @if (canViewPMUseOnlySection)
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card inner-border">
+                    <div class="card-header" style="height: 44px;">
+                        <strong>Defect PM/PD Use Only</strong>
+                        <div class="col-lg-3 col-sm-12 float-right" style="text-align: right;">
+                            @Html.CheckBoxFor(x => x.CapitalDefectCalloutViewModel.Complete, new RouteValueDictionary(new { @class = "filled-in chk-col-light-blue", @id = "chkPMComplete", style = "border:white;opacity:1;z-index:2;" })
+                             .AddIf(Model.DisableField("capitalDefectSection", "Complete"), "disabled", "disabled"))
+                            <label style="font-size:14px;" class="" for="Complete">Completed</label>
+                            @if (Model.CapitalDefectCalloutViewModel.CompletedDate.HasValue)
+                            {
+                                <span style="padding-left:10px;color:#1e88e5; font-weight: 600;font-size:12px">@Model.CapitalDefectCalloutViewModel.CompletedDate</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="card-base">
+                        <div class="col-lg-12">
+                            <div class="card inner-border-1 white-bg">
+                                <div class="card-base" style="margin-bottom:-18px; margin-left:-9px;">
+                                    <div class="row" style="margin-left:-5px;">
+                                        <div class="col-xl-3 col-lg-6 col-md-6">
+                                            <label><strong>Work Assignment</strong></label>
+                                                @if (!Model.DisableField("capitalDefectSection", "PSMWorkAssignmentStatusId"))
+                                                {
+                                                    <button type="button" class="btn-sm btn-rounded " data-toggle="popover" data-html="true"
+                                                            data-content="If you want to revert capital defect to reactive callout then select Assigned to FMC and this callout will be completed by FMC."
+                                                            style="vertical-align: middle; border: none; box-shadow: none; margin-left:5px; padding: 1px 8px 1px 8px; background: #002664; " data-original-title="" title="">
+                                                        <i class="fa fa-info" style=" color: white; font-size: 11px !important;"></i>
+                                                    </button>
+                                                }
+                                                @Html.DropDownListFor(x => x.CapitalDefectCalloutViewModel.PSMWorkAssignmentStatusId, (IEnumerable<SelectListItem>)ViewData["PSMWorkAssignmentStatusId"], "---Select---", new RouteValueDictionary(new { @class = "custom-select" })
+                                                                            .AddIf(Model.DisableField("capitalDefectSection", "PSMWorkAssignmentStatusId"), "disabled", "disabled"))
+                                                @if (Model.DisableField("capitalDefectSection", "PSMWorkAssignmentStatusId"))
+                                                {
+                                                    @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.PSMWorkAssignmentStatusId)
+                                                }
+                                            </div>
+                                        <div class="col-xl-3 col-lg-6 col-md-6">
+                                            <label><strong>Work Assigned Date and Time</strong></label>
+                                            <div class="input-group">
+
+                                                @Html.EditorFor(m => m.CapitalDefectCalloutViewModel.CallAssignedDate, new
+                                                {
+                                                    htmlAttributes = new RouteValueDictionary(new
+                                                    {
+                                                        @placeholder = "dd/mm/yyyy",
+                                                        @class = "form-control form-control-sm datepicker-control",
+                                                        @Value = ((Model.CapitalDefectCalloutViewModel.CallAssignedDate.HasValue) ? Model.CapitalDefectCalloutViewModel.CallAssignedDate.Value.ToString("dd/MM/yyyy") : ""),
+                                                        id = "txtCallAssignedDate",
+
+                                                    }).AddIf(Model.DisableField("capitalDefectSection", "CallAssignedDate"), "disabled", "disabled")
+                                                })
+                                                @{
+                                                    if (Model.DisableField("capitalDefectSection", "CallAssignedDate"))
+                                                    {
+                                                        @Html.HiddenFor(x => x.CapitalDefectCalloutViewModel.CallAssignedDate)
+                                                    }
+                                                }
+                                                <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                    <span class="input-group-text mr-2" id="basic-addon1">
+                                                        <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                    </span>
+                                                </div>
+
+                                                <div class="sm-1">
+                                                    <div class="row ml-2 date" id="tpCallAssignedTime" data-target-input="nearest">
+                                                        @{
+                                                            if (Model.DisableField("capitalDefectSection", "CallAssignedDate"))
+                                                            {
+                                                                <input id="txtCallAssignedTime" name="CallAssignedTime" type="text" class="form-control datetimepicker-input" style="width:70px" data-target="#tpCallAssignedTime" Value="@((Model.CapitalDefectCalloutViewModel.CallAssignedDate.HasValue) ? Model.CapitalDefectCalloutViewModel.CallAssignedDate.Value.ToString(" HH:mm") : "" )" placeholder="HH:mm" data-val="true" readonly />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input id="txtCallAssignedTime" name="CallAssignedTime" type="text" class="form-control datetimepicker-input dtTimeWidth" style="width:70px" data-target="#tpCallAssignedTime" onchange="CallAssignedTimeChanged();" Value="@((Model.CapitalDefectCalloutViewModel.CallAssignedDate.HasValue) ? Model.CapitalDefectCalloutViewModel.CallAssignedDate.Value.ToString(" HH:mm") : "" )" placeholder="HH:mm" data-val="true" />
+                                                            }
+                                                            <button type="button" class="btn btn-info h-32" id="btnSetCurrentDate1" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                         
+                                        </div>
+                                        <div class="col-xl-12 col-lg-12 col-md-12">
+                                            <form>
+                                                <div class="form-group m-t-10" style="">
+                                                    <label><span style="margin-right:5px;"><strong>Work Description &amp; Comments<span style="vertical-align: super; color:#d7153a;">*</span> </strong></span><span class="ml-1 label-desc"> (Maximum 1000 Characters) </span></label>
+                                                    @Html.TextAreaFor(x => x.CapitalDefectCalloutViewModel.PMComments, new RouteValueDictionary(new { @class = "form-control form-control-sm blue-border-1", rows = "5", style = "height: 52px;", @maxLength = 1000 })
+                                                                            .AddIf(Model.DisableField("capitalDefectSection", "PMComments"), "disabled", "disabled"))
+                                                    @if (!Model.DisableField("capitalDefectSection", "PMComments"))
+                                                    {
+                                                        @Html.ValidationMessageFor(x => x.CapitalDefectCalloutViewModel.PMComments)
+                                                    }
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,636 @@
+﻿@model AssetCare.Model.ViewModels.JobDetails
+@using AssetCare.Model.ViewModels
+@using AssetCare.Helpers
+@using System.Configuration;
+@{
+    string Google_apiKey = ConfigurationManager.AppSettings["Google_apiKey"];
+}
+<div class="row" style="margin-top:-12px;">
+    <div class="col-xl-12">
+        <div class="card ">
+
+            <div class="card-body collapse show mt-0">
+                @{
+                    string calloutLink = "#";
+                    if (!Model.DisableField("mainSection", "calloutLink"))
+                    {
+                        calloutLink = @Url.Action("Detail", "CallOut") + "?id=" + Model.CallLogFITSId.ToString() + "&sig=" + AssetCare.Model.Common.TamperHelper.GenerateSignature(Model.CallLogFITSId.Value);
+                    }
+                }
+                <div class="row top-ribbon">
+                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2">
+                        <i class="fa fa-edit fa-color"></i> <strong class="left-bdr">Callout ID:</strong> <span>
+                            @{
+                                if (!Model.DisableField("mainSection", "calloutLink"))
+                                {
+                                    <a href="@calloutLink"> @Model.CallOutId.ToString()</a>
+                                }
+                                else
+                                {
+                                    @Model.CallOutId.ToString()
+                                }
+                            }
+
+                        </span>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-12 float-left mb1-mt1 mt-2">
+                        <i class="fa fa-map-marker fa-color right-bdr" style="float:left;"></i>
+
+                        <button style="float: left; margin-left: 4px; background: none; border: none; font-weight: bold; color: #007bff;" id="mapPreviewButton" type="button" data-toggle="modal" data-target=".bs-map-modal">@Model.SchoolName</button>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2">
+                        <i class="fa fa-building fa-color"></i> <strong class="left-bdr">School ID:</strong> <span>@Model.SchoolId </span>
+                        @Html.Partial("_SitePlan")
+                    </div>
+                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2"><i class="fa fa-phone fa-color fa-color"></i> <strong class="left-bdr">Phone:</strong> <span><a href="tel:@Model.SchoolPhone"><strong>@Model.SchoolPhone  </strong> </a></span> </div>
+                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2"><i class="fa fa-user-circle fa-color"></i> <strong class="left-bdr">ASO:</strong> <span>@Model.ASOName </span> </div>
+                    <div class="col-lg-3 col-sm-12 float-left mb1-mt1 mt-2"><i class="fa fa-mobile-alt fa-color"></i> <strong class="left-bdr">ASO Mobile:</strong> <span><a href="tel:@Model.ASOContactNumber"><strong>@Model.ASOContactNumber</strong></a> </span> </div>
+                    <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-2 "><i class="fa fa-user-circle fa-color"></i> <strong class="left-bdr">Group Leader (GL):</strong> @Model.GLName </div>
+                    <div class="col-lg-3 col-sm-12 float-left mb1-mt1 mt-2"><i class="fa fa-mobile-alt fa-color"></i> <strong class="left-bdr">GL Mobile:</strong> <strong><a href="tel:@Model.GLContactNumber">@Model.GLContactNumber </a></strong></div>
+                    @{
+                        if (Model.ProposalId > 0)
+                        {
+                            <div class="col-lg-3 col-sm-12  float-left mb1-mt1 mt-3">
+                                <strong>
+                                    <i class="fa fa-edit fa-color" title="LRLV Id" style="margin-left:-2px;"></i>  <span class="left-bdr">LRLV Id: </span>
+                                </strong>
+                                @if (Model.CurrentRoleID == "C" || Model.CurrentRoleID == "LC")
+                                {
+                                    <a style="color: #007bff"> @Model.ProposalId.ToString()</a>
+
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Detail", "Proposals", new { Area = "FMWorks" })\?id=@Model.ProposalId&sig=@Model.SigProposal"> @Model.ProposalId.ToString()</a>
+                                }
+
+
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="row">&nbsp;</div>
+                <div class="row">
+
+                    <div class="col-xl-6 col-lg-6 col-xs-12">
+                        <div class="card inner-border-1 white-bg">
+                            <div class="card-base mt-4">
+                                <div class="row col-12 ">
+
+                                    <div class="col-xl-4 col-lg-6 col-sm-12 float-left">
+                                        <div class="form-group card" style="padding:8px;">
+
+                                            <label><strong>Element: </strong></label> <label>@Model.Element</label>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-lg-6 col-sm-12 float-left">
+                                        <div class="form-group card" style="padding:8px;">
+
+                                            <label><strong>First Visit Date: </strong></label> <label>
+                                                @if (Model.DetailsTab.FirstVisitDate == null)
+                                                {
+                                                    <text>N/A</text>
+                                                }
+                                                else
+                                                {
+                                                    @Model.DetailsTab.FirstVisitDate.Value.ToString("dd/MM/yyyy")
+                                                }
+
+
+                                            </label>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-4 col-lg-6 col-sm-12 float-left">
+                                        <div class="form-group card" style="padding:8px;">
+
+                                            <label><strong> Work Type:</strong> </label> <label>@Model.WorkTypeDesc</label>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row col-12 ">
+
+                                    <div class="col-12 float-left label-bdr-wo ">
+                                        <div class="form-group frmgrp_m10">
+
+                                            <label><strong> Work Order Description:</strong> </label>
+                                            <p>@Model.ServiceReportDesc</p>
+
+
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row col-12 ">
+
+
+                                        <div class="col-12 float-left label-bdr-wo">
+                                            <div class="form-group frmgrp_m10">
+                                                <label><i class="fa fa-building fa-color1"></i> <strong> Buildings Affected: </strong></label>
+                                                @Html.ListBoxFor(m => m.JobBuildingIDs, new MultiSelectList((IEnumerable<BuildingViewModel>)ViewData["BuildingsList"],
+"BuildingID", "BuildingDesc", Model.JobBuildingIDs),
+new RouteValueDictionary(new
+{
+    @class = "select2 m-b-10 select2-multiple select2-hidden-accessible",
+    @style = "width:100%; margin-bottom: 16px;",
+    @onchange = "updateErrorSummary();"
+}).AddIf(Model.DisableField("mainSection", "JobBuildingIDs"), "disabled", "disabled"))
+
+                                                @{
+                                                    if (Model.DisableField("mainSection", "JobBuildingIDs"))
+                                                    {
+                                                        for (int i = 0; i < Model.JobBuildingIDs.Count; i++)
+                                                        {
+                                                            @Html.HiddenFor(model => Model.JobBuildingIDs[i])
+                                                        }
+                                                    }
+
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row col-12">
+
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group frmgrp_m10">
+
+                                            <label><i class="fa fa-building fa-color1"></i> <strong> Room Nos:</strong>  </label> <label>@Model.RoomNumber</label>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group frmgrp_m10">
+                                            <label><i class="fa fa-map-pin fa-color1"></i> <strong>Room Location</strong> </label> <label>@Model.RoomLocation</label>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.AssociatedJobID))
+                                {
+                                    <div class="row col-12">
+
+                                        <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                            <div class="form-group frmgrp_m10">
+
+                                                <label><i class="fa fa-hashtag fa-color1"></i> <strong> Associated Work Order Id (For variations):</strong>  </label> <label>
+                                                    @Html.ActionLink(Model.AssociatedJobSequenceID.ToString(), "Detail", new { wrkId = Model.AssociatedJobID }, null)
+
+                                                </label>
+
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                            <div class="form-group frmgrp_m10">
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+
+
+                                <div class="row col-12">
+                                    <div class="col-lg-4 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group" style="margin-bottom: 5px; margin-top: 5px">
+                                            <label><i class="fa fa-dollar-sign fa-color1"></i> <strong> Invoice Total:</strong> </label> <label class="blue-theme" style="padding: 3px; border-radius: 5px !important;">@Model.Claim.TotalAmount.ToString("C")</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group" style="margin-bottom:5px;margin-top:5px">
+                                            <label><i class="fa fa-question fa-color1"></i> <strong>Invoice (Yes/No):</strong> </label> <label class="blue-theme" style="padding: 3px; border-radius: 5px !important;">
+                                                @{
+                                                    if (Model.Claim.ClaimFinalized)
+                                                    {
+                                                        <text>Yes</text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>No</text>
+                                                    }
+                                                }
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group" style="margin-bottom: 5px; margin-top: 5px">
+                                            <label><i class="fa fa-calendar fa-color1"></i> <strong>Invoice Date:</strong> </label> <label class="blue-theme" style="padding:3px; border-radius:5px !important;">
+                                                @{
+                                                    if (Model.Claim.ClaimFinalizedDate.HasValue)
+                                                    {
+
+                                                        @Model.Claim.ClaimFinalizedDate.Value.ToString("dd/MM/yyyy")
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>N/A</text>
+                                                    }
+                                                }
+                                            </label>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                @{
+                                    <div class="row col-12">
+                                        <div class="col-lg-4 col-sm-12 float-left label-bdr-wo">
+                                            <div class="form-group frmgrp_m10">
+                                                <label><i class="fa fa-calendar fa-color1"></i> <strong> Payment Review Date:</strong>  </label>
+                                                <label>
+                                                    @{
+                                                        if (Model.Claim != null && Model.Claim.FMCReviewedDate.HasValue)
+                                                        {
+                                                            <text>@Model.Claim.FMCReviewedDate.Value.ToString("dd/MM/yyyy")</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>N/A</text>
+                                                        }
+                                                    }
+
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-sm-12 float-left label-bdr-wo">
+                                            <div class="form-group frmgrp_m10">
+                                                <label><i class="fa fa-dollar fa-color1"></i><strong> Payment Approved (Yes/No):</strong> </label> <label>
+                                                    @{
+                                                        if (Model.Claim.AMUApproved == true)
+                                                        {
+                                                            <text>Yes</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>No</text>
+                                                        }
+                                                    }
+
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-sm-12 float-left label-bdr-wo">
+                                            <div class="form-group frmgrp_m10">
+                                                <label><i class="fa fa-calendar fa-color1"></i> <strong>Payment Approval Date:</strong> </label> <label>
+                                                    @{
+                                                        if (Model.Claim.AMUApprovedDate.HasValue)
+                                                        {
+                                                            <text>@Model.Claim.AMUApprovedDate.Value.ToString("dd/MM/yyyy")</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text>N/A</text>
+                                                        }
+                                                    }
+
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-xl-12  col-md-12 col-sm-12" style="margin-top:5px;">
+                                                @Html.Partial("_AsbestosRegister")
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12 col-sm-12 float-right mt-1 ml-2" style="text-align: left;">
+                                            <input type="checkbox" id="ro_SchoolFunded" class="filled-in chk-col-light-blue q ea-triggers-bound" style="border:red;" @(Model.WorkCategoryId == 100 ? "checked" : "") disabled> 
+                                            <label for="ro_SchoolFunded" style="margin-top:10px; font-size: 14px;">School Funded?</label>
+                                            <button type="button" class="btn-sm btn-rounded " data-toggle="popover" data-html="true" data-content="When checkbox is ticked, all associated work costs will be charged against selected School's cost centre." style="vertical-align: middle; border: none; box-shadow: none; margin-left:5px; padding: 1px 8px 1px 8px; background: #2196f3; " data-original-title="" title="">
+                                                <i class="fa fa-info" style=" color: white; font-size: 11px !important;"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                @*<div class="row col-12" style="height: 3.6em;"><span>&nbsp;</span></div>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-xs-12">
+                        <div class="card inner-border-1 white-bg">
+                            <div class="card-base mt-2">
+                                <img src=@Url.Content("~/theme2/assets/images/893.jpg") width="100%" alt="">
+                                <div class="row col-12 " style="margin-top:10px;">
+
+                                    <div class="col-lg-6 col-sm-12 float-left">
+                                        <div class="form-group frmgrp_m10">
+                                            <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                            <label><strong> Work Order Date:</strong> </label> <label>
+                                                @if (Model.RecordedDate != null)
+                                                {
+                                                    <text> @Model.RecordedDate.Value.ToString("dd/MM/yyyy") </text>
+                                                }
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12 float-left">
+                                        <div class="form-group frmgrp_m10">
+                                            <label><strong>Callout Date:</strong> </label> <label>@Model.CallLogDate</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row col-12 ">
+
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo ">
+                                        <div class="form-group frmgrp_m10">
+                                            <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                            <label><strong> School Response Time:</strong> </label> <label>@Model.SchoolResponseTimeDesc</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group frmgrp_m10">
+                                            <label><strong>FMC Response Time: </strong></label> <label>@Model.FMCResponseTimeDesc</label>
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row col-12 ">
+
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo ">
+                                        <div class="form-group frmgrp_m10">
+                                            <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                            <label><strong>Requested By:</strong> </label> <label>@Model.DetailsTab.RequestedBy</label>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group frmgrp_m10">
+                                            <label><strong>Requester Contact: </strong></label> <label>@Model.DetailsTab.RequesterContactNumber</label>
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row col-12 ">
+
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo ">
+                                        <div class="form-group frmgrp_m10">
+                                            <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                            <label><strong>Site Contact Person:</strong> </label> <label>@Model.DetailsTab.SiteContactPerson</label>
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group frmgrp_m10">
+                                            <label><strong>Site Contact: </strong></label> <label>@Model.DetailsTab.SiteContact</label>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row col-12">
+
+                                    <div class="col-xl-6 col-lg-12 col-sm-12 float-left label-bdr-wo">
+                                        <div class="form-group frmgrp_m10">
+                                            <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                            <label><strong> FMC Contact:</strong> </label> <label>@Model.ProcessedBy</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-12 col-sm-12 float-left label-bdr-wo" style="margin-bottom:10px">
+                                        <div class="form-group frmgrp_m10">
+                                            <i class="fa fa-phone fa-color fa-color1"></i> <strong class="left-bdr">FMC Mobile:</strong> <span><a href="tel:@Model.AgencyContactNumber"><strong>@Model.AgencyContactNumber</strong> </a></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row col-12">
+                                    <div class="col-xl-6 col-lg-12 col-sm-12 float-left label-bdr-wo">
+                                        <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                        <span>
+                                            <span style="font-size: 14px; font-weight: 500 !important; "><label style="font-size: 14px; font-weight: 500 !important;">School Contribution:</label></span>
+                                            <span class="ml-1">
+                                                @Html.RadioButtonFor(m => m.IsSchoolContribution, "True", new RouteValueDictionary(new { @id = "contrYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsSchoolContribution"), "disabled", "disabled"))
+                                                <label for="contrYes" style="margin-right:10px; font-size:14px; font-weight: 500 !important;">Yes</label>
+                                                @Html.RadioButtonFor(m => m.IsSchoolContribution, "False", new RouteValueDictionary(new { @id = "contrNo", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsSchoolContribution"), "disabled", "disabled"))
+                                                <label for="contrNo" style="font-size:14px; font-weight: 500 !important;">No</label>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    @if (Model.CurrentRoleID == "AO" || Model.CurrentRoleID == "D" || Model.CurrentRoleID == "C" || Model.CurrentRoleID == "A")
+                                    {
+                                        <div class="col-xl-6 col-lg-12 col-sm-12 float-left label-bdr-wo" style="margin-bottom:10px">
+                                            <div class="form-group frmgrp_m10">
+                                                <label><strong>Cost Centre Code: </strong></label> <label>@Model.CostCentreCode</label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="row col-12">
+                                    <div class="col-lg-12 col-sm-12 float-left label-bdr-wo">
+                                        <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                        <span>
+                                            <span style="font-size: 14px; font-weight: 500 !important;"><label style="font-size: 14px; font-weight: 500 !important;">Is this an insurance event related to work order?</label></span>
+                                            <span class="ml-1" style="vertical-align: middle; margin-top: -5px;">
+                                                @Html.RadioButtonFor(m => m.IsInsuranceEvent, "True", new RouteValueDictionary(new { @id = "insYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsInsuranceEvent"), "disabled", "disabled"))
+                                                <label for="insYes" style="margin-right:10px; font-size:14px; font-weight: 500 !important;">Yes</label>
+                                                @Html.RadioButtonFor(m => m.IsInsuranceEvent, "False", new RouteValueDictionary(new { @id = "insNo", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsInsuranceEvent"), "disabled", "disabled"))
+                                                <label for="insNo" style="font-size:14px; font-weight: 500 !important;">No</label>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                                @{
+                                    if (Model.DisableField("mainSection", "IsInsuranceEvent"))
+                                    {
+                                        @Html.HiddenFor(model => Model.IsInsuranceEvent)
+                                    }
+                                }
+                                @{
+                                    if (Model.InsuranceIncidentDateTime.HasValue && Model.IsInsuranceEvent == true)
+                                    {
+                                        <div class="row col-12" id="insuranceIncidentDateTimeSection1">
+                                            <div class="col-xl-12 col-lg-12 col-sm-12 float-left label-bdr-wo">
+                                                <div class="form-group frmgrp_m10">
+                                                    <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                                    <label><strong> Incident Date Time:</strong> </label> <label>@Model.InsuranceIncidentDateTime</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @*if (Model.DisableField("mainSection", "InsuranceIncidentDateTime"))
+                                            {
+                                                @Html.HiddenFor(x => x.InsuranceIncidentDateTime)
+                                                @Html.HiddenFor(x => x.IncidentTime)
+
+                                            }
+                                            else*@
+                                        if (!Model.DisableField("mainSection", "InsuranceIncidentDateTime") &&
+                                            !Model.InsuranceIncidentDateTime.HasValue)
+                                        {
+                                            <div id="insuranceIncidentDateTimeSection" class="row col-12 ml-4">
+                                                <label><strong>Incident Date and Time</strong></label>
+                                                <div class="row input-group">
+                                                    <div class="col-7 input-group">
+
+                                                        <div class="input-group date">
+                                                            @Html.EditorFor(m => m.IncidentDate, new
+                                                       {
+                                                           htmlAttributes = new RouteValueDictionary(new
+                                                           {
+                                                               @placeholder = "dd/mm/yyyy",
+                                                               @class = "form-control form-control-sm datepicker-control",
+                                                               @style = "height:2.58em",
+                                                               @Value = ((@Model.IncidentDate.HasValue) ? @Model.IncidentDate.Value.ToString("dd/MM/yyyy") : ""),
+                                                               id = "txtIncidentDate",
+
+                                                           }).AddIf(@Model.IsInsuranceEvent != true, "disabled", "disabled")
+                                                       })
+
+                                                            <div class="input-group-append datepicker-control-sibling" style="height: 33px;">
+                                                                <span class="input-group-text mr-2" id="basic-addon1">
+                                                                    <img src="@Url.Content("~/theme2/assets/images/350.png")" class="datepicker-control-img" style="height:20px;">
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.IncidentDate, string.Empty, new { @style = "margin-left:0em;" })
+                                                    </div>
+
+                                                    <div class="col-5 input-group" style="margin-left:-3em;">
+                                                        <div class="sm-1">
+                                                            <div class="row ml-2 date" data-target-input="nearest">
+                                                                @{
+                                                                    @Html.EditorFor(m => m.IncidentTime, new
+                                                               {
+                                                                   htmlAttributes = new RouteValueDictionary(new
+                                                                   {
+                                                                       @placeholder = "HH:mm",
+                                                                       @class = "form-control datetimepicker-input",
+                                                                       @Value = ((@Model.IncidentTime != null) ? @Model.IncidentTime : ""),
+                                                                       @id = "txtIncidentTime",
+                                                                       @style = "width:80px",
+                                                                       @type = "text"
+                                                                   }).AddIf(@Model.IsInsuranceEvent != true, "disabled", "disabled")
+                                                               })
+
+                                                                    <button type="button" class="btn btn-info h-32" id="btnSetCurrentIncidentDate" style="margin-left:5px"><i class="mdi mdi-update iem" style="font-size:18px; display: flex; justify-content: center;"></i></button>
+                                                                }
+
+                                                            </div>
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.IncidentTime, string.Empty, new { @style = "margin-left:0.8em;" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            if (Model.InsuranceIncidentDateTime.HasValue &&
+                                                !Model.DisableField("mainSection", "InsuranceIncidentDateTime"))
+                                            {
+                                                <div class="row col-12" id="insuranceIncidentDateTimeSection2">
+                                                    <div class="col-xl-12 col-lg-12 col-sm-12 float-left label-bdr-wo">
+                                                        <div class="form-group frmgrp_m10">
+                                                            <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                                            <label><strong> Incident Date Time:</strong> </label> <label>@Model.InsuranceIncidentDateTime</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                                <div class="row col-12">
+                                    <div class="col-lg-12 col-sm-12 label-bdr-wo">
+                                        <img src=@Url.Content("~/theme2/assets/images/bullet.jpg") width="20" height="20" alt="">
+                                        <span>
+                                            <span style="font-size: 14px; font-weight: 500 !important; "><label style="font-size: 14px; font-weight: 500 !important;">Does this workorder include betterment?</label></span>
+                                            <span class="ml-1">
+                                                @Html.RadioButtonFor(m => m.IsIncludeBetterment, "True", new RouteValueDictionary(new { @id = "includeBettermentYes", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsIncludeBetterment"), "disabled", "disabled"))
+                                                <label for="includeBettermentYes" style="margin-right:10px; font-size:14px; font-weight: 500 !important;">Yes</label>
+                                                @Html.RadioButtonFor(m => m.IsIncludeBetterment, "False", new RouteValueDictionary(new { @id = "includeBettermentNo", style = "margin-left:5px; margin-right:20px;" }).AddIf(Model.DisableField("mainSection", "IsIncludeBetterment"), "disabled", "disabled"))
+                                                <label for="includeBettermentNo" style="font-size:14px; font-weight: 500 !important;">No</label>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="mapPreviewModal" class="modal bs-map-modal" style="display: none;">
+    <!-- Modal content -->
+    <div class="modal-content" style="width: 40%; left: 27%; top: 20%; height: auto !important;">
+        <span class="close" data-dismiss="modal">×</span>
+        <iframe id="mapFrame" @*width="590"*@ height="300" style="z-index: 1;"></iframe>
+    </div>
+</div>
+
+@Html.HiddenFor(x => x.AgencyId)
+@Html.HiddenFor(x => x.PropertyId)
+@Html.HiddenFor(x => x.AgencySequenceId)
+@Html.HiddenFor(x => x.SupportDocumentClassID)
+@Html.HiddenFor(x => x.AcceptedFileTypes)
+@Html.HiddenFor(x => x.SupportDocs)
+@Html.HiddenFor(x => x.SupportQuoteDocs)
+@Html.HiddenFor(x => x.SchoolName)
+@Html.HiddenFor(x => x.SchoolAddress)
+@Html.HiddenFor(x => x.Phone)
+@Html.HiddenFor(x => x.SchoolLimit)
+@Html.HiddenFor(x => x.WorkCategoryId)
+@Html.HiddenFor(x => x.WorkCategoryDesc)
+@Html.HiddenFor(x => x.SchoolEmail)
+@Html.HiddenFor(x => x.Area)
+@Html.HiddenFor(x => x.CallLogFITSId)
+@Html.HiddenFor(x => x.ServiceReportId)
+@Html.HiddenFor(x => x.Claim.TotalAvailableToClaimThisMonth)
+@Html.HiddenFor(x => x.CallbackUrl)
+@Html.HiddenFor(x => x.SupportDocumentsCount)
+@Html.HiddenFor(x => x.SupportQuoteDocumentsCount)
+
+@Html.HiddenFor(x => x.Version)
+@Html.HiddenFor(x => x.DetailsTab.SubContractorId)
+@Html.HiddenFor(x => x.DetailsTab.AssignedTradieIds)
+@Html.HiddenFor(x => x.DetailsTab.SubContractorRespondedDate)
+@Html.HiddenFor(x => x.CallLogDate)
+@Html.HiddenFor(x => x.DetailsTab.SubContractorName)
+
+@Html.HiddenFor(x => x.SaveType)
+@Html.HiddenFor(x => x.DetailsTab.HasAtleastOneApprovedClaim)
+@Html.HiddenFor(x => x.DetailsTab.ClaimFinalizedForJobStatusValidation)
+@Html.HiddenFor(x => x.DetailsTab.ContractorReclaimedDateForJobStatusValidation)
+@Html.HiddenFor(x => x.DetailsTab.ValidateCompFirstDates)
+@Html.HiddenFor(x => x.DetailsTab.CallLogDateVal)
+@Html.HiddenFor(x => x.DetailsTab.RequestedBy)
+@Html.HiddenFor(x => x.Claim.ServiceReportStatusIdForValidation)
+@Html.HiddenFor(x => x.DetailsTab.ValidateDatesOnEstimateFinalised)
+@Html.HiddenFor(x => x.Estimate.AMUApprovedDate)
+@if (!Model.IsAMURegion)
+{
+    @Html.HiddenFor(x => x.Estimate.FMCApprovedDate)
+}
+@Html.HiddenFor(x => x.Estimate.OriginalEstimate)
+@Html.HiddenFor(x => x.ASOEmail)
+@Html.HiddenFor(x => x.Estimate.MaxApprovedWorkOrderAmount)
+@Html.HiddenFor(x => x.Claim.TotalAmount)
+@Html.HiddenFor(x => x.Claim.TotalApprovedAmount)
+@Html.ValidationSummary()
